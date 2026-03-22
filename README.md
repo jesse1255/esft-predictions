@@ -18,6 +18,9 @@ Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
 | II | Emergent gauge symmetry from Hopf soliton topology | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
 | III | Electron mass from topological string tension | Phys. Rev. Lett. (submitted) | [10.5281/zenodo.19159513](https://doi.org/10.5281/zenodo.19159513) |
 | IV | BKT topological phase transition | (in preparation) | — |
+| V | Multi-soliton landscape and mass spectrum | (planned) | — |
+| VI | ESFT cosmology: late-time phase relaxation | (planned) | — |
+| VII | Born rule and coherence floor | (planned) | — |
 
 ## Repository Structure
 
@@ -41,6 +44,15 @@ esft-predictions/
 ├── paper4/                             ← Paper IV: BKT phase transition
 │   ├── README.md                       ← Full parameter table + algorithm
 │   └── bkt_animation.py                ← Monte Carlo simulation → MP4
+│
+├── paper5/                             ← Paper V: Multi-soliton landscape (planned)
+│   └── README.md                       ← Research direction + preliminary results
+│
+├── paper6/                             ← Paper VI: ESFT cosmology (planned)
+│   └── README.md                       ← Framework + vacuum energy formula
+│
+├── paper7/                             ← Paper VII: Born rule + coherence floor (planned)
+│   └── README.md                       ← Prediction + testability window
 │
 └── scripts/                            ← Cross-paper tools
     ├── verify_predictions.py           ← All 24 predictions in one run
