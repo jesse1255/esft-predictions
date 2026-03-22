@@ -1,11 +1,8 @@
-# ESFT Simulations
+# Paper IV — BKT Topological Phase Transition
 
-Numerical simulations supporting the ESFT paper series. Each script is self-contained,
-deterministic, and maps to a specific paper section.
+**Journal:** (in preparation)
 
----
-
-## BKT Topological Phase Transition
+## BKT Phase Transition Simulation
 
 **Script:** `bkt_animation.py`
 **Supports:** Paper IV, Sec. 3 — Topological locking mechanism

@@ -1,46 +1,71 @@
 # ESFT — Energy String Field Theory
 
-## Numerical Verification
-
-This repository contains verification scripts and simulations for the quantitative
+Numerical verification, derivation chains, and simulations for the quantitative
 predictions of Energy String Field Theory (ESFT).
 
-### Papers
+![Predicted vs Observed](predictions_vs_experiment.png)
+
+*Left: mass predictions (log-log, MeV). Right: dimensionless predictions.
+Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
+
+---
+
+## Papers
 
 | Paper | Title | Journal | Zenodo DOI |
 |-------|-------|---------|------------|
 | I | Topological soliton coherence scale | Found. Phys. (under review) | [10.5281/zenodo.19154442](https://doi.org/10.5281/zenodo.19154442) |
-| II | Emergent gauge symmetry from Hopf soliton topology in ESFT | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
+| II | Emergent gauge symmetry from Hopf soliton topology | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
 | III | Electron mass from topological string tension | Phys. Rev. Lett. (submitted) | [10.5281/zenodo.19159513](https://doi.org/10.5281/zenodo.19159513) |
+| IV | BKT topological phase transition | (in preparation) | — |
 
-### Repository Structure
+## Repository Structure
 
 ```
-├── verify_predictions.py      # All 24 predictions vs experiment (Paper I–III)
-├── paper1/
-│   └── derivation_chain.py    # ϙ → α_EM → Λ_core → 7 domains (step-by-step)
-├── paper2/
-│   └── derivation_chain.py    # ϙ → √σ → α_s → hadron spectrum (step-by-step)
-├── paper3/
-│   └── derivation_chain.py    # ϙ + √σ + η → leptons + EW + heavy quarks
-└── simulations/
-    ├── README.md              # Simulation details & full parameter tables
-    └── bkt_animation.py       # BKT phase transition (Paper IV, Sec. 3)
+esft-predictions/
+├── README.md                           ← This file
+├── predictions_vs_experiment.png       ← 24 predictions vs experiment (45° plot)
+│
+├── paper1/                             ← Paper I: Soliton coherence scale
+│   ├── README.md                       ← Derivation chain diagram + domain table
+│   └── derivation_chain.py             ← ϙ → α_EM → Λ_core → 7 domains
+│
+├── paper2/                             ← Paper II: Emergent gauge symmetry
+│   ├── README.md                       ← Chain diagram + key results
+│   └── derivation_chain.py             ← ϙ → √σ → α_s → hadron spectrum
+│
+├── paper3/                             ← Paper III: Electron mass
+│   ├── README.md                       ← Chain diagram + key results
+│   └── derivation_chain.py             ← ϙ + √σ + η → leptons + EW + quarks
+│
+├── paper4/                             ← Paper IV: BKT phase transition
+│   ├── README.md                       ← Full parameter table + algorithm
+│   └── bkt_animation.py                ← Monte Carlo simulation → MP4
+│
+└── scripts/                            ← Cross-paper tools
+    ├── verify_predictions.py           ← All 24 predictions in one run
+    └── plot_predictions.py             ← Generate the comparison plot
 ```
 
-### Quick Start
+## Quick Start
 
 ```bash
-# Verify all 24 predictions (no dependencies beyond Python 3.x stdlib)
-python verify_predictions.py
+# Verify all 24 predictions (Python 3.x stdlib only)
+python scripts/verify_predictions.py
 
-# Run BKT simulation (requires numpy, matplotlib, ffmpeg)
-cd simulations
-pip install numpy matplotlib
-python bkt_animation.py
+# Step-by-step derivation for a specific paper
+python paper1/derivation_chain.py
+python paper2/derivation_chain.py
+python paper3/derivation_chain.py
+
+# BKT simulation (requires numpy, matplotlib, ffmpeg)
+cd paper4 && pip install numpy matplotlib && python bkt_animation.py
+
+# Regenerate comparison plot (requires numpy, matplotlib)
+python scripts/plot_predictions.py
 ```
 
-### Core Parameters
+## Core Parameters
 
 | Symbol | Value | Source | Role |
 |--------|-------|--------|------|
@@ -50,13 +75,7 @@ python bkt_animation.py
 
 All 24 predictions follow from these inputs. Zero additional free parameters beyond ϙ.
 
-### Results
-
-![Predicted vs Observed](predictions_vs_experiment.png)
-
-*Left: mass predictions (log-log, MeV). Right: dimensionless predictions. Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
-
-### Results Summary
+## Results Summary
 
 | Accuracy | Count | Examples |
 |----------|-------|----------|
@@ -65,7 +84,7 @@ All 24 predictions follow from these inputs. Zero additional free parameters bey
 | 5–15% | 7 | m_Δ − m_N, f_π, ... |
 | 15–25% | 3 | m_c, ... |
 
-### Reproducibility
+## Reproducibility
 
 Every script in this repository is deterministic (fixed random seeds where applicable)
 and self-contained. To reproduce any result:
@@ -76,7 +95,7 @@ and self-contained. To reproduce any result:
 
 No proprietary software, cloud APIs, or external datasets are required.
 
-### AI Disclosure
+## AI Disclosure
 
 AI-assisted tools were used for algebraic verification, numerical cross-checks,
 and manuscript preparation during the development of ESFT. The conceptual framework,
@@ -84,7 +103,7 @@ hypothesis selection, research direction, iterative branch decisions, and final
 interpretation of all results were determined by the author. The author takes sole
 responsibility for the content of all papers and code in this repository.
 
-### Author
+## Author
 
 Jesse C. P. Ting — Independent Researcher
 
@@ -97,6 +116,6 @@ my own; AI is used as a tool to accelerate checking, scanning, and refinement.
 - Email: jass168611@gmail.com
 - ORCID: [see Paper I]
 
-### License
+## License
 
 MIT
