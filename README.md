@@ -75,6 +75,13 @@ responsibility for the content of all papers and code in this repository.
 ### Author
 
 Jesse C. P. Ting — Independent Researcher
+
+I am an independent researcher working without institutional funding, laboratory
+infrastructure, or formal academic affiliation. My work is driven by long-developed
+physical intuition, iterative theoretical exploration, and AI-assisted computational
+support. The conceptual direction, model selection, and interpretive framework are
+my own; AI is used as a tool to accelerate checking, scanning, and refinement.
+
 - Email: jass168611@gmail.com
 - ORCID: [see Paper I]
 
