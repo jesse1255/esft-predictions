@@ -2,8 +2,8 @@
 
 ## Numerical Verification
 
-This repository contains the Python verification scripts for the quantitative predictions
-of Energy String Field Theory (ESFT).
+This repository contains verification scripts and simulations for the quantitative
+predictions of Energy String Field Theory (ESFT).
 
 ### Papers
 
@@ -13,34 +13,70 @@ of Energy String Field Theory (ESFT).
 | II | Emergent gauge symmetry from Hopf soliton topology in ESFT | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
 | III | Electron mass from topological string tension | Phys. Rev. Lett. (submitted) | [10.5281/zenodo.19159513](https://doi.org/10.5281/zenodo.19159513) |
 
+### Repository Structure
+
+```
+├── verify_predictions.py      # 24 predictions vs experiment (Paper I–III)
+└── simulations/
+    ├── README.md              # Simulation details & parameters
+    └── bkt_animation.py       # BKT phase transition (Paper IV, Sec. 3)
+```
+
 ### Quick Start
 
 ```bash
+# Verify all 24 predictions (no dependencies beyond Python 3.x stdlib)
 python verify_predictions.py
-```
 
-Requires only Python 3.x standard library (math module). No external dependencies.
+# Run BKT simulation (requires numpy, matplotlib, ffmpeg)
+cd simulations
+pip install numpy matplotlib
+python bkt_animation.py
+```
 
 ### Core Parameters
 
-| Symbol | Value | Source |
-|--------|-------|--------|
-| ϙ (Qoppa) | 0.003 fm | Paper I (fitted) |
-| √σ | 459 MeV | Paper II (derived) |
-| η | 1/4 | BKT exact (Nelson-Kosterlitz 1977) |
+| Symbol | Value | Source | Role |
+|--------|-------|--------|------|
+| ϙ (Qoppa) | 0.003 fm | Paper I, Eq. (12) | Fitted to α_EM; single free parameter |
+| √σ | 459 MeV | Paper II, Eq. (37) | Derived from ϙ via topological string tension |
+| η | 1/4 | Nelson–Kosterlitz (1977) | BKT universal exponent; not fitted |
+
+All 24 predictions follow from these inputs. Zero additional free parameters beyond ϙ.
 
 ### Results Summary
 
-24 predictions from 2 scales + BKT η = 1/4. Zero additional free parameters.
+| Accuracy | Count | Examples |
+|----------|-------|----------|
+| < 1% | 6 | α_s, m_b, m_e, m_ω, ⟨q̄q⟩, F |
+| 1–5% | 8 | m_τ, Λ_QCD, √σ_fund, ... |
+| 5–15% | 7 | m_Δ − m_N, f_π, ... |
+| 15–25% | 3 | m_c, ... |
 
-- **< 1%:** 6 predictions (α_s, m_b, m_e, m_ω, ⟨q̄q⟩, F)
-- **1-5%:** 8 predictions
-- **5-15%:** 7 predictions
-- **15-25%:** 3 predictions
+### Reproducibility
+
+Every script in this repository is deterministic (fixed random seeds where applicable)
+and self-contained. To reproduce any result:
+
+1. Clone this repo
+2. Run the relevant script
+3. Compare output to the values in the corresponding paper
+
+No proprietary software, cloud APIs, or external datasets are required.
+
+### AI Disclosure
+
+AI-assisted tools were used for algebraic verification, numerical cross-checks,
+and manuscript preparation during the development of ESFT. The conceptual framework,
+hypothesis selection, research direction, iterative branch decisions, and final
+interpretation of all results were determined by the author. The author takes sole
+responsibility for the content of all papers and code in this repository.
 
 ### Author
 
 Jesse C. P. Ting — Independent Researcher
+- Email: jass168611@gmail.com
+- ORCID: [see Paper I]
 
 ### License
 
