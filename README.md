@@ -50,6 +50,12 @@ python bkt_animation.py
 
 All 24 predictions follow from these inputs. Zero additional free parameters beyond ϙ.
 
+### Results
+
+![Predicted vs Observed](predictions_vs_experiment.png)
+
+*Left: mass predictions (log-log, MeV). Right: dimensionless predictions. Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
+
 ### Results Summary
 
 | Accuracy | Count | Examples |
