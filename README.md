@@ -16,9 +16,15 @@ predictions of Energy String Field Theory (ESFT).
 ### Repository Structure
 
 ```
-├── verify_predictions.py      # 24 predictions vs experiment (Paper I–III)
+├── verify_predictions.py      # All 24 predictions vs experiment (Paper I–III)
+├── paper1/
+│   └── derivation_chain.py    # ϙ → α_EM → Λ_core → 7 domains (step-by-step)
+├── paper2/
+│   └── derivation_chain.py    # ϙ → √σ → α_s → hadron spectrum (step-by-step)
+├── paper3/
+│   └── derivation_chain.py    # ϙ + √σ + η → leptons + EW + heavy quarks
 └── simulations/
-    ├── README.md              # Simulation details & parameters
+    ├── README.md              # Simulation details & full parameter tables
     └── bkt_animation.py       # BKT phase transition (Paper IV, Sec. 3)
 ```
 
