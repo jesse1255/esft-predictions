@@ -184,7 +184,7 @@ If you find errors, have questions, or want to collaborate, please reach out:
 
 ## Author
 
-Jesse C. P. Ting — Independent Researcher
+Jesse C. P. Won Ting — Independent Researcher
 
 I am an independent researcher working without institutional funding, laboratory
 infrastructure, or formal academic affiliation. My work is driven by long-developed
