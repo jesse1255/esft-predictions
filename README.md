@@ -67,6 +67,24 @@ All predictions below use a single fitted scale ϙ = 0.003 fm. The exponents n a
 
 ---
 
+## Testable Predictions
+
+ESFT makes several quantitative predictions that differ from the Standard Model and can be confirmed or ruled out by current or near-future experiments:
+
+| Prediction | Value | Where to Test | SM Expectation |
+|-----------|-------|---------------|----------------|
+| q₆ resonance | 65.78 GeV, J^P = 1/2⁻, Γ ≈ 3.2 MeV | LHC (ATLAS/CMS) | No such state predicted |
+| BKT phase transition in π-π scattering | Discontinuity at √s = 918 MeV | BESIII, COMPASS | Smooth crossover |
+| Electron g−2 soliton correction | δ(g/2) = 4.4 × 10⁻¹⁶ | Next-gen g−2 experiments | Zero (point particle) |
+| Soliton form factor (electron) | F(q) = (πqa/2)/sinh(πqa/2); 0.38% at 10 GeV, 9.6% at 50 GeV | Belle II, BES III | Point-like (F = 1) |
+| Density-dependent G | ΔG/G ~ 5 × 10⁻⁵ at neutron star density | Binary pulsar timing | G = const |
+| QNM triplet degeneracy | Ringdown amplitude × √3 from A₂ structure | LIGO/Virgo/KAGRA O5+ | Non-degenerate |
+| Coherence floor | Γ ~ 8 × 10⁻³ s⁻¹; testable when qubit T₁ > 10 s | Transmon/SQUID (5–10 yr) | No floor predicted |
+
+If any of these are experimentally excluded, the corresponding sector of ESFT is falsified.
+
+---
+
 ## ESFT vs Standard Model
 
 | Aspect | Standard Model | ESFT |
