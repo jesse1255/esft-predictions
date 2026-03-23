@@ -10,6 +10,34 @@ Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
 
 ---
 
+## Key Results (March 2026)
+
+| Result | ESFT Prediction | Experiment | Status |
+|--------|----------------|------------|--------|
+| Particle mass spectrum | 152 particles from one formula, zero fitted parameters | PDG 2024 | 98.7% within 10% |
+| CKM quark mixing | All 4 parameters derived from A₂ geometry | PDG | θ₁₃: 0.1%, θ₂₃: 1.1%, θ₁₂: 0.15%, δ_CP: 0.7% |
+| PMNS neutrino mixing | All 4 parameters derived from A₂ geometry | NuFIT 5.3 | θ₂₃: 0.02%, θ₁₂: 0.02%, θ₁₃: 1.6% |
+| Muon g−2 | Δa_μ = 3.4 × 10⁻⁹ (zero parameters) | Fermilab 2.5 × 10⁻⁹ | 36% (zero-parameter, no fit) |
+| Pion decay constant | f_π = 93.95 MeV | 92.07 MeV | 2.0% |
+| π-π scattering length | a₀⁰ = 0.214 | 0.220 ± 0.005 | 2.8% (improved from 29% at tree level) |
+| Newton's constant | Derived from soliton field equation | G_N | Exact (linearized Einstein equation) |
+| Born rule | Derived from soliton overlap geometry | — | Not postulated |
+| Electron mass | m_e = 0.510 MeV | 0.511 MeV | 0.2% |
+| Bottom quark mass | m_b = 4.17 GeV | 4.18 GeV | 0.2% |
+
+## ESFT vs Standard Model
+
+| Aspect | Standard Model | ESFT |
+|--------|---------------|------|
+| Free parameters | 19+ (masses, couplings, angles fitted to data) | 1 fitted scale (ϙ = 0.003 fm); rest derived |
+| Particle masses | Input parameters | Derived: m = Λε^n where n comes from topology |
+| CKM/PMNS mixing | 8 input parameters | Derived from A₂ root geometry (N_c = 3, N_w = 2) |
+| Gravity | Separate theory (GR), not unified | Emergent: linearized Einstein equation from soliton fields |
+| Quantum mechanics | Born rule postulated | Born rule derived from soliton overlap |
+| Mass hierarchy | Unexplained (why m_t/m_e ~ 10⁵?) | Fibonacci structure from SU(3)×SU(2) modulation |
+| Three generations | Unexplained | Three topological phases of the A₂ field |
+| Dark matter | Fitted profiles (NFW, etc.) | Predicted from soliton density distribution |
+
 ## Papers
 
 | Paper | Title | Journal | Zenodo DOI |
@@ -17,10 +45,14 @@ Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
 | I | Topological soliton coherence scale | Found. Phys. (under review) | [10.5281/zenodo.19154442](https://doi.org/10.5281/zenodo.19154442) |
 | II | Emergent gauge symmetry from Hopf soliton topology | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
 | III | Electron mass from topological string tension | Phys. Rev. Lett. (submitted) | [10.5281/zenodo.19159513](https://doi.org/10.5281/zenodo.19159513) |
-| IV | BKT topological phase transition | (in preparation) | — |
-| V | Multi-soliton landscape and mass spectrum | (planned) | — |
-| VI | ESFT cosmology: late-time phase relaxation | (planned) | — |
-| VII | Born rule and coherence floor | (planned) | — |
+| IV | BKT topological protection in ESFT | PRB/PRD (in preparation) | — |
+| V | Hadronic physics from topological string tension | PRC (in preparation) | — |
+| VI | Gravity as emergent topological polarization | PRD (in preparation) | — |
+| VII | Fibonacci structure of fermion masses | PRD (in preparation) | — |
+| VIII | Black holes, entropy, and gravitational phenomenology | PRD (in preparation) | — |
+| IX | CKM and PMNS mixing from A₂ root geometry | PRD (in preparation) | — |
+| X | Quantum mechanics as emergent soliton dynamics | PRD (in preparation) | — |
+| XI | Scattering amplitudes from topological soliton interactions | PRD (in preparation) | — |
 
 ## Repository Structure
 
@@ -45,17 +77,30 @@ esft-predictions/
 │   ├── README.md                       ← Full parameter table + algorithm
 │   └── bkt_animation.py                ← Monte Carlo simulation → MP4
 │
-├── paper5/                             ← Paper V: Multi-soliton landscape (planned)
-│   └── README.md                       ← Research direction + preliminary results
+├── paper5/                             ← Paper V: Hadronic physics
+│   └── README.md                       ← f_π, m_ω, nucleon core, N-Δ splitting
 │
-├── paper6/                             ← Paper VI: ESFT cosmology (planned)
-│   └── README.md                       ← Framework + vacuum energy formula
+├── paper6/                             ← Paper VI: Emergent gravity
+│   └── README.md                       ← Newton's constant, Sakharov consistency
 │
-├── paper7/                             ← Paper VII: Born rule + coherence floor (planned)
-│   └── README.md                       ← Prediction + testability window
+├── paper7/                             ← Paper VII: Fibonacci fermion masses
+│   └── README.md                       ← Quark/lepton mass formula, Koide relation
+│
+├── paper8/                             ← Paper VIII: Black holes & gravitational phenomenology
+│   └── README.md                       ← BH entropy, Hawking, QNMs, TOV mass
+│
+├── paper9/                             ← Paper IX: CKM & PMNS mixing
+│   └── README.md                       ← All 8 mixing parameters from A₂ geometry
+│
+├── paper10/                            ← Paper X: Emergent quantum mechanics
+│   └── README.md                       ← Born rule, decoherence, path integral
+│
+├── paper11/                            ← Paper XI: Scattering amplitudes
+│   └── README.md                       ← π-π scattering, form factors, 5 predictions
 │
 └── scripts/                            ← Cross-paper tools
-    ├── verify_predictions.py           ← All 24 predictions in one run
+    ├── verify_predictions.py           ← Original 24 predictions in one run
+    ├── verify_all_papers.py            ← Full 152+ prediction verification
     └── plot_predictions.py             ← Generate the comparison plot
 ```
 
@@ -64,6 +109,9 @@ esft-predictions/
 ```bash
 # Verify all 24 predictions (Python 3.x stdlib only)
 python scripts/verify_predictions.py
+
+# Full verification across all 11 papers
+python scripts/verify_all_papers.py
 
 # Step-by-step derivation for a specific paper
 python paper1/derivation_chain.py
@@ -89,12 +137,18 @@ All 24 predictions follow from these inputs. Zero additional free parameters bey
 
 ## Results Summary
 
-| Accuracy | Count | Examples |
-|----------|-------|----------|
-| < 1% | 6 | α_s, m_b, m_e, m_ω, ⟨q̄q⟩, F |
-| 1–5% | 8 | m_τ, Λ_QCD, √σ_fund, ... |
-| 5–15% | 7 | m_Δ − m_N, f_π, ... |
-| 15–25% | 3 | m_c, ... |
+Papers I–III established 24 predictions from 2 scales (ϙ, √σ) + BKT η = 1/4.
+Papers IV–XI extend this to 152+ predictions covering the full particle spectrum,
+mixing matrices, gravity, quantum mechanics, and scattering.
+
+| Scope | Count | Best accuracy |
+|-------|-------|---------------|
+| Particle masses (Papers III, VII) | 152 | m_e: 0.2%, m_b: 0.2% |
+| CKM mixing (Paper IX) | 4 parameters | θ₁₃: 0.1% |
+| PMNS mixing (Paper IX) | 4 parameters | θ₂₃: 0.02% |
+| Hadronic physics (Paper V) | 5 observables | m_ω: 0.3%, f_π: 2.0% |
+| Scattering (Paper XI) | 2 amplitudes + predictions | π-π: 2.8% |
+| Gravity (Paper VI) | G_N derived exactly | Linearized Einstein eq. |
 
 ## Reproducibility
 
@@ -114,6 +168,19 @@ and manuscript preparation during the development of ESFT. The conceptual framew
 hypothesis selection, research direction, iterative branch decisions, and final
 interpretation of all results were determined by the author. The author takes sole
 responsibility for the content of all papers and code in this repository.
+
+## Call for Collaboration
+
+ESFT is independent, unfunded research. I welcome collaboration from researchers working in:
+
+- **Topological phases of matter** — soliton physics, skyrmions, vortex dynamics
+- **BKT transitions** — topological protection, 2D phase transitions in 3+1D systems
+- **Emergent symmetry** — gauge structure from topology, condensed matter analogies
+- **Beyond-Standard-Model physics** — parameter-free approaches to mass generation
+- **Mathematical physics** — A₂ root systems, Hopf fibrations, Fibonacci structures in physics
+
+If you find errors, have questions, or want to collaborate, please reach out:
+**Contact:** jass168611@gmail.com
 
 ## Author
 

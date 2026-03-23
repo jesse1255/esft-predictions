@@ -1,0 +1,8 @@
+*.pdf
+*.zip
+*.npz
+*.npy
+*.pyc
+__pycache__/
+*.pkl
+*.mp4

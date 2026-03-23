@@ -1,52 +1,39 @@
-# Paper VI — ESFT Cosmology: Late-Time Phase Relaxation
+# Paper VI — Gravity as Emergent Topological Polarization
 
-**Journal:** (planned)
-**Status:** Minimal fit model complete; data comparison in progress
+**Journal:** Physical Review D (in preparation)
 
-## Research Direction
+## Summary
 
-Paper VI connects ESFT to cosmological observables by deriving late-time modifications
-to the expansion history from the topological phase field dynamics.
+Derives Newton's constant and the linearized Einstein equation from the ESFT
+soliton field equation. Gravity emerges as topological polarization — the
+progressive alignment of soliton topological directions under matter density.
 
-The core mechanism: three-mode phase relaxation produces a **Hubble–Γ dynamic equilibrium**
-that modifies the effective dark energy density at late times, while leaving early-universe
-(CMB) physics untouched.
+## Key Results
 
-### Framework
+| Result | Value | Notes |
+|--------|-------|-------|
+| Newton's constant | G = g²/(8πf⁴) = G_N exactly | Classical derivation from ESFT field equation |
+| Sakharov consistency | G_Sakharov ~ 1/M_Pl² | Independent quantum derivation agrees |
+| Density dependence | G_eff(ρ) = G₀ × P(ρ) | BKT-driven polarization |
+| Neutron star ΔG/G | ~5 × 10⁻⁵ | Testable via binary pulsar timing |
+| Equivalence principle | Universal | Every soliton carries topological direction |
 
-The cosmological modification is controlled by three parameters, all derivable from ESFT:
+### Two Independent Routes to G_N
 
-| Parameter | Meaning | Best-fit value |
-|-----------|---------|---------------|
-| ε | Amplitude of late-time modification | 0.173 |
-| a_c | Scale factor at onset (z_c ≈ 0.91) | 0.525 |
-| Δ | Transition sharpness | 0.003 |
+1. **Classical:** ESFT Poisson equation → linearized Einstein equation → G = G_N exact
+2. **Quantum:** Sakharov induced gravity with N_eff = 6π → G ~ 1/M_Pl²
 
-**Theory bridge:** All three parameters trace back to a single function Γ_relax(a) —
-the relaxation rate of the topological phase field.
+The agreement between classical and quantum derivations is a non-trivial consistency check.
 
-### Preliminary Results
+### Black Hole Predictions (Paper VIII)
 
-- ΛCDM χ² = 998.78, ESFT best χ² = 971.40 → **Δχ² = −27.38 (ESFT preferred)**
-- Tested against: DESI DR2 BAO (14 pts), Pantheon+ SN (20 bins), fσ8 (16 pts)
-- Unique ESFT signature: synchronized triple transition (H + fσ8 + lensing) at same z_c
-
-### Vacuum Energy
-
-The vacuum energy formula:
-
-```
-ρ_Λ = ½(ℏH₀)² t² exp(2b/√t)
-```
-
-where t is the KT reduced temperature and b ≈ π/2 is the BKT vortex unbinding constant.
-If b ≈ 1.3, this yields ρ_Λ ~ 10⁻⁴⁷ GeV⁴ — matching observation with zero free parameters.
+- Black holes = gravitational superconductors (complete topological locking, P = 1)
+- Type I (Schwarzschild) / Type II (Kerr) classification
+- BH entropy: S = (A/4ℓ_P²) × ln 3 from A₂ Z₃ symmetry
+- Hawking enhancement: 58.5% from ln 3 factor
 
 ### Prerequisites
 
-- **Paper I:** Core scale ϙ and KT reduced temperature t = 1.1×10⁻³
-- **Paper IV:** BKT mechanism and vortex unbinding constant b
-
-### Scripts
-
-Data fitting and cosmological evolution scripts will be added upon manuscript completion.
+- **Paper I:** Core scale ϙ
+- **Paper II:** SU(3) structure, A₂ root lattice
+- **Paper IV:** BKT mechanism for topological locking
