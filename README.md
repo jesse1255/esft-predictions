@@ -20,16 +20,16 @@ Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
 | Muon g−2 | Δa_μ = 3.4 × 10⁻⁹ (zero parameters) | Fermilab 2.5 × 10⁻⁹ | 36% (zero-parameter, no fit) |
 | Pion decay constant | f_π = 93.95 MeV | 92.07 MeV | 2.0% |
 | π-π scattering length | a₀⁰ = 0.214 | 0.220 ± 0.005 | 2.8% (improved from 29% at tree level) |
-| Newton's constant | Derived from soliton field equation | G_N | Exact (linearized Einstein equation) |
-| Born rule | Derived from soliton overlap geometry | — | Not postulated |
+| Newton's constant | Obtained from soliton field equation | G_N | Linearized Einstein equation reproduced |
+| Born rule | Obtained from soliton Fokker-Planck dynamics | — | Not postulated |
 | Electron mass | m_e = 0.510 MeV | 0.511 MeV | 0.2% |
 | Bottom quark mass | m_b = 4.17 GeV | 4.18 GeV | 0.2% |
 
-## Why These Numbers Are Not Fitted
+## Structure of the Predictions
 
-A common first reaction: *how can one formula match 152 particles?* The answer is that these are not fits. The mass formula m = Λε^n contains no adjustable parameters — the exponent n is fixed by the topological winding number, and its numerator and denominator are built from exactly two integers: the color gauge dimension N_c = 3 and the weak isospin dimension N_w = 2. These are the same integers that define SU(3) × SU(2) × U(1) in the Standard Model, but here they are not inputs — they arise from the rank-3 Hopf soliton topology (Paper II).
+The mass formula m = Λε^n contains no continuously adjustable parameters. The exponent n is determined by the topological winding number, with its numerator and denominator built from the color gauge dimension N_c = 3 and the weak isospin dimension N_w = 2. These integers also define the Standard Model gauge group SU(3) × SU(2) × U(1); within ESFT, they arise from the rank-3 Hopf soliton topology (Paper II).
 
-Every deviation from experiment therefore has a structural meaning: it reflects either (a) a higher-order topological correction not yet included, or (b) a genuine prediction that differs from the Standard Model. The two worst cases (η meson at 16.7% and W boson at 13.9%) are traced to specific physical mechanisms (axial anomaly and Weinberg angle splitting) that, when corrected using only N_c and N_w, bring both within 3%.
+Deviations from experiment have identifiable structural origins: either (a) a higher-order topological correction not yet included, or (b) a point where ESFT and the Standard Model make different predictions. The two largest deviations (η meson at 16.7% and W boson at 13.9%) are traced to the axial anomaly and Weinberg angle splitting respectively; corrections using only N_c and N_w reduce both to within 3%.
 
 ### Fermion Masses — Zero Free Parameters
 
@@ -74,11 +74,11 @@ All predictions below use a single fitted scale ϙ = 0.003 fm. The exponents n a
 | Free parameters | 19+ (masses, couplings, angles fitted to data) | 1 fitted scale (ϙ = 0.003 fm); rest derived |
 | Particle masses | Input parameters | Derived: m = Λε^n where n comes from topology |
 | CKM/PMNS mixing | 8 input parameters | Derived from A₂ root geometry (N_c = 3, N_w = 2) |
-| Gravity | Separate theory (GR), not unified | Emergent: linearized Einstein equation from soliton fields |
-| Quantum mechanics | Born rule postulated | Born rule derived from soliton overlap |
-| Mass hierarchy | Unexplained (why m_t/m_e ~ 10⁵?) | Fibonacci structure from SU(3)×SU(2) modulation |
-| Three generations | Unexplained | Three topological phases of the A₂ field |
-| Dark matter | Fitted profiles (NFW, etc.) | Predicted from soliton density distribution |
+| Gravity | Separate framework (GR) | Linearized Einstein equation obtained from soliton fields |
+| Quantum mechanics | Born rule postulated | Born rule obtained from soliton Fokker-Planck dynamics |
+| Mass hierarchy | Not derived (m_t/m_e ~ 10⁵ unexplained) | Fibonacci structure from SU(3)×SU(2) modulation |
+| Three generations | Not derived | Mapped to three topological phases of the A₂ field |
+| Dark matter profiles | Fitted (NFW, etc.) | Obtained from soliton density distribution |
 
 ## Papers
 
@@ -190,7 +190,7 @@ mixing matrices, gravity, quantum mechanics, and scattering.
 | PMNS mixing (Paper IX) | 4 parameters | θ₂₃: 0.02% |
 | Hadronic physics (Paper V) | 5 observables | m_ω: 0.3%, f_π: 2.0% |
 | Scattering (Paper XI) | 2 amplitudes + predictions | π-π: 2.8% |
-| Gravity (Paper VI) | G_N derived exactly | Linearized Einstein eq. |
+| Gravity (Paper VI) | G_N obtained | Linearized Einstein eq. reproduced |
 
 ## Reproducibility
 
@@ -228,11 +228,9 @@ If you find errors, have questions, or want to collaborate, please reach out:
 
 Jesse C. P. Won Ting — Independent Researcher
 
-I am an independent researcher working without institutional funding, laboratory
-infrastructure, or formal academic affiliation. My work is driven by long-developed
-physical intuition, iterative theoretical exploration, and AI-assisted computational
-support. The conceptual direction, model selection, and interpretive framework are
-my own; AI is used as a tool to accelerate checking, scanning, and refinement.
+Independent researcher. The conceptual direction, model selection, and interpretive
+framework are my own; AI-assisted tools were used to accelerate algebraic verification
+and numerical cross-checks.
 
 - Email: jass168611@gmail.com
 - ORCID: [see Paper I]
