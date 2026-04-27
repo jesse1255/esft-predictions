@@ -100,21 +100,45 @@ If any of these are experimentally excluded, the corresponding sector of ESFT is
 
 ## Papers
 
-| Paper | Title | Status | Zenodo DOI |
-|-------|-------|--------|------------|
-| I | Topological soliton coherence scale | Preprint v2 | [10.5281/zenodo.19802907](https://doi.org/10.5281/zenodo.19802907) |
-| II | Emergent gauge symmetry from Hopf soliton topology | Preprint v2 | [10.5281/zenodo.19803030](https://doi.org/10.5281/zenodo.19803030) |
-| III | Electron mass from topological string tension | Preprint v2 | [10.5281/zenodo.19803049](https://doi.org/10.5281/zenodo.19803049) |
-| IV | BKT topological protection in ESFT | In preparation | — |
-| V | Hadronic physics from topological string tension | In preparation | — |
-| VI | Gravity as emergent topological polarization | In preparation | — |
-| VII | Fibonacci structure of fermion masses | In preparation | — |
-| VIII | Black holes, entropy, and gravitational phenomenology | In preparation | — |
-| IX | CKM and PMNS mixing from A₂ root geometry | In preparation | — |
-| X | Quantum mechanics as emergent soliton dynamics | In preparation | — |
-| XI | Scattering amplitudes from topological soliton interactions | In preparation | — |
-| XII | Cosmological history from topological phase transitions | In preparation | — |
-| XIII | Unified ESFT framework | In preparation | — |
+### Published Preprints
+
+| Paper | Title | Zenodo DOI |
+|-------|-------|------------|
+| I | Topological soliton coherence scale | [10.5281/zenodo.19802907](https://doi.org/10.5281/zenodo.19802907) |
+| II | Emergent gauge symmetry from Hopf soliton topology | [10.5281/zenodo.19803030](https://doi.org/10.5281/zenodo.19803030) |
+| III | Electron mass from topological string tension | [10.5281/zenodo.19803049](https://doi.org/10.5281/zenodo.19803049) |
+
+### In Preparation (IV–XIII)
+
+**Paper IV: BKT Topological Protection.**
+Establishes why particles are stable. The BKT vortex binding mechanism arises naturally from the Hopf fibration structure, providing exact topological protection for all soliton states. Extends BKT theory to coupled three-field systems. Derives a density-driven phase transition relevant to astrophysical environments. Explains proton longevity and quark-gluon plasma near-perfect fluidity from the same mechanism.
+
+**Paper V: Hadronic Physics.**
+Derives nuclear force parameters from the same framework that produces particle masses. Addresses the pion decay constant, vector meson masses, the nucleon hard-core radius, and the nucleon-delta mass splitting, all from a single starting point with no additional free parameters.
+
+**Paper VI: Emergent Gravity.**
+Proposes that gravity is not fundamental but emerges from the progressive alignment of soliton topological directions under increasing matter density. Derives Newton's constant from two independent routes (classical field equation and quantum induced gravity). Shows that the full nonlinear Einstein equation follows from three independent mathematical arguments. Predicts density-dependent gravitational coupling testable by binary pulsar timing.
+
+**Paper VII: Fibonacci Structure of Fermion Masses.**
+Resolves why quarks and leptons have the masses they do. The mass exponents decompose into an SU(3) color ladder and SU(2) weak modulation whose numerators follow Fibonacci sequences. Reproduces all six quark masses and three charged lepton masses with zero free parameters. Derives the Koide relation as a geometric identity.
+
+**Paper VIII: Black Holes and Gravitational Phenomenology.**
+Develops consequences of emergent gravity for black holes, neutron stars, and gravitational waves. Identifies black holes as regions of complete topological locking with a Type I/II classification. The three-field structure produces distinctive signatures in black hole entropy, Hawking radiation, and gravitational wave ringdown. Predicts a modified neutron star maximum mass accommodating mass-gap objects. Identifies a topological phase boundary near the horizon producing gravitational wave echoes at a characteristic timescale distinguishable from competing models.
+
+**Paper IX: CKM and PMNS Mixing.**
+Derives all eight quark and neutrino mixing parameters (four CKM + four PMNS) from root-lattice geometry with zero free parameters. The Standard Model treats these as independent inputs; ESFT derives them from the same algebraic structure that determines particle masses. Reveals a structural quark-lepton complementarity: CKM angles arise from mass-ratio suppression while PMNS angles are direct geometric projections.
+
+**Paper X: Emergent Quantum Mechanics.**
+Proposes that quantum mechanics is not fundamental but emerges from classical soliton dynamics near a topological phase transition. The Born rule, superposition, interference, measurement-induced collapse, and Bell nonlocality all emerge from the underlying field theory without additional axioms. The complex structure of Hilbert space follows from the circular topology of the phase field. Derives quantitative decoherence rates from soliton-phonon scattering.
+
+**Paper XI: Scattering Amplitudes.**
+Bridges the gap between static mass predictions and dynamical scattering processes. Connects topological soliton interactions to measurable cross sections using sine-Gordon integrability and collective coordinate methods. Achieves significant improvement over tree-level results through topological corrections. Makes several testable predictions including a new narrow resonance as a unique collider search target with no Standard Model counterpart.
+
+**Paper XII: Cosmological Predictions.**
+Demonstrates that four fundamental quantities spanning 96 orders of magnitude—dark matter relaxation, vacuum energy, CMB temperature, and neutrino mass—all derive from a single algebraic object through different projection rules. Resolves the cosmological constant problem, predicts the neutrino mass consistent with oscillation data and cosmological bounds, and addresses baryogenesis through critical slowing at a topological phase transition. No adjustable parameters.
+
+**Paper XIII: Unified Master Equation.**
+Derives a single equation that simultaneously contains gauge forces and gravity as two projections of the same underlying field. The spacetime metric and gauge connection are both functionals of the phase field rather than independent fields. Verifies that all results from Papers I–XII emerge as limiting cases. Resolves the three open mathematical problems of the unified framework: metric functional form, self-consistent coupling existence, and cross-sector hierarchy stability.
 
 ## Repository Structure
 
