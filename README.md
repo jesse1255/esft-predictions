@@ -10,7 +10,7 @@ Dashed line = perfect agreement. Green < 5%, yellow 5–15%, red > 15%.*
 
 ---
 
-## Key Results (March 2026)
+## Key Results (April 2026)
 
 | Result | ESFT Prediction | Experiment | Status |
 |--------|----------------|------------|--------|
@@ -100,19 +100,21 @@ If any of these are experimentally excluded, the corresponding sector of ESFT is
 
 ## Papers
 
-| Paper | Title | Journal | Zenodo DOI |
-|-------|-------|---------|------------|
-| I | Topological soliton coherence scale | Found. Phys. (under review) | [10.5281/zenodo.19154442](https://doi.org/10.5281/zenodo.19154442) |
-| II | Emergent gauge symmetry from Hopf soliton topology | Phys. Rev. D (submitted) | [10.5281/zenodo.19159255](https://doi.org/10.5281/zenodo.19159255) |
-| III | Electron mass from topological string tension | Phys. Rev. Lett. (submitted) | [10.5281/zenodo.19159513](https://doi.org/10.5281/zenodo.19159513) |
-| IV | BKT topological protection in ESFT | PRB/PRD (in preparation) | — |
-| V | Hadronic physics from topological string tension | PRC (in preparation) | — |
-| VI | Gravity as emergent topological polarization | PRD (in preparation) | — |
-| VII | Fibonacci structure of fermion masses | PRD (in preparation) | — |
-| VIII | Black holes, entropy, and gravitational phenomenology | PRD (in preparation) | — |
-| IX | CKM and PMNS mixing from A₂ root geometry | PRD (in preparation) | — |
-| X | Quantum mechanics as emergent soliton dynamics | PRD (in preparation) | — |
-| XI | Scattering amplitudes from topological soliton interactions | PRD (in preparation) | — |
+| Paper | Title | Status | Zenodo DOI |
+|-------|-------|--------|------------|
+| I | Topological soliton coherence scale | Preprint v2 | [10.5281/zenodo.19802907](https://doi.org/10.5281/zenodo.19802907) |
+| II | Emergent gauge symmetry from Hopf soliton topology | Preprint v2 | [10.5281/zenodo.19803030](https://doi.org/10.5281/zenodo.19803030) |
+| III | Electron mass from topological string tension | Preprint v2 | [10.5281/zenodo.19803049](https://doi.org/10.5281/zenodo.19803049) |
+| IV | BKT topological protection in ESFT | In preparation | — |
+| V | Hadronic physics from topological string tension | In preparation | — |
+| VI | Gravity as emergent topological polarization | In preparation | — |
+| VII | Fibonacci structure of fermion masses | In preparation | — |
+| VIII | Black holes, entropy, and gravitational phenomenology | In preparation | — |
+| IX | CKM and PMNS mixing from A₂ root geometry | In preparation | — |
+| X | Quantum mechanics as emergent soliton dynamics | In preparation | — |
+| XI | Scattering amplitudes from topological soliton interactions | In preparation | — |
+| XII | Cosmological history from topological phase transitions | In preparation | — |
+| XIII | Unified ESFT framework | In preparation | — |
 
 ## Repository Structure
 
@@ -198,8 +200,8 @@ All 24 predictions follow from these inputs. Zero additional free parameters bey
 ## Results Summary
 
 Papers I–III established 24 predictions from 2 scales (ϙ, √σ) + BKT η = 1/4.
-Papers IV–XI extend this to 152+ predictions covering the full particle spectrum,
-mixing matrices, gravity, quantum mechanics, and scattering.
+Papers IV–XIII extend this to 152+ predictions covering the full particle spectrum,
+mixing matrices, gravity, quantum mechanics, scattering, cosmology, and unification.
 
 | Scope | Count | Best accuracy |
 |-------|-------|---------------|
