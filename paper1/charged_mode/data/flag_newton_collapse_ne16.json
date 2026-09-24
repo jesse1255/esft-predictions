@@ -1,0 +1,38 @@
+{
+ "ne": 16,
+ "l3": 0,
+ "E_embedded": 321.43881532856653,
+ "description": "Damped Newton (run_flag_branch.py) started from the unstable embedded Hopfion. Every run ends in the vacuum (E = 0, Hopf degree 0): the charge is lost on the lattice.",
+ "runs": [
+  {
+   "model": "M2 (kappa3=0)",
+   "lam": 1.0,
+   "kappa3": 0.0,
+   "start": "embedded + 0.3*critical mode (lambda pencil)",
+   "E": 1.1701227564288374e-15,
+   "D": 0.05593457968315091,
+   "newton_iterations": 30
+  },
+  {
+   "model": "kappa3 family",
+   "lam": 1.0,
+   "kappa3": 0.6,
+   "start": "embedded + 0.3*critical mode at kappa3*",
+   "E": 4.8502520475361004e-20,
+   "D": 0.046022110560702115,
+   "Q": -1.5769952712563594e-24,
+   "newton_iterations": 56
+  },
+  {
+   "model": "kappa3 family",
+   "lam": 1.0,
+   "kappa3": 0.88,
+   "start": "embedded + 0.1*critical mode at kappa3*",
+   "E": 0.0,
+   "D": 0.0001646,
+   "Q": 0.0,
+   "newton_iterations": 78,
+   "note": "from the run log (process stopped before its JSON was written)"
+  }
+ ]
+}

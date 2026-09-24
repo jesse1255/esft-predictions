@@ -1,0 +1,26 @@
+{
+ "ne": 48,
+ "e": 0.3,
+ "N": 1.0,
+ "mu": 1.0,
+ "sectors": [
+  {
+   "k": 0,
+   "nfree": 90916,
+   "M_phi": 1,
+   "grad_at_background": 4.244123693397813e-07,
+   "asym": 2.9802322387695312e-08,
+   "eigenvalues": [
+    -4.099901779535883e-05,
+    -1.0396596257511437e-10,
+    0.9998379818236636,
+    0.9998379818458811,
+    0.9998580637552683,
+    0.9998580637566623
+   ],
+   "t_assemble": 69.93097591400146,
+   "t_eig": 1134.4698667526245
+  }
+ ],
+ "description": "Lowest eigenvalues of the soliton Hessian with the gauge field relaxed (Schur complement), generalised with the L\u00b2 mass of the matter perturbation; the vacuum continuum starts at \u03bc\u00b2 = 1. Local part of the fixed-charge term only (the rest is PSD)."
+}
