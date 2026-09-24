@@ -1,0 +1,289 @@
+{
+ "A_constants": {
+  "alpha": 0.0072973525692838015,
+  "me_MeV": 0.51099895,
+  "hbarc_MeVfm": 197.3269804,
+  "lambdabar_C_fm": 386.1592678419398,
+  "bohr_radius_fm": 52917.72107426617
+ },
+ "B1_energy": {
+  "statement": "E = ∫|∇Θ|² d³x with |∇Θ| = n/√(r²+a²) diverges linearly at r → ∞ (IR), not at the origin; the core changes E only by the finite amount -2π²n²a.",
+  "rows": [
+   {
+    "R_over_a": 10.0,
+    "E_closed_form": 107.17697056725073,
+    "E_quad": 107.17697056725072,
+    "E_over_R": 10.717697056725074
+   },
+   {
+    "R_over_a": 100.0,
+    "E_closed_form": 1237.023512151343,
+    "E_quad": 1237.023512151343,
+    "E_over_R": 12.370235121513431
+   },
+   {
+    "R_over_a": 1000.0,
+    "E_closed_form": 12546.64397192342,
+    "E_quad": 12546.64397192343,
+    "E_over_R": 12.54664397192342
+   },
+   {
+    "R_over_a": 10000.0,
+    "E_closed_form": 125643.96819142661,
+    "E_quad": 125643.96819142654,
+    "E_over_R": 12.564396819142662
+   }
+  ],
+  "unregularised_contribution_r_below_1em3": 0.012566370614359173,
+  "dE_da_large_R": -19.739208802178716,
+  "derrick": "For a pure gradient energy in 3D, E[Θ(x/λ)] = λ E[Θ]: no stationary size."
+ },
+ "B2_charge_flux": {
+  "statement": "(1/2π)∮∇Θ·dS = 2nR²/√(R²+a²) → 2nR: not n, diverges.",
+  "rows": [
+   {
+    "R_over_a": 10.0,
+    "Q": 19.900743804199784
+   },
+   {
+    "R_over_a": 100.0,
+    "Q": 199.9900007499375
+   },
+   {
+    "R_over_a": 1000.0,
+    "Q": 1999.9990000007497
+   }
+  ]
+ },
+ "B3_form_factor": {
+  "statement": "FT[1/(r²+a²)] = 2π² e^{-qa}/q = 2π²(1/q - a + q a²/2 - ...): a 1/q pole (infinite charge) and odd powers of q; F = 1 - q²a²/6 does not follow.",
+  "rows": [
+   {
+    "qa": 0.1,
+    "numeric": 178.60774726110844,
+    "closed_form": 178.60774726636072
+   },
+   {
+    "qa": 0.5,
+    "numeric": 23.944870672986116,
+    "closed_form": 23.944870673981754
+   },
+   {
+    "qa": 1.0,
+    "numeric": 7.261649103344818,
+    "closed_form": 7.261649103311922
+   },
+   {
+    "qa": 2.0,
+    "numeric": 1.3357057069880285,
+    "closed_form": 1.3357057070547476
+   }
+  ]
+ },
+ "C_g_minus_2": {
+  "I_paper": 0.04675225418392521,
+  "coefficient_paper": 9.049753840594066e-06,
+  "coefficient_universal": 0.0002580910517524133,
+  "ratio_universal_over_paper": 28.519123978235307,
+  "schwinger_check_aV0_over_alpha_over_pi": 0.5000000000000001,
+  "note": "Δa in units of α/π; 'exact_p' = one-loop with F=(1-k²/Λ²)^-p on both internal vertices (gauge invariant: only the photon propagator changes).",
+  "rows": [
+   {
+    "m_a": 1e-05,
+    "leading_universal": -1.1111111111111113e-11,
+    "exact_p1": -1.1111111092443659e-11,
+    "exact_p2": -1.111111109538605e-11,
+    "exact_p3": -1.1111111096372203e-11,
+    "paper": -3.896021181993768e-13
+   },
+   {
+    "m_a": 0.0001,
+    "leading_universal": -1.111111111111111e-09,
+    "exact_p1": -1.111110962812996e-09,
+    "exact_p2": -1.1111109858408269e-09,
+    "exact_p3": -1.1111109935703375e-09,
+    "paper": -3.8960211819937676e-11
+   },
+   {
+    "m_a": 0.001,
+    "leading_universal": -1.1111111111111111e-07,
+    "exact_p1": -1.1111001189263767e-07,
+    "exact_p2": -1.1111017821079107e-07,
+    "exact_p3": -1.1111023418582162e-07,
+    "paper": -3.896021181993767e-09
+   },
+   {
+    "m_a": 0.01,
+    "leading_universal": -1.1111111111111112e-05,
+    "exact_p1": -1.1103955568316886e-05,
+    "exact_p2": -1.1104979495407997e-05,
+    "exact_p3": -1.1105326145836137e-05,
+    "paper": -3.8960211819937673e-07
+   },
+   {
+    "m_a": 0.1,
+    "leading_universal": -0.0011111111111111113,
+    "exact_p1": -0.0010774337562494186,
+    "exact_p2": -0.00108144217792787,
+    "exact_p3": -0.0010828257962660222,
+    "paper": -3.8960211819937675e-05
+   }
+  ],
+  "at_a_2p7em3_fm": {
+   "m_a": 6.991933704165677e-06,
+   "delta_a_paper": 4.4241655512862123e-16,
+   "delta_a_universal": 1.2617332585736924e-14
+  },
+  "bounds_fm": {
+   "paper_coeff_1e_13": 0.0405927130979461,
+   "universal_1e_13": 0.00760116200227459,
+   "universal_1e_12": 0.024036984791113682
+  }
+ },
+ "D_atomic": {
+  "reproduce_paper": {
+   "lamb_2kHz_bound_fm": 0.10106580465130903,
+   "s1s2s_10Hz_bound_fm": 0.002701097246598733
+  },
+  "proton_size_terms_Hz": {
+   "r_p": 0.84087,
+   "shift_1S": 1107564.9997828163,
+   "shift_2S": 138445.62497285203,
+   "one_s_two_s": 969119.3748099642,
+   "one_s_two_s_from_drp_muH": 899.1739634219557
+  },
+  "electron_size_term_at_a_2p7em3_fm_Hz": 9.9918771992607,
+  "degeneracy": "electron and proton finite-size terms enter as (2/3)α⁴m³(r_p² + a²)/n³ δ_l0: identical n and l dependence; electronic hydrogen alone cannot separate them.",
+  "eH_vs_muH": {
+   "Bezginov2019_Lamb": {
+    "r_p_eH": 0.833,
+    "r2_diff_fm2": -0.013173356899999988,
+    "sigma_fm2": 0.01667290546779229,
+    "upper_2sigma_fm2": 0.03334581093558458,
+    "a_upper_fm": 0.18260835395891553
+   },
+   "Grinin2020_1S3S": {
+    "r_p_eH": 0.8482,
+    "r2_diff_fm2": 0.012380883099999962,
+    "sigma_fm2": 0.006479600163616421,
+    "upper_2sigma_fm2": 0.025340083427232804,
+    "a_upper_fm": 0.1591856885126072
+   }
+  }
+ },
+ "E_LEP": {
+  "matching": "⟨r²⟩ = 6/(α Λ²) for the VV contact model with g² = 4π",
+  "rows": [
+   {
+    "Lambda_TeV": 2.0,
+    "a_fm": 0.0028291074013600008
+   },
+   {
+    "Lambda_TeV": 10.0,
+    "a_fm": 0.0005658214802720001
+   },
+   {
+    "Lambda_TeV": 20.0,
+    "a_fm": 0.00028291074013600005
+   }
+  ],
+  "Lambda_equivalent_to_a_2p7em3_fm_TeV": 2.0956351121185186,
+  "lit": "LEP combined ee→ff contact-interaction limits Λ ~ 10-20 TeV (model dependent); check.",
+  "z_pole_illustration": {
+   "q_a": 1.2477083442969465,
+   "q2a2_over_6": 0.25946268540470463
+  }
+ },
+ "F_KT": {
+  "tau0_s": 9.006230570350106e-27,
+  "orders": 41.04545693876894,
+  "t_match": 0.0011049386835719278,
+  "log10_tau_at_t": {
+   "t_1e_4": 110.3921784454152,
+   "t_1e_3": 17.099911699391487,
+   "t_1e_2": -12.401693400350528
+  },
+  "paper_claims_log10_tau": {
+   "t_1e_4": 60,
+   "t_1e_2": 4
+  },
+  "dlntau_dlnt": -47.255328641169186,
+  "paper_formula_1_over_2t": 452.5137977644636,
+  "fractional_t_change_for_factor_10": 0.048726464489933036,
+  "xy3d_power_law": {
+   "nu": 0.6717,
+   "tau_ratio_modelA": 9375.177332196034,
+   "tau_ratio_modelF": 952.7624190023607,
+   "t_needed_for_1e41_modelA": 3.0228932288600536e-31
+  },
+  "dm_amplitude_check_km_s": 326.75077418012404
+ },
+ "G_misc": {
+  "decoherence": {
+   "Gamma_bare": 67106969566.399376,
+   "suppression_without_rho_s": 7.47182640428293e-21,
+   "Gamma_times_rho_s": 5.014116271176339e-10,
+   "rho_s_needed_for_1em9_to_1em8": [
+    0.5014116271176339,
+    0.05014116271176339
+   ]
+  },
+  "lorentz": {
+   "Lambda_core_GeV": 73.0840668148148,
+   "delta_LV_atomic": 1.3862958456584392e-19,
+   "optical": 1.8722101183018357e-22,
+   "hard_xray": 1.872210118301836e-12,
+   "note": "A Lorentz-invariant F□F term changes the propagator to 1/(k²(1 + c k²/Λ²)): the massless pole keeps ω = |k|; a second pole appears at k² = -Λ²/c. It cannot give ω² = k²(1 + c k²/Λ²)."
+  },
+  "rank3_moduli": {
+   "2": {
+    "dim_SU": 3,
+    "dim_stab": 0,
+    "orientation": 3
+   },
+   "3": {
+    "dim_SU": 8,
+    "dim_stab": 1,
+    "orientation": 7
+   },
+   "4": {
+    "dim_SU": 15,
+    "dim_stab": 4,
+    "orientation": 11
+   },
+   "5": {
+    "dim_SU": 24,
+    "dim_stab": 9,
+    "orientation": 15
+   }
+  },
+  "rank3_paper_overcount": 51.875
+ },
+ "H_july": {
+  "inputs": {
+   "beta_60x120": 0.03866,
+   "beta_120x240": 0.04211,
+   "beta_fixed_background": 0.041974,
+   "linear_threshold_fixed_background": 0.042581
+  },
+  "extrapolated": {
+   "p=1": 0.04556,
+   "p=2": 0.04326,
+   "p=3": 0.042602857142857144,
+   "p=4": 0.04234
+  },
+  "note": "Two grids cannot fix the order p; the brief's 0.0433-0.0434 corresponds to p ≈ 2."
+ },
+ "I_charged_hopfion": {
+  "E": 307.5602165140198,
+  "rms": 1.5956352711356276,
+  "mu": 14.71145111606107,
+  "mu_at_N0": 14.710957952437694,
+  "M_times_rms": 490.75392946788037,
+  "rms_if_M_is_me_fm": 189509.17809387165,
+  "in_bohr_radii": 3.5812044480885583,
+  "g_like_J_half": 60328.76120654882,
+  "g_like_J_one": 30164.38060327441,
+  "scaling": "E = (f/g) Ẽ(μ/(fg), e/g), R = R̃/(fg)  ⇒  M·R ∝ 1/g² at fixed μ/(fg), e/g"
+ }
+}
