@@ -1,0 +1,33 @@
+{
+ "description": "Compactification scale a varied at fixed element count.",
+ "ne": 64,
+ "a_reference": 3.0,
+ "E_reference": 307.558372118031,
+ "rms_reference": 1.5956107012202114,
+ "runs": [
+  {
+   "a": 2.5,
+   "label": "a=2.5",
+   "E_start": 309.83680495928763,
+   "E": 307.5592361219784,
+   "iterations": 10,
+   "converged": true,
+   "rms_charge": 1.5956228121041371,
+   "Dzz": -1.0587405255787328,
+   "mu_volume": -14.711288616424488,
+   "Q_H": -0.9999942572753562
+  },
+  {
+   "a": 4.0,
+   "label": "a=4.0",
+   "E_start": 309.8315734040772,
+   "E": 307.55489641882775,
+   "iterations": 10,
+   "converged": true,
+   "rms_charge": 1.595561056661983,
+   "Dzz": -1.05861644291126,
+   "mu_volume": -14.71048776199871,
+   "Q_H": -0.9999673671307238
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "description": "Spherical source K = 3 exp(-r\u00b2/2), e = 0.3: the compactified-grid \u03b2 solve has an O(1/ne) error (error\u00b7ne \u2248 const); first-order extrapolation removes it.",
+ "I_reference": 39.72982092872261,
+ "rows": [
+  {
+   "ne": 32,
+   "I": 39.76237680564386,
+   "error": 0.032555876921250615,
+   "error_times_ne": 1.0417880614800197
+  },
+  {
+   "ne": 48,
+   "I": 39.75153293193116,
+   "error": 0.021712003208548936,
+   "error_times_ne": 1.042176154010349
+  },
+  {
+   "ne": 64,
+   "I": 39.74609919629017,
+   "error": 0.016278267567557236,
+   "error_times_ne": 1.0418091243236631
+  },
+  {
+   "ne": 96,
+   "I": 39.74056912421112,
+   "error": 0.010748195488510248,
+   "error_times_ne": 1.0318267668969838
+  }
+ ],
+ "extrapolations": [
+  {
+   "pair": [
+    48,
+    96
+   ],
+   "I_extrapolated": 39.72960531649108,
+   "error": -0.00021561223152843922
+  },
+  {
+   "pair": [
+    64,
+    96
+   ],
+   "I_extrapolated": 39.729508980053026,
+   "error": -0.00031194866958372813
+  }
+ ]
+}

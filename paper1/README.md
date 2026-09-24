@@ -31,6 +31,15 @@ python derivation_chain.py
 
 No dependencies beyond Python 3.x standard library.
 
+## Follow-up: charged Hopfion mode (research notes)
+
+[`charged_mode/`](charged_mode/) contains an independent axisymmetric solver for a charged,
+gauged Hopf soliton (S² direction field + Faddeev–Skyrme terms + Maxwell field, fixed
+charge). It reproduces the September 2026 restricted-profile results and then relaxes
+both tangential components of the direction field together with all electromagnetic
+fields. Notes are in Traditional Chinese with an English summary. They are classical,
+model-unit calculations and are not electron predictions; see the note's last section.
+
 ## Domains Covered
 
 | Domain | Predictions |

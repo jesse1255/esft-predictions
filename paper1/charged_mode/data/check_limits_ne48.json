@@ -1,0 +1,72 @@
+{
+ "description": "Same grid, other couplings; E/16\u03c0\u00b2 is the energy in the normalisation (1/32\u03c0\u00b2)\u222b[(\u2202n)\u00b2 + \u00bd(\u2202n\u00d7\u2202n)\u00b2].",
+ "ne": 48,
+ "runs": [
+  {
+   "label": "e=0.3, N=0 (gauged, uncharged)",
+   "e": 0.3,
+   "N": 0.0,
+   "mu": 1.0,
+   "E": 307.5476706140765,
+   "converged": true,
+   "breakdown": {
+    "sigma": 98.12179059323535,
+    "skyrme": 168.41589570157777,
+    "pot": 27.820760619343318,
+    "mag": 13.189217106493036,
+    "gauge_fix": 6.593426994293356e-06,
+    "mag_tor": 6.724403673940543,
+    "mag_pol": 6.464813432552494,
+    "total": 307.5476706140765
+   },
+   "Q_H": -0.9999649404831851,
+   "virial_relative": null,
+   "energy_density_rms_radius": 1.229011441659601,
+   "E_over_16pi2": 1.9475683758163782
+  },
+  {
+   "label": "e=0 (no Maxwell field), mu=1",
+   "e": 0.0,
+   "N": 0.0,
+   "mu": 1.0,
+   "E": 321.6190198850677,
+   "converged": true,
+   "breakdown": {
+    "sigma": 103.43941800719776,
+    "skyrme": 189.49950269221134,
+    "pot": 28.68009918565856,
+    "mag": 0.0,
+    "gauge_fix": 0.0,
+    "mag_tor": 0.0,
+    "mag_pol": 0.0,
+    "total": 321.61901988506764
+   },
+   "Q_H": -0.9999701706778458,
+   "virial_relative": null,
+   "energy_density_rms_radius": 1.232549030810367,
+   "E_over_16pi2": 2.036676236040227
+  },
+  {
+   "label": "e=0, mu=0 (Faddeev-Skyrme)",
+   "e": 0.0,
+   "N": 0.0,
+   "mu": 0.0,
+   "E": 273.5549137271111,
+   "converged": true,
+   "breakdown": {
+    "sigma": 136.77513564376704,
+    "skyrme": 136.77977808334407,
+    "pot": 0.0,
+    "mag": 0.0,
+    "gauge_fix": 0.0,
+    "mag_tor": 0.0,
+    "mag_pol": 0.0,
+    "total": 273.5549137271111
+   },
+   "Q_H": -0.9999899900486803,
+   "virial_relative": null,
+   "energy_density_rms_radius": 2.031070863195661,
+   "E_over_16pi2": 1.7323067281255309
+  }
+ ]
+}

@@ -1,0 +1,102 @@
+{
+ "description": "Same grid, other couplings. E/16\u03c0\u00b2 and E/(16\u221a2\u03c0\u00b2) are the energy in the normalisations (1/32\u03c0\u00b2)\u222b[(\u2202n)\u00b2 + \u00bd(\u2202n\u00d7\u2202n)\u00b2] and (1/32\u221a2\u03c0\u00b2)\u222b[...] used in the Hopfion literature.",
+ "ne": 96,
+ "runs": [
+  {
+   "label": "e=0.3, N=0 (gauged, uncharged)",
+   "e": 0.3,
+   "N": 0.0,
+   "mu": 1.0,
+   "E": 307.55319552236097,
+   "converged": true,
+   "breakdown": {
+    "sigma": 98.1273556399018,
+    "skyrme": 168.4127268907192,
+    "pot": 27.824306204914972,
+    "mag": 13.18880637236939,
+    "gauge_fix": 4.144556232009698e-07,
+    "mag_tor": 6.724195237403034,
+    "mag_pol": 6.464611134966354,
+    "total": 307.553195522361
+   },
+   "Q_H": -0.9999978228001339,
+   "virial_relative": null,
+   "mu_volume": -14.710957952437694,
+   "mu_far": -14.710283016290852,
+   "ring": {
+    "core_radius": 0.917,
+    "u3_max": 0.9999888404269623,
+    "inner_zero": 0.44320646348111414,
+    "outer_zero": 1.5607974612298299,
+    "tube_half_height": 0.78
+   },
+   "energy_density_rms_radius": 1.2289728646469207,
+   "E_over_16pi2": 1.9476033627068094,
+   "E_over_16sqrt2pi2": 1.377163544831708
+  },
+  {
+   "label": "e=0 (no Maxwell field), mu=1",
+   "e": 0.0,
+   "N": 0.0,
+   "mu": 1.0,
+   "E": 321.62433172862967,
+   "converged": true,
+   "breakdown": {
+    "sigma": 103.44450468899407,
+    "skyrme": 189.49634087500237,
+    "pot": 28.683486164633084,
+    "mag": 0.0,
+    "gauge_fix": 0.0,
+    "mag_tor": 0.0,
+    "mag_pol": 0.0,
+    "total": 321.62433172862956
+   },
+   "Q_H": -0.9999981537022119,
+   "virial_relative": null,
+   "mu_volume": -0.0,
+   "mu_far": 0.0,
+   "ring": {
+    "core_radius": 0.929,
+    "u3_max": 0.999991933608664,
+    "inner_zero": 0.4445975530776516,
+    "outer_zero": 1.5738868011252232,
+    "tube_half_height": 0.782
+   },
+   "energy_density_rms_radius": 1.2326021096463469,
+   "E_over_16pi2": 2.0367098736825406,
+   "E_over_16sqrt2pi2": 1.440171362990521
+  },
+  {
+   "label": "e=0, mu=0 (Faddeev-Skyrme)",
+   "e": 0.0,
+   "N": 0.0,
+   "mu": 0.0,
+   "E": 273.5562366242901,
+   "converged": true,
+   "breakdown": {
+    "sigma": 136.77797174850494,
+    "skyrme": 136.77826487578523,
+    "pot": 0.0,
+    "mag": 0.0,
+    "gauge_fix": 0.0,
+    "mag_tor": 0.0,
+    "mag_pol": 0.0,
+    "total": 273.55623662429014
+   },
+   "Q_H": -0.9999993784468422,
+   "virial_relative": null,
+   "mu_volume": -0.0,
+   "mu_far": 0.0,
+   "ring": {
+    "core_radius": 1.232,
+    "u3_max": 1.0000044812960271,
+    "inner_zero": 0.5736863146070882,
+    "outer_zero": 2.2287126959898815,
+    "tube_half_height": 1.04
+   },
+   "energy_density_rms_radius": 2.0280937139944655,
+   "E_over_16pi2": 1.7323151054697814,
+   "E_over_16sqrt2pi2": 1.2249317582295716
+  }
+ ]
+}

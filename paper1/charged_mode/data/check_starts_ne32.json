@@ -1,0 +1,52 @@
+{
+ "description": "Full relaxation from four other initial shapes (same grid) versus the run started from the h(r) optimum.",
+ "ne": 32,
+ "E_reference": 307.5295920011596,
+ "runs": [
+  {
+   "label": "h(r/1.3)",
+   "E_start": 330.4293233889351,
+   "E": 307.52959200122376,
+   "iterations": 9,
+   "converged": true,
+   "rms_charge": 1.5952182187792883,
+   "Dzz": -1.0579050537607952,
+   "mu_volume": -14.706033119366959,
+   "Q_H": -0.9998202364715753
+  },
+  {
+   "label": "h(1.3 r)",
+   "E_start": 326.6118903584249,
+   "E": 307.5295920012172,
+   "iterations": 9,
+   "converged": true,
+   "rms_charge": 1.5952182187788757,
+   "Dzz": -1.0579050537576546,
+   "mu_volume": -14.706033119342658,
+   "Q_H": -0.9998202364718913
+  },
+  {
+   "label": "h(r'), r'^2 = rho^2 + (z/0.7)^2",
+   "E_start": 319.8170823019445,
+   "E": 307.52959200129266,
+   "iterations": 9,
+   "converged": true,
+   "rms_charge": 1.5952182187779387,
+   "Dzz": -1.0579050537617405,
+   "mu_volume": -14.706033119431854,
+   "Q_H": -0.9998202364711997
+  },
+  {
+   "label": "h(r'), r'^2 = rho^2 + (z/1.4)^2",
+   "E_start": 316.19424761536925,
+   "E": 307.5295920012839,
+   "iterations": 9,
+   "converged": true,
+   "rms_charge": 1.59521821878048,
+   "Dzz": -1.0579050537563233,
+   "mu_volume": -14.70603311928448,
+   "Q_H": -0.999820236472271
+  }
+ ],
+ "max_abs_dE": 1.3307044355315156e-10
+}

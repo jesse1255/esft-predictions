@@ -1,0 +1,59 @@
+{
+ "mode_localisation": [
+  {
+   "fraction_in_A": 0.999999998994441,
+   "fraction_beyond_r6": 0.9999995473902207
+  },
+  {
+   "fraction_in_A": 0.999999999999946,
+   "fraction_beyond_r6": 0.999999999690297
+  },
+  {
+   "fraction_in_A": 0.9999999999999997,
+   "fraction_beyond_r6": 0.9999999999996778
+  },
+  {
+   "fraction_in_A": 0.999999982522745,
+   "fraction_beyond_r6": 0.9999921361066385
+  },
+  {
+   "fraction_in_A": 0.9999999999978003,
+   "fraction_beyond_r6": 0.999999987434209
+  },
+  {
+   "fraction_in_A": 0.9999999861220992,
+   "fraction_beyond_r6": 0.9999937555576646
+  },
+  {
+   "fraction_in_A": 0.999999999999997,
+   "fraction_beyond_r6": 0.9999999999705425
+  },
+  {
+   "fraction_in_A": 0.999999999998756,
+   "fraction_beyond_r6": 0.9999999928955028
+  }
+ ],
+ "eigenvalues_matter_block_A_frozen": [
+  0.07049840909548458,
+  0.07049840909548463,
+  0.10930805315646952,
+  0.10930805315647099,
+  0.13924919244955974,
+  0.13924919245022266
+ ],
+ "description": "Lowest eigenvalues of the discrete Hessian (a1, a2, A_\u03c1, A_z, A_\u03c6), mass-normalised by nodal volumes, reflection-symmetric half plane, Coulomb-gauge term \u03ba = 1, fixed-charge term included locally (the omitted non-local part is positive semi-definite). Central differences. mode_localisation: share of each eigenvector in A and beyond r = 6.",
+ "ne": 48,
+ "ndof": 45506,
+ "eigenvalues": [
+  3.066923729003147e-06,
+  9.476759786286202e-06,
+  2.070208387628834e-05,
+  6.192971829930638e-05,
+  8.77406252895673e-05,
+  9.364353059392234e-05,
+  0.0001510109043956064,
+  0.0001539993352671794
+ ],
+ "gradient_max": 8.488247314049904e-07,
+ "seconds": 15.127486944198608
+}

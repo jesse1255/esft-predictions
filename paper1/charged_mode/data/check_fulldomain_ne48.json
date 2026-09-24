@@ -1,0 +1,57 @@
+{
+ "description": "State reflected to the full meridional plane (no reflection symmetry imposed). Gradient of the full problem, lowest mass-normalised Hessian eigenvalues with overlaps on the exact phase zero mode and the (lattice-broken) z-translation mode, and relaxation after an odd kick.",
+ "ne": 48,
+ "E_half": 307.5543293073503,
+ "E_full_plane": 307.55432930767256,
+ "grad_max_full_plane": 4.2441236933978043e-07,
+ "eigenvalues": [
+  -0.00012302347297397248,
+  -4.614853138920985e-05,
+  3.0669237289782103e-06,
+  9.476759211840546e-06,
+  9.47675978623286e-06,
+  1.1828998036019032e-05,
+  2.070208387626232e-05,
+  2.0702085676299218e-05
+ ],
+ "overlaps": [
+  {
+   "phase": 0.2715063776399074,
+   "z_translation": 0.9364863896050751
+  },
+  {
+   "phase": 0.9969409947161966,
+   "z_translation": 0.10410877181760941
+  },
+  {
+   "phase": 2.0847854051149228e-08,
+   "z_translation": 1.327366268749602e-08
+  },
+  {
+   "phase": 0.0008248694470475107,
+   "z_translation": 0.0012752644409713132
+  },
+  {
+   "phase": 9.777782232245502e-08,
+   "z_translation": 1.206981337040761e-07
+  },
+  {
+   "phase": 0.0007208341651573684,
+   "z_translation": 0.0025216394499622415
+  },
+  {
+   "phase": 3.918391260668904e-05,
+   "z_translation": 0.0002194860829802512
+  },
+  {
+   "phase": 0.16614960466327558,
+   "z_translation": 0.9317363608040141
+  }
+ ],
+ "E_after_kick": 307.62692776565336,
+ "E_relaxed": 307.55432930772946,
+ "relaxed_converged": true,
+ "relaxed_Q_H": -0.9999649426260351,
+ "relaxed_energy_centroid_z": 1.2365657712534833e-05,
+ "relaxed_rms_charge": 1.5955563454741344
+}
