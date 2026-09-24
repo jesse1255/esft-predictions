@@ -20,6 +20,49 @@
    ],
    "t_assemble": 69.93097591400146,
    "t_eig": 1134.4698667526245
+  },
+  {
+   "k": 1,
+   "nfree": 182214,
+   "M_phi": 5,
+   "grad_at_background": 8.32667268468862e-17,
+   "asym": 7.450580596923828e-09,
+   "eigenvalues": [
+    -0.00028462418443245263,
+    -0.00028462418442097397,
+    0.00037165491461010197,
+    0.00037165491462261974,
+    0.9998289932376327,
+    0.9998491133268821
+   ],
+   "t_assemble": 403.63782811164856,
+   "t_eig": 4825.083122491837,
+   "overlaps": [
+    {
+     "translation_x": 0.8201881990844277,
+     "rotation_x": 0.5954599537720847
+    },
+    {
+     "translation_x": 0.02142015224473729,
+     "rotation_x": 0.015551117289143341
+    },
+    {
+     "translation_x": 0.5484799748066064,
+     "rotation_x": 0.7708439073667936
+    },
+    {
+     "translation_x": 0.16041065411624386,
+     "rotation_x": 0.22544410200390277
+    },
+    {
+     "translation_x": 1.644227876915095e-07,
+     "rotation_x": 7.523886324337861e-08
+    },
+    {
+     "translation_x": 2.2043344403626386e-10,
+     "rotation_x": 1.887466073706212e-09
+    }
+   ]
   }
  ],
  "description": "Lowest eigenvalues of the soliton Hessian with the gauge field relaxed (Schur complement), generalised with the L\u00b2 mass of the matter perturbation; the vacuum continuum starts at \u03bc\u00b2 = 1. Local part of the fixed-charge term only (the rest is PSD)."
