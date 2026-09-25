@@ -1,0 +1,43 @@
+{
+ "ne": 32,
+ "box": 3.0,
+ "disc": "align",
+ "kappa3_star": 0.9188831150531769,
+ "E_embedded": 321.61013334595964,
+ "Q_embedded": [
+  -0.9999603864482763,
+  -0.9999603864482763,
+  0.0
+ ],
+ "description": "\nFollow the F\u2082 branch below \u03ba\u2083* in the R-even slice, with the Hopf charge tracked.\n\nStarts from the \u03b4 = 0.04 end state of run_flag_twosided.py and lowers \u03ba\u2083 in\nsteps, re-converging with Newton in the R-even coordinates at every step.\nAnswers whether the \u03ba\u2083 = 0.6 charge loss of the first round (ne = 16, no\nsymmetry restriction) happens on the branch itself or only off the slice.\n\nRecorded per step: \u0394E = E \u2212 E_emb (E_emb does not depend on \u03ba\u2083), D, the three\namplitudes D_c = \u222b(1 \u2212 |Z_cc|\u00b2) (D = D_2; D_0 \u2212 D_2 measures the 0 \u2194 2 asymmetry),\nQ and its three-cycle part, the energy-weighted rms radius R_E, the LDL\u1d40 inertia\nof the R-even and R-odd Hessian blocks.\n\nEvery converged state is kept in data/flag_continue_states_ne{ne}[_a{box}].npz\n(not committed), keyed by \u03ba\u2083, so that a finer scan can restart from it:\n--start K resumes from the stored state nearest to K; a negative --step walks\nupward in \u03ba\u2083 (hysteresis check).\n\nThe Hopf degree is evaluated on the smooth-gauge lift (flag_gauge.py).\n\nUsage: python run_flag_continue.py ne [--box 3.0] [--stop 0.3] [--step 0.04]\n                                      [--start K --tag _fine] [--disc u|proj]\nWrites data/flag_continue_ne{ne}[_a{box}][_proj][tag].json.\n",
+ "rows": [
+  {
+   "kappa3": 0.7589,
+   "E": 319.2511795909562,
+   "dE": -2.3589537550034265,
+   "D": 4.287518116920633,
+   "D_all": [
+    11.46035122650294,
+    11.934757878529961,
+    4.287518116920633
+   ],
+   "Q": -0.9999408023022242,
+   "Q_3cycle": -0.1968243727262318,
+   "R_E": 1.128317019128415,
+   "converged": true,
+   "newton_iterations": 5,
+   "symmetry_defect": 4.2547559350647453e-13,
+   "inertia_even": [
+    24130,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    24128,
+    2,
+    0
+   ],
+   "t": 279.9918165206909
+  }
+ ]
+}
