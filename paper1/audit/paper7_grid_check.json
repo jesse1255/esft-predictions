@@ -1,0 +1,62 @@
+{
+ "description": "\nLook-elsewhere check of the Paper 7 quark-mass formula (2026-09-25).\n\nPaper 7 writes m(l) = \u039b \u03b5^{n(l)} with \u039b = \u0127c/(0.003 fm) = 65.78 GeV and\n\u03b5 = \u221a\u03c3/\u039b, \u221a\u03c3 = 459 MeV, and builds the exponents n from a colour ladder plus\na \"Fibonacci\" correction F_k/(N_c D_k) with F = 2, 5, 7 and D = 5, 3, 5.\n\nFor fixed \u039b and \u03b5, the exponent a mass needs is n* = ln(m/\u039b)/ln \u03b5.  All of\nPaper 7's exponents are fractions whose denominators divide 45 (1, 3, 5, 9,\n15), so the natural baseline is: round n* to the nearest multiple of 1/45.\nThis script compares the two, and gives the deviation that rounding produces\nfor arbitrary masses.  Masses are the ones quoted in Paper 7 (PDG 2024).\n\nUsage: python paper7_grid_check.py   \u2192 paper7_grid_check.json\n",
+ "Lambda_MeV": 65775.66666666667,
+ "epsilon": 0.006978264505110805,
+ "rows": [
+  {
+   "quark": "u,d",
+   "n_needed": 1.9850393302913516,
+   "n_paper7": 2.0,
+   "dev_paper7": 0.07158741801569357,
+   "n_nearest_k_over_45": 1.9777777777777779,
+   "dev_nearest": 0.03671108273556878,
+   "paper7_equals_nearest": false
+  },
+  {
+   "quark": "s",
+   "n_needed": 1.3206794129592967,
+   "n_paper7": 1.3333333333333333,
+   "dev_paper7": 0.060893272691667444,
+   "n_nearest_k_over_45": 1.3111111111111111,
+   "dev_nearest": 0.04865269058636579,
+   "paper7_equals_nearest": false
+  },
+  {
+   "quark": "c",
+   "n_needed": 0.7950188948411542,
+   "n_paper7": 0.8,
+   "dev_paper7": 0.024427658336000024,
+   "n_nearest_k_over_45": 0.8,
+   "dev_nearest": 0.024427658336000024,
+   "paper7_equals_nearest": true
+  },
+  {
+   "quark": "b",
+   "n_needed": 0.555078283387135,
+   "n_paper7": 0.5555555555555556,
+   "dev_paper7": 0.0023668294855940797,
+   "n_nearest_k_over_45": 0.5555555555555556,
+   "dev_nearest": 0.0023668294855940797,
+   "paper7_equals_nearest": true
+  },
+  {
+   "quark": "t",
+   "n_needed": -0.19441225772674903,
+   "n_paper7": -0.2,
+   "dev_paper7": 0.028131306684003876,
+   "n_nearest_k_over_45": -0.2,
+   "dev_nearest": 0.028131306684003876,
+   "paper7_equals_nearest": true
+  }
+ ],
+ "grid_baseline": {
+  "median": 0.02800993223751258,
+  "q90": 0.05084908035982394,
+  "max": 0.05671578395932708
+ },
+ "fibonacci_terms_used": [
+  2,
+  5,
+  7
+ ]
+}
