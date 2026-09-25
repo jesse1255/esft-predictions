@@ -1,0 +1,428 @@
+{
+ "ne": 16,
+ "box": 3.0,
+ "kappa3_star": 0.9212939441204071,
+ "E_embedded": 321.43881532856653,
+ "Q_embedded": [
+  -0.9993629896563359,
+  -0.9993629896563359,
+  0.0
+ ],
+ "description": "\nFollow the F\u2082 branch below \u03ba\u2083* in the R-even slice, with the Hopf charge tracked.\n\nStarts from the \u03b4 = 0.04 end state of run_flag_twosided.py and lowers \u03ba\u2083 in\nsteps, re-converging with Newton in the R-even coordinates at every step.\nAnswers whether the \u03ba\u2083 = 0.6 charge loss of the first round (ne = 16, no\nsymmetry restriction) happens on the branch itself or only off the slice.\n\nRecorded per step: \u0394E = E \u2212 E_emb (E_emb does not depend on \u03ba\u2083), D, Q and its\nthree-cycle part, the energy-weighted rms radius R_E, the LDL\u1d40 inertia of the\nR-even and R-odd Hessian blocks.\n\nEvery converged state is kept in data/flag_continue_states_ne{ne}[_a{box}].npz\n(not committed), keyed by \u03ba\u2083, so that a finer scan can restart from it:\n--start K resumes from the stored state nearest to K; a negative --step walks\nupward in \u03ba\u2083 (hysteresis check).\n\nUsage: python run_flag_continue.py ne [--box 3.0] [--stop 0.3] [--step 0.04]\n                                      [--start K --tag _fine]\nWrites data/flag_continue_ne{ne}[_a{box}][tag].json.\n",
+ "rows": [
+  {
+   "kappa3": 0.8812939441204071,
+   "E": 321.3264605389967,
+   "dE": -0.11235478956984934,
+   "D": 0.5079388092054761,
+   "Q": -0.9993159603400046,
+   "Q_3cycle": -0.036606245692157265,
+   "R_E": 1.2125938396898446,
+   "converged": true,
+   "newton_iterations": 1,
+   "symmetry_defect": 6.886264191654701e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5919,
+    3,
+    0
+   ],
+   "t": 43.85546660423279
+  },
+  {
+   "kappa3": 0.8412939441,
+   "E": 320.9321852000147,
+   "dE": -0.5066301285518193,
+   "D": 1.351292152486868,
+   "Q": -0.9992538936805856,
+   "Q_3cycle": -0.08519827470854704,
+   "R_E": 1.1875079564165414,
+   "converged": true,
+   "newton_iterations": 6,
+   "symmetry_defect": 6.973012561401156e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5919,
+    3,
+    0
+   ],
+   "t": 108.23204183578491
+  },
+  {
+   "kappa3": 0.8012939441,
+   "E": 320.1905935774836,
+   "dE": -1.2482217510829514,
+   "D": 2.590132006909689,
+   "Q": -0.999156216677405,
+   "Q_3cycle": -0.1412137492958845,
+   "R_E": 1.1573132526394214,
+   "converged": true,
+   "newton_iterations": 6,
+   "symmetry_defect": 7.076171797707727e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5919,
+    3,
+    0
+   ],
+   "t": 102.87866306304932
+  },
+  {
+   "kappa3": 0.7612939441,
+   "E": 319.05279063297303,
+   "dE": -2.3860246955935054,
+   "D": 4.575761852200872,
+   "Q": -0.9989488525987077,
+   "Q_3cycle": -0.2044201966107819,
+   "R_E": 1.1214893704487197,
+   "converged": true,
+   "newton_iterations": 7,
+   "symmetry_defect": 7.195779414704536e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5919,
+    3,
+    0
+   ],
+   "t": 121.95378494262695
+  },
+  {
+   "kappa3": 0.7212939441,
+   "E": 317.2721784656118,
+   "dE": -4.1666368629547605,
+   "D": 10.566297913774077,
+   "Q": -0.997291685738054,
+   "Q_3cycle": -0.21955849941927638,
+   "R_E": 1.108506599121469,
+   "converged": true,
+   "newton_iterations": 11,
+   "symmetry_defect": 7.796244330109912e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 182.42339992523193
+  },
+  {
+   "kappa3": 0.6812939441,
+   "E": 315.6968569134424,
+   "dE": -5.741958415124145,
+   "D": 9.125522194738998,
+   "Q": -0.9978972176144171,
+   "Q_3cycle": -0.24398982649271325,
+   "R_E": 1.0927646694404702,
+   "converged": true,
+   "newton_iterations": 7,
+   "symmetry_defect": 7.705850273005901e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 134.72110843658447
+  },
+  {
+   "kappa3": 0.6412939441,
+   "E": 314.03224300693864,
+   "dE": -7.406572321627891,
+   "D": 8.511688347630994,
+   "Q": -0.9980573206842724,
+   "Q_3cycle": -0.24796294550495912,
+   "R_E": 1.0877816832243592,
+   "converged": true,
+   "newton_iterations": 6,
+   "symmetry_defect": 7.664409899643842e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 133.55649662017822
+  },
+  {
+   "kappa3": 0.6012939441,
+   "E": 312.34582175472303,
+   "dE": -9.0929935738435,
+   "D": 8.231621681685086,
+   "Q": -0.9980915275410462,
+   "Q_3cycle": -0.24876578463897056,
+   "R_E": 1.0844060496763537,
+   "converged": true,
+   "newton_iterations": 5,
+   "symmetry_defect": 7.651929871475936e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 117.272287607193
+  },
+  {
+   "kappa3": 0.5612939441,
+   "E": 310.6466312958522,
+   "dE": -10.792184032714317,
+   "D": 8.048102633363495,
+   "Q": -0.9980915413124496,
+   "Q_3cycle": -0.2490379113328926,
+   "R_E": 1.0812633918434589,
+   "converged": true,
+   "newton_iterations": 5,
+   "symmetry_defect": 7.648525076820597e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 121.77438974380493
+  },
+  {
+   "kappa3": 0.5212939441,
+   "E": 308.9361920074916,
+   "dE": -12.502623321074907,
+   "D": 7.902925184295572,
+   "Q": -0.998076888395382,
+   "Q_3cycle": -0.24915743345210178,
+   "R_E": 1.0781626833020896,
+   "converged": true,
+   "newton_iterations": 5,
+   "symmetry_defect": 7.648857365809659e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 118.43928694725037
+  },
+  {
+   "kappa3": 0.4812939441,
+   "E": 307.2146427509943,
+   "dE": -14.224172577572233,
+   "D": 7.776271463785161,
+   "Q": -0.9980535622793665,
+   "Q_3cycle": -0.24921741038978498,
+   "R_E": 1.0750567558562774,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.651054031033169e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 97.42305707931519
+  },
+  {
+   "kappa3": 0.4412939441,
+   "E": 305.48168082990225,
+   "dE": -15.957134498664288,
+   "D": 7.659566310322139,
+   "Q": -0.9980236884762437,
+   "Q_3cycle": -0.2492497423229512,
+   "R_E": 1.0719276636366712,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.654295775745999e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 81.80875730514526
+  },
+  {
+   "kappa3": 0.4012939441,
+   "E": 303.7367800877073,
+   "dE": -17.70203524085923,
+   "D": 7.54839563299307,
+   "Q": -0.9979878151196078,
+   "Q_3cycle": -0.24926840058304453,
+   "R_E": 1.0687647640502642,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.658161645259417e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 76.82861590385437
+  },
+  {
+   "kappa3": 0.3612939441,
+   "E": 301.97923963282676,
+   "dE": -19.459575695739773,
+   "D": 7.440089007599908,
+   "Q": -0.9979454933272836,
+   "Q_3cycle": -0.24928173730167777,
+   "R_E": 1.0655577578662299,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.662401025075913e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 76.22386169433594
+  },
+  {
+   "kappa3": 0.3212939441,
+   "E": 300.20815827393926,
+   "dE": -21.230657054627272,
+   "D": 7.3326104144325726,
+   "Q": -0.9978951053499584,
+   "Q_3cycle": -0.24929869681144926,
+   "R_E": 1.0622910347094887,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.666829243439645e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 74.72161412239075
+  },
+  {
+   "kappa3": 0.2812939441,
+   "E": 298.4223029241081,
+   "dE": -23.01651240445841,
+   "D": 7.223580106816557,
+   "Q": -0.9978324410762817,
+   "Q_3cycle": -0.24933965466736038,
+   "R_E": 1.0589288078688357,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.671243933679711e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 75.81239104270935
+  },
+  {
+   "kappa3": 0.2412939441,
+   "E": 296.6195353242317,
+   "dE": -24.819280004334814,
+   "D": 7.1073818412178955,
+   "Q": -0.9977430095872725,
+   "Q_3cycle": -0.24949418466052428,
+   "R_E": 1.0553333661887108,
+   "converged": true,
+   "newton_iterations": 4,
+   "symmetry_defect": 7.675237410950305e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 77.63105726242065
+  },
+  {
+   "kappa3": 0.2012939441,
+   "E": 294.7917520632165,
+   "dE": -26.647063265350027,
+   "D": 6.9475857325793795,
+   "Q": -0.9975140204170294,
+   "Q_3cycle": -0.25075761693847004,
+   "R_E": 1.0501377586220018,
+   "converged": true,
+   "newton_iterations": 5,
+   "symmetry_defect": 7.677392207855731e-13,
+   "inertia_even": [
+    5922,
+    0,
+    0
+   ],
+   "inertia_odd": [
+    5920,
+    2,
+    0
+   ],
+   "t": 91.72256231307983
+  }
+ ]
+}

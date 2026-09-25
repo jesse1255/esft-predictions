@@ -10,8 +10,14 @@ Recorded per step: ΔE = E − E_emb (E_emb does not depend on κ₃), D, Q and 
 three-cycle part, the energy-weighted rms radius R_E, the LDLᵀ inertia of the
 R-even and R-odd Hessian blocks.
 
+Every converged state is kept in data/flag_continue_states_ne{ne}[_a{box}].npz
+(not committed), keyed by κ₃, so that a finer scan can restart from it:
+--start K resumes from the stored state nearest to K; a negative --step walks
+upward in κ₃ (hysteresis check).
+
 Usage: python run_flag_continue.py ne [--box 3.0] [--stop 0.3] [--step 0.04]
-Writes data/flag_continue_ne{ne}[_a{box}].json.
+                                      [--start K --tag _fine]
+Writes data/flag_continue_ne{ne}[_a{box}][tag].json.
 """
 
 import argparse
@@ -39,12 +45,20 @@ def rms_radius(fm, U, r, k3):
     return float(np.sqrt((G.W @ ((G.rho ** 2 + G.zq ** 2) * dens)) / (G.W @ dens)))
 
 
-def main(ne, box=3.0, stop=0.3, step=0.04):
+def main(ne, box=3.0, stop=0.3, step=0.04, start=None, run_tag=""):
     tag = "" if box == 3.0 else f"_a{box:g}"
     G, Uemb = embedded(ne, box)
     ts = json.load(open(os.path.join(DATA, f"flag_twosided_ne{ne}{tag}.json")))
-    U = np.load(os.path.join(DATA, f"flag_twosided_states_ne{ne}{tag}.npz"))["below_0.04"]
     k3s = ts["kappa3_star"]
+    sfile = os.path.join(DATA, f"flag_continue_states_ne{ne}{tag}.npz")
+    states = dict(np.load(sfile)) if os.path.exists(sfile) else {}
+    if start is None:
+        U = np.load(os.path.join(DATA, f"flag_twosided_states_ne{ne}{tag}.npz"))["below_0.04"]
+        k3 = k3s - 0.04
+    else:
+        key = min(states, key=lambda k: abs(float(k) - start))
+        U, k3 = states[key], float(key)
+        print(f"resuming from the stored state at κ3 = {k3}", flush=True)
     fm = FlagModel(G, L=(0, 1, 0), kappa3=1.0)
     pf = FlagProblem(fm, U, types=range(NT))
     perm, sign = reflection(G, pf)
@@ -52,9 +66,9 @@ def main(ne, box=3.0, stop=0.3, step=0.04):
     E_emb = float(fm.energy_U(jnp.asarray(Uemb), None, 0.0))
     out = dict(ne=ne, box=box, kappa3_star=k3s, E_embedded=E_emb, Q_embedded=ts["Q_embedded"],
                description=__doc__, rows=[])
-    fname = os.path.join(DATA, f"flag_continue_ne{ne}{tag}.json")
-    k3 = k3s - 0.04
-    while k3 >= stop - 1e-12:
+    fname = os.path.join(DATA, f"flag_continue_ne{ne}{tag}{run_tag}.json")
+    down = step > 0
+    while (k3 >= stop - 1e-12) if down else (k3 <= stop + 1e-12):
         t0 = time.time()
         pf.set_couplings(r=(2.0, 2.0, 2.0), kappa3=k3)
         U, E, hist, conv = newton_sector(pf, U, Be, max_iter=80)
@@ -67,6 +81,8 @@ def main(ne, box=3.0, stop=0.3, step=0.04):
                    inertia_even=list(inertia((Be.T @ H @ Be).tocsr())),
                    inertia_odd=list(inertia((Bo.T @ H @ Bo).tocsr())), t=time.time() - t0)
         out["rows"].append(row)
+        states[f"{k3:.4f}"] = U
+        np.savez_compressed(sfile, **states)
         print(f"κ3={k3:.4f}: ΔE={row['dE']:+.5e} D={row['D']:.4f} Q={Q:+.5f} (3-cycle {Q3:+.4f}) "
               f"R_E={row['R_E']:.4f} conv={conv} it={len(hist)} even neg={row['inertia_even'][1]} "
               f"odd neg={row['inertia_odd'][1]} ({row['t']:.0f}s)", flush=True)
@@ -83,5 +99,7 @@ if __name__ == "__main__":
     ap.add_argument("--box", type=float, default=3.0)
     ap.add_argument("--stop", type=float, default=0.3)
     ap.add_argument("--step", type=float, default=0.04)
+    ap.add_argument("--start", type=float, default=None)
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
-    main(a.ne, a.box, a.stop, a.step)
+    main(a.ne, a.box, a.stop, a.step, a.start, a.tag)

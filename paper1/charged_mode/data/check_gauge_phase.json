@@ -1,0 +1,38 @@
+{
+ "description": "\nHow much does the discrete flag energy depend on the nodal column phases?\n\nIn the continuum U \u21a6 U\u00b7diag(e^{i\u03b8_a(x)}) is a gauge transformation and the\nenergy does not change.  On the grid U is interpolated node by node, so the\ndiscrete energy does depend on the nodal phases.  Newton in the Cayley chart\n(off-diagonal coordinates only) never optimises them; they change only as a\nside effect of re-anchoring, i.e. a closed path in the flag manifold can come\nback with different phases (a holonomy).\n\n1. Scaling: apply a smooth phase field \u03b8(\u03c1, z) = A\u00b7exp(\u2212((\u03c1 \u2212 0.9)\u00b2 + z\u00b2)/0.25)\n   (columns 0 and 1, opposite signs) to the embedded Hopfion and record\n   \u0394E(ne) for ne = 16, 24, 32.\n2. If the ne = 16 continuation states exist (run_flag_continue.py 16 and the\n   _up_large scan), take the end state T at \u03ba\u2083 = 0.9863, which as a flag lies\n   within 1 % of g(U_emb) = P\u2080\u2082 S U_emb S P\u2080\u2082 (an exact symmetry image of the\n   embedded Hopfion), and swap the nodal phases between T and g(U_emb).\n\nUsage: python check_gauge_phase.py   \u2192 data/check_gauge_phase.json\n",
+ "scaling": {
+  "16": {
+   "E_embedded": 321.43881532856653,
+   "dE_A0.5": -0.11685541911140263,
+   "dE_A1.5": -0.9323947583768586
+  },
+  "24": {
+   "E_embedded": 321.5896706621303,
+   "dE_A0.5": -0.024392192040352256,
+   "dE_A1.5": -0.2021630919614381
+  },
+  "32": {
+   "E_embedded": 321.6137659340948,
+   "dE_A0.5": -0.007867835607669349,
+   "dE_A1.5": -0.06557739358038361
+  }
+ },
+ "phase_swap": {
+  "kappa3": 0.9863,
+  "E_T": 320.596161159843,
+  "E_image": 321.43881532856653,
+  "E_T_with_image_phases": 321.47607696344926,
+  "E_image_with_T_phases": 320.6333172614312,
+  "flag_difference_max": 0.01009399797193001,
+  "phase_difference_max": [
+   1.5358455742047197,
+   0.004201623949469078,
+   1.5358455742047201
+  ],
+  "phase_difference_rms": [
+   0.276922510825096,
+   0.000338505559763223,
+   0.27671982357546704
+  ]
+ }
+}
