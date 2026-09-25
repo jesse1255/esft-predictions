@@ -32,8 +32,10 @@ U_emb·Cay(t*ξ_e − t*²η/2) below and from U_emb·Cay(t*ξ_e) above.  Report
 each end state: ΔE, the normal amplitude D = ∫(1 − |Z₃₃|²), the Hopf degree Q
 (and its three-cycle part), the symmetry defect and the two sector spectra.
 
-Usage: python run_flag_twosided.py ne [--box 3.0] [--deltas 0.01,0.02,0.04]
-Writes data/flag_twosided_ne{ne}[_a{box}].json.
+The Hopf degree is evaluated on the smooth-gauge lift (flag_gauge.py).
+
+Usage: python run_flag_twosided.py ne [--box 3.0] [--deltas 0.01,0.02,0.04] [--disc u|proj]
+Writes data/flag_twosided_ne{ne}[_a{box}][_proj].json.
 """
 
 import argparse
@@ -49,7 +51,8 @@ import jax.numpy as jnp
 from hopfion_axisym import sparse_solve
 from flag_axisym import FlagModel, FlagProblem, inertia, NT
 from flag_path import degree_parts
-from run_flag_landau import embedded
+from run_flag_landau import embedded, file_tag
+from flag_gauge import smooth_gauge
 from flag_symmetry import symmetry_defect, reflection, sector_basis
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -111,13 +114,18 @@ def sector_spectrum(H, M, B, nev=5, sigma=-1.0):
     return dict(inertia=[n_pos, n_neg, n_pert], lowest=np.sort(vals).tolist())
 
 
-def main(ne, box=3.0, deltas=(0.01, 0.02, 0.04), l3=0):
-    tag = "" if box == 3.0 else f"_a{box:g}"
-    G, Uemb = embedded(ne, box)
+def charge(fm, G, U):
+    """Hopf degree (total, diagonal part, three-cycle part) of the smooth-gauge lift."""
+    return degree_parts(fm, smooth_gauge(G, U)[0])
+
+
+def main(ne, box=3.0, deltas=(0.01, 0.02, 0.04), l3=0, disc="u"):
+    tag = file_tag(box, disc)
+    G, Uemb = embedded(ne, box, disc)
     vec = np.load(os.path.join(DATA, f"flag_landau_vec_ne{ne}{tag}.npz"))
     xi, eta = vec["xi"], vec["eta"]
     k3s, a1, c4 = float(vec["kappa3_star"]), float(vec["a1"]), float(vec["c4"])
-    fm = FlagModel(G, L=(0, 1, l3), kappa3=1.0)
+    fm = FlagModel(G, L=(0, 1, l3), kappa3=1.0, disc=disc)
     pf = FlagProblem(fm, Uemb, types=range(NT))
     perm, sign = reflection(G, pf)
     R = lambda x: sign * x[perm]
@@ -131,14 +139,14 @@ def main(ne, box=3.0, deltas=(0.01, 0.02, 0.04), l3=0):
     xe = xe * (mn(xi) / mn(xe))
     eta_parity = float(eta @ (Mf @ R(eta)) / (eta @ (Mf @ eta)))
     E_emb = float(fm.energy_U(jnp.asarray(Uemb), None, 0.0))
-    Q_emb = degree_parts(fm, Uemb)
+    Q_emb = charge(fm, G, Uemb)
     # check that R is a symmetry of the discrete energy (random perturbation)
     pf.set_base(Uemb)
     pf.set_couplings(r=(2.0, 2.0, 2.0), kappa3=k3s)
     rng = np.random.default_rng(1)
     xr = 1e-2 * rng.standard_normal(pf.nfree)
     e1, e2 = float(pf.energy(jnp.asarray(xr))), float(pf.energy(jnp.asarray(R(xr))))
-    out = dict(ne=ne, box=box, l3=l3, kappa3_star=k3s, a1=a1, c4=c4, E_embedded=E_emb,
+    out = dict(ne=ne, box=box, l3=l3, disc=disc, kappa3_star=k3s, a1=a1, c4=c4, E_embedded=E_emb,
                Q_embedded=Q_emb, symmetry_defect_embedded=symmetry_defect(G, Uemb),
                energy_R_check=abs(e1 - e2) / abs(e1), xi_even_fraction=even_fraction,
                eta_R_parity=eta_parity, n_even=int(Be.shape[1]), n_odd=int(Bo.shape[1]),
@@ -169,7 +177,7 @@ def main(ne, box=3.0, deltas=(0.01, 0.02, 0.04), l3=0):
             U, E, hist, conv = newton_sector(pf, Ustart, Be)
             pf.set_base(U)
             H = pf.hessian()
-            Q, Qd, Q3 = degree_parts(fm, U)
+            Q, Qd, Q3 = charge(fm, G, U)
             row = dict(side=side, delta=delta, kappa3=k3, t_start=float(tstar), E=E,
                        dE=E - E_emb,
                        dE_predicted=(-(a1 * delta) ** 2 / (16 * c4) if side == "below" else 0.0),
@@ -202,5 +210,6 @@ if __name__ == "__main__":
     ap.add_argument("ne", type=int)
     ap.add_argument("--box", type=float, default=3.0)
     ap.add_argument("--deltas", default="0.01,0.02,0.04")
+    ap.add_argument("--disc", default="u", choices=("u", "proj", "align"))
     a = ap.parse_args()
-    main(a.ne, a.box, tuple(float(v) for v in a.deltas.split(",")))
+    main(a.ne, a.box, tuple(float(v) for v in a.deltas.split(",")), disc=a.disc)

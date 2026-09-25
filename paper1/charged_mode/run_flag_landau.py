@@ -22,8 +22,9 @@ parametrisation of the centre manifold.
 
 All derivatives are exact (JAX); only the Hessian solve is sparse-direct.
 
-Usage: python run_flag_landau.py ne [--box 3.0] [--l3 0]
-Writes data/flag_landau_ne{ne}_a{box}.json.
+Usage: python run_flag_landau.py ne [--box 3.0] [--l3 0] [--disc u|proj]
+Writes data/flag_landau_ne{ne}[_a{box}][_proj].json.  --disc proj uses the
+gauge-invariant projector discretisation (flag_axisym.FlagModel).
 """
 
 import argparse
@@ -45,23 +46,31 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 
 
-def embedded(ne, box):
-    fn = os.path.join(DATA, f"flag_embedded_ne{ne}" + ("" if box == 3.0 else f"_a{box:g}") + ".npy")
+def file_tag(box=3.0, disc="u"):
+    return ("" if box == 3.0 else f"_a{box:g}") + ("" if disc == "u" else f"_{disc}")
+
+
+def embedded(ne, box, disc="u"):
+    """Embedded m = 1 Hopfion, relaxed with the given discretisation (cached)."""
+    fn = os.path.join(DATA, f"flag_embedded_ne{ne}{file_tag(box, disc)}.npy")
     G = Grid(ne, ne, p=2, a=box, half=False)
     if os.path.exists(fn):
         return G, np.load(fn)
-    cf = np.load(os.path.join(DATA, "state_ne32.npz"))["cf"]
-    U0 = embedded_hopfion(G, HProfile(G).h_nodes(cf))
-    U, E, hist, conv = newton_relax(FlagModel(G, L=(0, 1, 2)), U0, types=(0, 1), max_iter=60,
-                                    verbose=False)
+    if disc == "u":
+        cf = np.load(os.path.join(DATA, "state_ne32.npz"))["cf"]
+        U0 = embedded_hopfion(G, HProfile(G).h_nodes(cf))
+    else:
+        U0 = embedded(ne, box, "u")[1]
+    U, E, hist, conv = newton_relax(FlagModel(G, L=(0, 1, 2), disc=disc), U0, types=(0, 1),
+                                    max_iter=60, verbose=False)
     np.save(fn, U)
     return G, U
 
 
-def main(ne, box=3.0, l3=0, tol=1e-7):
+def main(ne, box=3.0, l3=0, tol=1e-7, disc="u"):
     t_start = time.time()
-    G, U = embedded(ne, box)
-    fm = FlagModel(G, L=(0, 1, l3), kappa3=1.0)
+    G, U = embedded(ne, box, disc)
+    fm = FlagModel(G, L=(0, 1, l3), kappa3=1.0, disc=disc)
     E_emb = float(fm.energy_U(jnp.asarray(U), None, 0.0))
     # ---- threshold κ₃* in the normal block -----------------------------------------
     pn = FlagProblem(fm, U, types=(2, 3, 4, 5))
@@ -170,7 +179,7 @@ def main(ne, box=3.0, l3=0, tol=1e-7):
         x = tt * xi - 0.5 * tt * tt * etaf
         red.append(dict(t=tt, dE=float(energy(U0, jnp.asarray(x), r, k3)) - E_emb,
                         quartic=c4 * tt ** 4))
-    out = dict(ne=ne, box=box, l3=l3, E_embedded=E_emb, kappa3_star=k3s,
+    out = dict(ne=ne, box=box, l3=l3, disc=disc, E_embedded=E_emb, kappa3_star=k3s,
                lowest_normal_at_star=vals.tolist(), a1=a1, E2=E2, E3=E3, E4=E4, E4_fd=E4_fd,
                g_normal_max=g_normal, g_inblock_max=float(np.abs(gb).max()),
                zero_mode_residual=zres, g_dot_zero_mode=g_dot_z, g_odd_relative=g_odd_rel,
@@ -184,7 +193,7 @@ def main(ne, box=3.0, l3=0, tol=1e-7):
                                           "gHg_shifted_solve", "c4_shifted_solve", "shift_eps",
                                           "order")}, indent=1), flush=True)
     print("reduced energy check:", red, flush=True)
-    tag = "" if box == 3.0 else f"_a{box:g}"
+    tag = file_tag(box, disc)
     with open(os.path.join(DATA, f"flag_landau_ne{ne}{tag}.json"), "w") as fh:
         json.dump(out, fh, indent=1)
     np.savez_compressed(os.path.join(DATA, f"flag_landau_vec_ne{ne}{tag}.npz"), xi=xi, eta=etaf,
@@ -196,5 +205,6 @@ if __name__ == "__main__":
     ap.add_argument("ne", type=int)
     ap.add_argument("--box", type=float, default=3.0)
     ap.add_argument("--l3", type=int, default=0)
+    ap.add_argument("--disc", default="u", choices=("u", "proj", "align"))
     a = ap.parse_args()
-    main(a.ne, a.box, a.l3)
+    main(a.ne, a.box, a.l3, disc=a.disc)

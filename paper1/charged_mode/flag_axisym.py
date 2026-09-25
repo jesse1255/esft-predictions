@@ -78,10 +78,12 @@ def x_to_X(x6):
 
 class FlagModel:
     def __init__(self, grid, L=(0, 1, 2), r=(2.0, 2.0, 2.0), kappa=(2.0, 2.0, 2.0),
-                 m2=(1.0, 1.0, 1.0), kappa3=0.0):
+                 m2=(1.0, 1.0, 1.0), kappa3=0.0, disc="u"):
         G = grid
         assert not G.half
+        assert disc in ("u", "proj", "align")
         self.G = G
+        self.disc = disc
         self.L = tuple(int(l) for l in L)
         self.r = jnp.asarray(np.array(r, dtype=float))      # (r_01, r_02, r_12)
         self.kappa, self.m2 = kappa, m2
@@ -90,6 +92,34 @@ class FlagModel:
         self.rho = jnp.asarray(G.rho)
         self.W = jnp.asarray(G.W)
         self.Lvec = jnp.asarray(np.array(self.L, dtype=float))
+        if disc == "align":
+            # element-local gauge: every node's column phases are aligned with the element's
+            # centre node (odd I, odd J) before interpolation, so a change of nodal phases
+            # multiplies each element by one overall phase per column and drops out.
+            S = (abs(G.Pv) + abs(G.Pr) + abs(G.Pz)).tocoo()
+            rows, cols = S.row, S.col
+            centre = (G.I[cols] % 2 == 1) & (G.J[cols] % 2 == 1)
+            nq = G.Pv.shape[0]
+            ref = -np.ones(nq, dtype=np.int64)
+            ref[rows[centre]] = cols[centre]
+            assert np.all(ref >= 0), "every quadrature point needs an element centre node"
+            val = lambda P: np.asarray(sp.csr_matrix(P)[rows, cols]).ravel()
+            self.nq = nq
+            self.a_rows, self.a_cols = jnp.asarray(rows), jnp.asarray(cols)
+            self.a_ref = jnp.asarray(ref[rows])
+            self.a_vv, self.a_vr, self.a_vz = (jnp.asarray(val(P)) for P in (G.Pv, G.Pr, G.Pz))
+
+    def _interp_aligned(self, U):
+        """Z, ∂_ρZ, ∂_zZ at the quadrature points in the element-local aligned gauge."""
+        Ug = U[self.a_cols]                                    # (entries, 3, 3)
+        Ur = U[self.a_ref]
+        w = jnp.sum(jnp.conj(Ur) * Ug, axis=1)                  # <Z_a(centre), Z_a(n)>
+        ph = jnp.conj(w) * jax.lax.rsqrt(_abs2(w) + 1e-300)
+        Ua = Ug * ph[:, None, :]
+
+        def ip(v):
+            return jax.ops.segment_sum(v[:, None, None] * Ua, self.a_rows, num_segments=self.nq)
+        return ip(self.a_vv), ip(self.a_vr), ip(self.a_vz)
 
     # ---------------------------------------------------------------------------
     def density_terms(self, U, r=None, k3=None):
@@ -101,12 +131,18 @@ class FlagModel:
         r = self.r if r is None else r
         with_c = (k3 is not None) or (self.kappa3 != 0.0)
         k3 = self.kappa3 if k3 is None else k3
-        nn = U.shape[0]
-        flat = jnp.concatenate([U.real.reshape(nn, 9), U.imag.reshape(nn, 9)], axis=1)
-        def ip(P):
-            o = P @ flat
-            return (o[:, :9] + 1j * o[:, 9:]).reshape(-1, 3, 3)
-        Z, Zr, Zz = ip(self.Pv), ip(self.Pr), ip(self.Pz)
+        if self.disc == "proj":
+            return self._density_proj(U, r, k3, with_c)
+        if self.disc == "align":
+            Z, Zr, Zz = self._interp_aligned(U)
+        else:
+            nn = U.shape[0]
+            flat = jnp.concatenate([U.real.reshape(nn, 9), U.imag.reshape(nn, 9)], axis=1)
+
+            def ip(P):
+                o = P @ flat
+                return (o[:, :9] + 1j * o[:, 9:]).reshape(-1, 3, 3)
+            Z, Zr, Zz = ip(self.Pv), ip(self.Pr), ip(self.Pz)
         Zh = jnp.conj(jnp.swapaxes(Z, 1, 2))
         w_r = Zh @ Zr
         w_z = Zh @ Zz
@@ -145,6 +181,68 @@ class FlagModel:
             for c in range(3):
                 if c != a:
                     pot = pot + self.m2[a] * _abs2(Z[:, c, a])
+        return sig, sk, pot
+
+    def _density_proj(self, U, r, k3, with_c):
+        """Gauge-invariant discretisation: interpolate the projectors P_a = Z_a Z_a†.
+
+        The nodal column phases drop out exactly, so the discrete energy is a
+        function of the nodal flags only.  With D_ρ, D_z the derivatives of the
+        interpolated P̂_a and D_φ P̂ = (i/ρ)[L, P̂] (the R_L conjugation drops out of
+        every trace):
+            |ω_i^{ab}|²   = −½ Tr(D_iP_a D_iP_b)                        (a ≠ b)
+            F^{(a)}_{ij}  = −i Tr(P_a [D_iP_a, D_jP_a])
+            |C^{ac}_{ij}|² = ‖P_a (D_iP_b P_b D_jP_c − D_jP_b P_b D_iP_c) P_c‖²
+            1 − |Z_aa|²   = Σ_{c≠a} Σ_d |(P_a)_cd|².
+        For exact projectors these are the formulas of the U discretisation.
+        """
+        nn = U.shape[0]
+        Pn = jnp.einsum("nia,nja->naij", U, jnp.conj(U))                 # (nn, a, i, j)
+        flat = jnp.concatenate([Pn.real.reshape(nn, 27), Pn.imag.reshape(nn, 27)], axis=1)
+
+        def ip(Pm):
+            o = Pm @ flat
+            return (o[:, :27] + 1j * o[:, 27:]).reshape(-1, 3, 3, 3)
+        P, Pr, Pz = ip(self.Pv), ip(self.Pr), ip(self.Pz)
+        Lm = jnp.diag(self.Lvec).astype(jnp.complex128)
+        Pf = 1j * (jnp.einsum("ij,qajk->qaik", Lm, P) - jnp.einsum("qaij,jk->qaik", P, Lm))
+        Pf = Pf / self.rho[:, None, None, None]
+        D = (Pr, Pz, Pf)
+
+        def tr(A, B):
+            return jnp.real(jnp.einsum("qij,qji->q", A, B))
+        sig = 0.0
+        for k, (a, b) in enumerate(PAIRS):
+            s_ab = 0.0
+            for Di in D:
+                s_ab = s_ab - 0.5 * tr(Di[:, a], Di[:, b])
+            sig = sig + r[k] * s_ab
+        comps = ((0, 1), (0, 2), (1, 2))
+        sk = 0.0
+        for a in range(3):
+            for (i, j) in comps:
+                Di, Dj = D[i][:, a], D[j][:, a]
+                comm = Di @ Dj - Dj @ Di
+                F = jnp.real(-1j * jnp.einsum("qij,qji->q", P[:, a], comm))
+                sk = sk + 0.5 * self.kappa[a] * F ** 2
+        if with_c:
+            for (i, j) in comps:
+                for a in range(3):
+                    for c in range(3):
+                        if c == a:
+                            continue
+                        b = 3 - a - c
+                        M = P[:, a] @ (D[i][:, b] @ P[:, b] @ D[j][:, c]
+                                       - D[j][:, b] @ P[:, b] @ D[i][:, c]) @ P[:, c]
+                        sk = sk + 0.5 * k3 * jnp.real(jnp.einsum("qij,qij->q", M, jnp.conj(M)))
+        # 1 − |Z_aa|² = Σ_{c≠a} Σ_d |(P_a)_cd|² for an exact projector.  This form is a sum of
+        # squares of interpolated entries, whose leading part near the vacuum is the
+        # consistent mass |x|²; the linear form 1 − (P_a)_aa would act like a lumped mass,
+        # which is not positive on the stretched outer elements.
+        pot = 0.0
+        for a in range(3):
+            sq = jnp.real(P[:, a]) ** 2 + jnp.imag(P[:, a]) ** 2          # (q, c, d)
+            pot = pot + self.m2[a] * (jnp.sum(sq, axis=(1, 2)) - jnp.sum(sq[:, a, :], axis=1))
         return sig, sk, pot
 
     def energy_U(self, U, r=None, k3=None):

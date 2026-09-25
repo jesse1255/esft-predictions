@@ -1,0 +1,214 @@
+{
+ "description": "\nValidation of the gauge-invariant discretisations of the flag energy\n(FlagModel(disc=\"proj\") and FlagModel(disc=\"align\")).\n\n1. Gauge invariance: random nodal column phases U \u2192 U\u00b7diag(e^{i\u03b8_a(n)}) change\n   the projector and the element-aligned (\"align\") energies only at round-off;\n   the U discretisation changes.\n2. Consistency: for the embedded Hopfion, and for the same Hopfion tilted along\n   the critical normal mode (so that the three-cycle term is non-zero), both\n   discretisations approach the same energies as ne grows.\n3. In-block spectra of the embedded Hopfion in both discretisations (needs the\n   relaxed states from run_flag_landau.py [--disc proj]).\n\nUsage: python check_proj_disc.py   \u2192 data/check_proj_disc.json\n",
+ "rows": [
+  {
+   "ne": 16,
+   "gauge_change_u": -134.3256643035449,
+   "gauge_change_proj": 9.094947017729282e-13,
+   "gauge_change_align": 0.0,
+   "embedded_align": {
+    "sigma": 103.26813762841238,
+    "skyrme": 189.5201555359061,
+    "pot": 28.591994444770584
+   },
+   "embedded_u": {
+    "sigma": 103.27316269517328,
+    "skyrme": 189.57281260740046,
+    "pot": 28.592840025992786
+   },
+   "embedded_proj": {
+    "sigma": 103.24638319790974,
+    "skyrme": 188.8448972434193,
+    "pot": 28.585675638306903
+   },
+   "tilted_u": {
+    "sigma": 103.95512715029318,
+    "skyrme": 188.84792327831593,
+    "pot": 28.784310156407415
+   },
+   "tilted_proj": {
+    "sigma": 103.928735933576,
+    "skyrme": 188.1302486875689,
+    "pot": 28.777135156282874
+   },
+   "tilted_align": {
+    "sigma": 103.95023710239767,
+    "skyrme": 188.79733824460263,
+    "pot": 28.78346591272201
+   }
+  },
+  {
+   "ne": 24,
+   "gauge_change_u": -130.4166305115798,
+   "gauge_change_proj": -1.1368683772161603e-13,
+   "gauge_change_align": 0.0,
+   "embedded_align": {
+    "sigma": 103.41246519951537,
+    "skyrme": 189.49894112428794,
+    "pot": 28.667000298909834
+   },
+   "embedded_u": {
+    "sigma": 103.41350315494537,
+    "skyrme": 189.50899927404993,
+    "pot": 28.667168233135015
+   },
+   "embedded_proj": {
+    "sigma": 103.40805501291089,
+    "skyrme": 189.36939446360623,
+    "pot": 28.665713113655027
+   },
+   "tilted_u": {
+    "sigma": 104.08887729919431,
+    "skyrme": 188.79194947055692,
+    "pot": 28.85853486368097
+   },
+   "tilted_proj": {
+    "sigma": 104.08349300482388,
+    "skyrme": 188.65426437475656,
+    "pot": 28.857077700217474
+   },
+   "tilted_align": {
+    "sigma": 104.08785987414512,
+    "skyrme": 188.78224647310225,
+    "pot": 28.85836721262215
+   }
+  },
+  {
+   "ne": 32,
+   "gauge_change_u": -131.82019693789323,
+   "gauge_change_proj": -1.1368683772161603e-13,
+   "gauge_change_align": 0.0,
+   "embedded_align": {
+    "sigma": 103.4348771418006,
+    "skyrme": 189.49679605152983,
+    "pot": 28.678582045235235
+   },
+   "embedded_u": {
+    "sigma": 103.43520659032139,
+    "skyrme": 189.49992411634844,
+    "pot": 28.67863522742505
+   },
+   "embedded_proj": {
+    "sigma": 103.43347021448218,
+    "skyrme": 189.45620212584245,
+    "pot": 28.678170578331866
+   },
+   "tilted_u": {
+    "sigma": 104.1095982443072,
+    "skyrme": 188.7840304481514,
+    "pot": 28.86998695860471
+   },
+   "tilted_proj": {
+    "sigma": 104.10788068414597,
+    "skyrme": 188.7409051078984,
+    "pot": 28.86952166108205
+   },
+   "tilted_align": {
+    "sigma": 104.1092747055954,
+    "skyrme": 188.78101006055988,
+    "pot": 28.869933865081094
+   }
+  }
+ ],
+ "inblock": [
+  {
+   "ne": 16,
+   "disc": "u",
+   "lowest": [
+    -0.14115799174083388,
+    -0.006235070440809565,
+    2.000273631831003
+   ],
+   "rayleigh_isorotation": -0.05285603058708727,
+   "rayleigh_translation": -0.06731477816291495
+  },
+  {
+   "ne": 16,
+   "disc": "proj",
+   "lowest": [
+    -0.006532491313758326,
+    6.140172259527787e-10,
+    2.000273631232964
+   ],
+   "rayleigh_isorotation": 6.140161631479634e-10,
+   "rayleigh_translation": 0.023435634741757225
+  },
+  {
+   "ne": 16,
+   "disc": "align",
+   "lowest": [
+    -0.0022164014603370252,
+    3.89677734524696e-11,
+    2.0002736318045056
+   ],
+   "rayleigh_isorotation": 3.895891176760332e-11,
+   "rayleigh_translation": 0.01134361623001515
+  },
+  {
+   "ne": 24,
+   "disc": "u",
+   "lowest": [
+    -0.026656686835510368,
+    -0.0011990917412050273,
+    2.0001216633265693
+   ],
+   "rayleigh_isorotation": -0.010406692754206755,
+   "rayleigh_translation": -0.01332391603646515
+  },
+  {
+   "ne": 24,
+   "disc": "proj",
+   "lowest": [
+    -0.0011743757696057178,
+    1.371746605194346e-09,
+    2.0001216633200714
+   ],
+   "rayleigh_isorotation": 1.3717316259295021e-09,
+   "rayleigh_translation": 0.0018049837244203519
+  },
+  {
+   "ne": 24,
+   "disc": "align",
+   "lowest": [
+    -0.0003958487209860251,
+    1.6246626266536168e-10,
+    2.0001216644913105
+   ],
+   "rayleigh_isorotation": 1.624614232954483e-10,
+   "rayleigh_translation": 0.0012655192487106128
+  },
+  {
+   "ne": 32,
+   "disc": "u",
+   "lowest": [
+    -0.008339452537317549,
+    -0.00037779346730609786,
+    2.0000684452024418
+   ],
+   "rayleigh_isorotation": -0.0032964092572226053,
+   "rayleigh_translation": -0.004241748339627426
+  },
+  {
+   "ne": 32,
+   "disc": "proj",
+   "lowest": [
+    -0.0003613231450453336,
+    3.511479329532108e-09,
+    2.0000684452944237
+   ],
+   "rayleigh_isorotation": 3.511468253887528e-09,
+   "rayleigh_translation": 0.0002982946062858803
+  },
+  {
+   "ne": 32,
+   "disc": "align",
+   "lowest": [
+    -0.0001221739463626026,
+    4.0833342263013606e-10,
+    2.0000684453282696
+   ],
+   "rayleigh_isorotation": 4.083279680591018e-10,
+   "rayleigh_translation": 0.00029893920144487886
+  }
+ ]
+}
