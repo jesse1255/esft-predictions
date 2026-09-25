@@ -1,0 +1,471 @@
+{
+ "S1_vortex": {
+  "fetter_exact_in_sextic_GL": {
+   "potential": "V(f) = (1-f^2)^2 (3-2f^2)/(4 a^2)",
+   "max_residual": 3.287647931671245e-14,
+   "radial_mass_squared": 2.0
+  },
+  "gp_vortex": [
+   {
+    "n": 1,
+    "bvp_status": 0,
+    "E_exact_R40": 12.785993061642163,
+    "E_fetter_R40": 12.856324054430049,
+    "fetter_a_opt": 1.415090523150606,
+    "fetter_a_opt_over_sqrt2": 1.0006201049126124,
+    "energy_excess_rel": 0.005500628105209762,
+    "max_abs_profile_diff": 0.05956427061256264,
+    "least_squares_core_a": 1.510984446132764
+   },
+   {
+    "n": 2,
+    "bvp_status": 0,
+    "E_exact_R40": 39.33511584838574,
+    "E_fetter_R40": 39.62659541075767,
+    "fetter_a_opt": 3.1914704286127584,
+    "fetter_a_opt_over_sqrt2": 2.2567103820284187,
+    "energy_excess_rel": 0.007410161533409969,
+    "max_abs_profile_diff": 0.07579219843428159,
+    "least_squares_core_a": 3.0353271608617787
+   }
+  ],
+  "pure_phase_log_divergence": [
+   {
+    "r_min": 1.0,
+    "E_per_length_over_pi": 3.6888794541139363
+   },
+   {
+    "r_min": 0.01,
+    "E_per_length_over_pi": 8.294049640102028
+   },
+   {
+    "r_min": 0.0001,
+    "E_per_length_over_pi": 12.89921982609012
+   },
+   {
+    "r_min": 1e-08,
+    "E_per_length_over_pi": 22.1095601980663
+   }
+  ]
+ },
+ "S2_hedgehog": {
+  "paper_E_equals_hedgehog_angular_energy": [
+   {
+    "R": 10.0,
+    "hedgehog_angular": 107.17697056725072,
+    "paper_formula": 107.17697056725073,
+    "rel_diff": 1.3259242764549934e-16
+   },
+   {
+    "R": 100.0,
+    "hedgehog_angular": 1237.023512151343,
+    "paper_formula": 1237.023512151343,
+    "rel_diff": 0.0
+   },
+   {
+    "R": 1000.0,
+    "hedgehog_angular": 12546.64397192343,
+    "paper_formula": 12546.64397192342,
+    "rel_diff": 7.248908184596405e-16
+   }
+  ],
+  "hedgehog_exact_in_sextic_O3": {
+   "potential": "V(f) = (1-f^2)^2 (2-f^2)/(2 a^2)",
+   "max_residual": 6.166595012402354e-14,
+   "radial_mass_squared": 4.0,
+   "energy": [
+    {
+     "R": 50.0,
+     "E": 616.1071554325135,
+     "E_minus_4piR": -12.211375285445115
+    },
+    {
+     "R": 200.0,
+     "E": 2500.96853277343,
+     "E_minus_4piR": -12.305590098404537
+    },
+    {
+     "R": 1000.0,
+     "E": 12554.03989203893,
+     "E_minus_4piR": -12.330722320240966
+    }
+   ],
+   "lowest_radial_omega2": [
+    4.010743210698355,
+    4.025500839482111,
+    4.04565819905456
+   ],
+   "note": "lowest radial \u03c9\u00b2 in a box of radius 60: positive, continuum starts at m\u00b2 = 4/a\u00b2; angular (non-hedgehog) perturbations not checked here"
+  },
+  "mexican_hat_hedgehog": {
+   "bvp_status": 0,
+   "least_squares_core_a": 1.795460086083586,
+   "max_abs_profile_diff": 0.02621989685439574
+  }
+ },
+ "S3_monopole_harmonics": [
+  {
+   "n": 0,
+   "q": 0.0,
+   "lowest_j": [
+    {
+     "j": 0.0,
+     "Jz_values": [
+      0.0
+     ],
+     "multiplicity": 1,
+     "expected": 1,
+     "eigenvalue_theory": 0.0,
+     "max_eigenvalue_error": 8.150562359847478e-09
+    },
+    {
+     "j": 1.0,
+     "Jz_values": [
+      -1.0,
+      0.0,
+      1.0
+     ],
+     "multiplicity": 3,
+     "expected": 3,
+     "eigenvalue_theory": 2.0,
+     "max_eigenvalue_error": 1.1602118377140869e-08
+    },
+    {
+     "j": 2.0,
+     "Jz_values": [
+      -2.0,
+      -1.0,
+      0.0,
+      1.0,
+      2.0
+     ],
+     "multiplicity": 5,
+     "expected": 5,
+     "eigenvalue_theory": 6.0,
+     "max_eigenvalue_error": 7.791282641278485e-08
+    }
+   ]
+  },
+  {
+   "n": 1,
+   "q": 0.5,
+   "lowest_j": [
+    {
+     "j": 0.5,
+     "Jz_values": [
+      -0.5,
+      0.5
+     ],
+     "multiplicity": 2,
+     "expected": 2,
+     "eigenvalue_theory": 0.5,
+     "max_eigenvalue_error": 2.859189290882469e-08
+    },
+    {
+     "j": 1.5,
+     "Jz_values": [
+      -1.5,
+      -0.5,
+      0.5,
+      1.5
+     ],
+     "multiplicity": 4,
+     "expected": 4,
+     "eigenvalue_theory": 3.5,
+     "max_eigenvalue_error": 8.919672689344793e-08
+    },
+    {
+     "j": 2.5,
+     "Jz_values": [
+      -2.5,
+      -1.5,
+      -0.5,
+      0.5,
+      1.5,
+      2.5
+     ],
+     "multiplicity": 6,
+     "expected": 6,
+     "eigenvalue_theory": 8.5,
+     "max_eigenvalue_error": 1.4545401150201087e-07
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "q": 1.0,
+   "lowest_j": [
+    {
+     "j": 1.0,
+     "Jz_values": [
+      -1.0,
+      0.0,
+      1.0
+     ],
+     "multiplicity": 3,
+     "expected": 3,
+     "eigenvalue_theory": 1.0,
+     "max_eigenvalue_error": 4.411921872282676e-08
+    },
+    {
+     "j": 2.0,
+     "Jz_values": [
+      -2.0,
+      -1.0,
+      0.0,
+      1.0,
+      2.0
+     ],
+     "multiplicity": 5,
+     "expected": 5,
+     "eigenvalue_theory": 5.0,
+     "max_eigenvalue_error": 7.717544026064616e-08
+    },
+    {
+     "j": 3.0,
+     "Jz_values": [
+      -3.0,
+      -2.0,
+      -1.0,
+      0.0,
+      1.0,
+      2.0,
+      3.0
+     ],
+     "multiplicity": 7,
+     "expected": 7,
+     "eigenvalue_theory": 11.0,
+     "max_eigenvalue_error": 1.955724115987323e-07
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "q": 1.5,
+   "lowest_j": [
+    {
+     "j": 1.5,
+     "Jz_values": [
+      -1.5,
+      -0.5,
+      0.5,
+      1.5
+     ],
+     "multiplicity": 4,
+     "expected": 4,
+     "eigenvalue_theory": 1.5,
+     "max_eigenvalue_error": 1.0419493046143202e-07
+    },
+    {
+     "j": 2.5,
+     "Jz_values": [
+      -2.5,
+      -1.5,
+      -0.5,
+      0.5,
+      1.5,
+      2.5
+     ],
+     "multiplicity": 6,
+     "expected": 6,
+     "eigenvalue_theory": 6.5,
+     "max_eigenvalue_error": 1.683030825816445e-07
+    },
+    {
+     "j": 3.5,
+     "Jz_values": [
+      -3.5,
+      -2.5,
+      -1.5,
+      -0.5,
+      0.5,
+      1.5,
+      2.5,
+      3.5
+     ],
+     "multiplicity": 8,
+     "expected": 8,
+     "eigenvalue_theory": 13.5,
+     "max_eigenvalue_error": 3.307270617369795e-07
+    }
+   ]
+  }
+ ],
+ "S4_electron_sizes": {
+  "darwin": {
+   "r_equiv_fm": 334.42373585791904,
+   "E1S_GeV": 7.245215879895936e-13,
+   "E1S_over_alpha4_m_over_2": 0.9999999999999996
+  },
+  "welton": {
+   "rms_fm": 82.56528638269312,
+   "lamb_2S_estimate_MHz": 1334.8009364870375,
+   "note": "leading-log estimate (Welton 1948 / Bethe 1947); the measured 2S-2P Lamb shift is 1057.8 MHz (LIT); the full Bethe logarithm lowers the estimate"
+  },
+  "fermi_scale_1S2S_Hz": 40.729415146652606,
+  "weak_range_fm": {
+   "hbar_over_mW": 0.0024552623573766003,
+   "hbar_over_mZ": 0.002163967254319666
+  },
+  "paper_bound": {
+   "dnu_Hz": 10.0,
+   "Lambda_GeV": 73.05437840972672,
+   "a_fm": 0.0027010972469478593,
+   "a_times_mW": 1.1001257111414884,
+   "dnu_over_nuF": 0.24552279879279978
+  },
+  "closed_form": {
+   "sqrt_alpha_over_GF_GeV": 25.01283142131026,
+   "tree_level_sqrt_alpha_over_GF": 25.92888404843578,
+   "Lambda_check": 73.05437840972672
+  },
+  "lambda_vs_precision": [
+   {
+    "dnu_Hz": 1.0,
+    "Lambda_GeV": 231.018228822566,
+    "nearest": "v",
+    "ratio": 0.9382607311096657
+   },
+   {
+    "dnu_Hz": 3.0,
+    "Lambda_GeV": 133.37843659841903,
+    "nearest": "mH",
+    "ratio": 1.065322976025711
+   },
+   {
+    "dnu_Hz": 10.0,
+    "Lambda_GeV": 73.05437840972672,
+    "nearest": "mW",
+    "ratio": 0.9089870274574366
+   },
+   {
+    "dnu_Hz": 30.0,
+    "Lambda_GeV": 42.17796504033651,
+    "nearest": "mW",
+    "ratio": 0.5248039049924288
+   },
+   {
+    "dnu_Hz": 100.0,
+    "Lambda_GeV": 23.1018228822566,
+    "nearest": "mW",
+    "ratio": 0.2874469370311513
+   }
+  ],
+  "look_elsewhere": {
+   "range_GeV": [
+    23.1018228822566,
+    231.018228822566
+   ],
+   "frac_within_10pct": 0.328078359608202,
+   "frac_within_15pct": 0.4632126839365803
+  }
+ },
+ "S5_sine_gordon": {
+  "numeric": {
+   "M": 7.999999982222224,
+   "M_expected": 8.0,
+   "Q": 1.0000000000000038,
+   "r_rms": 1.5707963310389343,
+   "r_rms_expected": 1.5707963267948966,
+   "M_r": 12.566370620386209,
+   "M_r_expected": 12.566370614359172
+  },
+  "table": [
+   {
+    "beta2": 0.1,
+    "M_cl_times_r_rms": 125.66370614359172,
+    "thirring_g_over_pi": 124.66370614359172
+   },
+   {
+    "beta2": 1.0,
+    "M_cl_times_r_rms": 12.566370614359172,
+    "thirring_g_over_pi": 11.566370614359172
+   },
+   {
+    "beta2": 12.566370614359172,
+    "M_cl_times_r_rms": 1.0,
+    "thirring_g_over_pi": 0.0
+   },
+   {
+    "beta2": 18.84955592153876,
+    "M_cl_times_r_rms": 0.6666666666666666,
+    "thirring_g_over_pi": -0.33333333333333337
+   },
+   {
+    "beta2": 25.132741228718345,
+    "M_cl_times_r_rms": 0.5,
+    "thirring_g_over_pi": -0.5
+   }
+  ]
+ },
+ "S6_lorentz": {
+  "paper_conservative": [
+   {
+    "label": "atomic (27 eV)",
+    "k_GeV": 2.72e-08,
+    "delta_conservative": 1.388328016513417e-19
+   },
+   {
+    "label": "LEP beam (104.5 GeV)",
+    "k_GeV": 104.5,
+    "delta_conservative": 2.049211859635954
+   },
+   {
+    "label": "cosmic-ray electrons (10 TeV)",
+    "k_GeV": 10000.0,
+    "delta_conservative": 18765.246762994935
+   },
+   {
+    "label": "GRB photons (10 TeV)",
+    "k_GeV": 10000.0,
+    "delta_conservative": 18765.246762994935
+   }
+  ],
+  "emergent_single_scale": [
+   {
+    "source": "Vasileiou 2013, GRB 090510",
+    "E_QG2_GeV": 130000000000.0,
+    "xi_max_fm": 2.14663455310623e-12,
+    "core_a_max_fm": 3.0357996984615384e-12,
+    "ratio_to_paper_a": 1.1243702586894587e-09
+   },
+   {
+    "source": "LHAASO 2024, GRB 221009A",
+    "E_QG2_GeV": 732533999999.9999,
+    "xi_max_fm": 3.80955002639891e-13,
+    "core_a_max_fm": 5.387517313872121e-13,
+    "ratio_to_paper_a": 1.9953767829156003e-10
+   }
+  ]
+ },
+ "S7_vortex_ring": [
+  {
+   "R_over_a": 3.0,
+   "E": 2.142080745521919,
+   "P": 28.274333882308138,
+   "U": 0.07766904012317224,
+   "E_over_sqrtP_lnP": 0.12054220138292707
+  },
+  {
+   "R_over_a": 10.0,
+   "E": 13.160133173369406,
+   "P": 314.1592653589793,
+   "U": 0.03288162319478587,
+   "E_over_sqrtP_lnP": 0.1291293754978868
+  },
+  {
+   "R_over_a": 100.0,
+   "E": 246.73058638339634,
+   "P": 31415.926535897932,
+   "U": 0.005120501316677156,
+   "E_over_sqrtP_lnP": 0.1344296304266435
+  },
+  {
+   "R_over_a": 10000.0,
+   "E": 47698.90956828009,
+   "P": 314159265.35897934,
+   "U": 8.785179311074294e-05,
+   "E_over_sqrtP_lnP": 0.1375449175803099
+  }
+ ]
+}
