@@ -1,0 +1,369 @@
+{
+ "ne": 32,
+ "e": 0.6,
+ "N": 0.5,
+ "mu": 1.0,
+ "description": "\nHigh azimuthal sectors k \u2265 5 without assembling each one.\n\nFor k \u2265 1 the second variation in sector k is an exact quadratic polynomial\nin k on a k-independent coefficient space (the \u03c6 quadrature is exact, the\nbackground is \u03c6-independent, and k enters only through \u2202_\u03c6 = k\u00b7(swap c \u2194 s)):\n\n    H(k) = A + k B + k\u00b2 C.\n\nFor k \u2265 2 the axis constraints are also k-independent, so A, B, C follow\nexactly from H(2), H(3), H(4); a direct assembly at k = 5 checks this.\nThen for every integer k from 5 to k_max the LDL\u1d40 inertia of H(k) is taken:\nH_AA \u227b 0 (gauge-fixed Maxwell block), so by Haynsworth additivity the number\nof negative eigenvalues of H(k) equals that of the gauge-relaxed Schur\ncomplement.  For the tail, H(k) \u2212 H(k0) = (k \u2212 k0)[B + (k + k0)C]: if B + 2k0 C \u2ab0 0\n(and C \u227b 0) then H(k) \u2ab0 H(k0) for all k \u2265 k0, so the finite check closes.\n\nUsage: python run_kbound.py ne [--state f.npz --e 0.6 --N 0.5 --tag _e0.6_N0.5 --kmax 60]\nWrites data/kbound{tag}_ne{ne}.json.\n",
+ "rows": [
+  {
+   "k": 5,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 6,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 7,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 8,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 9,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 10,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 11,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 12,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 13,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 14,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 15,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 16,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 17,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 18,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 19,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 20,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 21,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 22,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 23,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 24,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 25,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 26,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 27,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 28,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 29,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 30,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 31,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 32,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 33,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 34,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 35,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 36,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 37,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 38,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 39,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 40,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 41,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 42,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 43,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 44,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 45,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 46,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 47,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 48,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 49,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 50,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 51,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 52,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 53,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 54,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 55,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 56,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 57,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 58,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 59,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  },
+  {
+   "k": 60,
+   "n_negative": 0,
+   "n_positive": 80010,
+   "perturbed_pivots": 0
+  }
+ ],
+ "control_k4": {
+  "0.99": 0,
+  "0.9995": 0,
+  "1.0005": 12,
+  "1.01": 50
+ },
+ "inertia_k2_k4": {
+  "2": 0,
+  "3": 0,
+  "4": 0
+ },
+ "polynomial_check_k5": 1.27776343224041e-15,
+ "inertia_C": [
+  80010,
+  0,
+  0
+ ],
+ "nfree": 80010,
+ "tail": {
+  "10": 24,
+  "20": 0,
+  "40": 0,
+  "60": 0
+ }
+}

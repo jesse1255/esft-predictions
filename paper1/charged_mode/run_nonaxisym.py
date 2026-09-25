@@ -2,8 +2,8 @@
 Non-axisymmetric stability of the charged Hopfion: soliton spectrum (gauge
 field relaxed, Schur complement) in the azimuthal sectors k = 0..4.
 
-Usage: python run_nonaxisym.py ne [k ...]      (default k = 0..4)
-Writes data/nonaxisym_ne{ne}.json.
+Usage: python run_nonaxisym.py ne [k ...] [--state f.npz --e 0.6 --N 0.5 --tag _e0.6_N0.5]
+Writes data/nonaxisym{tag}_ne{ne}.json.
 """
 
 import json
@@ -56,6 +56,14 @@ def main(ne, ks=(0, 1, 2, 3, 4), nev=6, state=None, e=0.3, N=1.0, mu=1.0, tag=""
 
 
 if __name__ == "__main__":
-    ne = int(sys.argv[1]) if len(sys.argv) > 1 else 32
-    ks = tuple(int(k) for k in sys.argv[2:]) or (0, 1, 2, 3, 4)
-    main(ne, ks=ks)
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("ne", type=int)
+    ap.add_argument("ks", type=int, nargs="*", default=[0, 1, 2, 3, 4])
+    ap.add_argument("--state", default=None, help="npz with V (half plane) at this ne")
+    ap.add_argument("--e", type=float, default=0.3)
+    ap.add_argument("--N", type=float, default=1.0)
+    ap.add_argument("--mu", type=float, default=1.0)
+    ap.add_argument("--tag", default="")
+    a = ap.parse_args()
+    main(a.ne, ks=tuple(a.ks), state=a.state, e=a.e, N=a.N, mu=a.mu, tag=a.tag)

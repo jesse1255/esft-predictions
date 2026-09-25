@@ -1,0 +1,35 @@
+{
+ "note": "First version of run_flag_twosided.py (2026-09-25, before the R-symmetric slice): Newton on all six tangent coordinates without symmetry restriction, started from U_emb\u00b7Cay(t*\u03be \u2212 t*\u00b2\u03b7/2) with the \u03be returned by eigsh (R-even fraction 0.999) at \u03ba\u2083 = \u03ba\u2083* \u2212 0.02, ne = 16, a = 3.  It slid along the R-odd lattice-lifted zero modes and ended at the vacuum (E \u2192 0, Q \u2192 0).  Values copied from that run's output file.",
+ "ne": 16,
+ "box": 3.0,
+ "kappa3_star": 0.9212939441204071,
+ "a1": 13.532662899467967,
+ "c4_first_version": 0.19350297407840739,
+ "E_embedded": 321.43881532856653,
+ "Q_embedded": -0.9993629896563359,
+ "run": {
+  "side": "below",
+  "delta": 0.02,
+  "kappa3": 0.9012939441204071,
+  "t_start": 0.5913339474315011,
+  "E": 4.165964404765117e-24,
+  "Q": -7.034219450006594e-27,
+  "D": 1.6254998003546175e-05,
+  "converged": true,
+  "newton_iterations": 71,
+  "inertia": [
+   11844,
+   0,
+   0
+  ],
+  "lowest_eigenvalues": [
+   2.0001122479493527,
+   2.0001122479493536,
+   2.0002736370225924,
+   2.000273637034085,
+   2.0002736370350154,
+   2.0004742453471507
+  ],
+  "t_seconds": 1667.8
+ }
+}

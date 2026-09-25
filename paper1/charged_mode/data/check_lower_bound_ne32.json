@@ -1,0 +1,52 @@
+{
+ "ne": 32,
+ "E0": 307.5295920011596,
+ "I0": 75.10772942159336,
+ "omega0": 0.013314208906340623,
+ "t": 0.001,
+ "rows": [
+  {
+   "direction": "dilation",
+   "fd": 0.0028783367101807102,
+   "predicted": 0.0028783368048312156,
+   "response_term": 0.000742730853767911,
+   "square_term": 0.0021356059510633046
+  },
+  {
+   "direction": "z-stretch",
+   "fd": 0.0011875726166343803,
+   "predicted": 0.0011875728119406432,
+   "response_term": 0.0003366146282902086,
+   "square_term": 0.0008509581836504347
+  },
+  {
+   "direction": "random 0",
+   "fd": 8.61196068161855e-06,
+   "predicted": 8.612216448676048e-06,
+   "response_term": 4.185976503471984e-06,
+   "square_term": 4.426239945204064e-06
+  },
+  {
+   "direction": "random 1",
+   "fd": 4.178833205396397e-06,
+   "predicted": 4.179866135911658e-06,
+   "response_term": 3.323537292601618e-06,
+   "square_term": 8.563288433100401e-07
+  },
+  {
+   "direction": "random 2",
+   "fd": 0.00010369440491449684,
+   "predicted": 0.00010369510499698303,
+   "response_term": 3.50355401404722e-05,
+   "square_term": 6.865956485651084e-05
+  },
+  {
+   "direction": "random 3",
+   "fd": 1.4531446647832643e-05,
+   "predicted": 1.4532585449835718e-05,
+   "response_term": 9.828449951661294e-06,
+   "square_term": 4.704135498174424e-06
+  }
+ ],
+ "description": "\nNumerical check of the lower-bound statement used in E1 (k = 0 sector).\n\nE_N[n, A] = E_s[n, A] + N\u00b2/(2 I[n]),  I[n] = min_\u03b2 F[\u03b2; n],\nF = \u222b (\u03b2\u00b2 K[n] + |\u2207\u03b2|\u00b2/e\u00b2).  The Hessian used in nonaxisym.py replaces the\ncharge term by its local part, i.e. it is the Hessian of\n\n    E_loc[n, A] = E_s[n, A] \u2212 (\u03c9\u2080\u00b2/2) \u222b \u03b2\u2080\u00b2 K[n]  (+ const),   \u03c9\u2080 = N/I\u2080,\n\nwhich has the same value and gradient as E_N at the background.  The claim is\n\n    d\u00b2/dt\u00b2 (E_N \u2212 E_loc)(U\u2080 + t v) |\u2080 = (N\u00b2/I\u00b3)(\u03b4I)\u00b2 + (N\u00b2/2I\u00b2)\u00b7R\u1d40(\u2202\u00b2_\u03b2F)\u207b\u00b9R \u2265 0\n\nfor every direction v (matter and gauge).  Here it is checked by second\ndifferences of the exact E_N (\u03b2 re-solved at every point) along random\naxisymmetric directions on the half plane, together with the analytic\ndecomposition.\n\nUsage: python check_lower_bound.py 32\nWrites data/check_lower_bound_ne{ne}.json.\n"
+}

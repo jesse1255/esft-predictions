@@ -1,0 +1,118 @@
+{
+ "g2": {
+  "heavy_vector_limit_check": {
+   "30.0": 0.656102629374397,
+   "100.0": 0.665240374409549,
+   "300.0": 0.6664596284625448
+  },
+  "expected": "2/3 = 0.6667",
+  "coefficient_alpha_over_9pi": 0.0002580910517524133,
+  "coefficient_original_eq10": 9.049753839834269e-06,
+  "ratio_new_over_original": 28.519123980629708,
+  "bounds": [
+   {
+    "alpha_from": "Rb",
+    "delta_ae": 4.8e-13,
+    "sigma": 3e-13,
+    "lower_95": -1.0799999999999994e-13,
+    "a_max_fm": 0.007899359270700939
+   },
+   {
+    "alpha_from": "Cs",
+    "delta_ae": -8.7e-13,
+    "sigma": 3.6e-13,
+    "lower_95": -1.5755999999999999e-12,
+    "a_max_fm": 0.030171921890951393,
+    "a_central_fm": 0.022420206844004822
+   }
+  ]
+ },
+ "LEP": [
+  {
+   "model": "VV constructive (applies)",
+   "Lambda_TeV": 21.6,
+   "a_max_Me_fm": 0.00026195438901481483,
+   "a_max_Mu_fm": 0.0001852297248339544,
+   "sqrt_s_a_at_200GeV": 0.265502860768263
+  },
+  {
+   "model": "VV destructive (wrong sign)",
+   "Lambda_TeV": 13.7,
+   "a_max_Me_fm": 0.000413008379760584,
+   "a_max_Mu_fm": 0.00029204102601557776,
+   "sqrt_s_a_at_200GeV": 0.41860305055434177
+  }
+ ],
+ "atomic_coefficients": {
+  "C_1S_Hz_per_fm2": 1563875.3240623525,
+  "C_2S_Hz_per_fm2": 195484.41550779407,
+  "C_1S2S_Hz_per_fm2": 1368390.9085545584
+ },
+ "original_1S2S_bound_fm": 0.0027010972469478597,
+ "proton_term_1S2S_Hz": 966916.4557326465,
+ "atomic_Me": {
+  "model": "M-e (only the electron has a radius; muon pointlike)",
+  "relation": "r_e\u00b2 = s_H \u2212 s_\u03bc,  s_H = (r_p\u00b2 + r_e\u00b2) from electronic H,  s_\u03bc = r_p\u00b2 from \u03bcH",
+  "muH": {
+   "r_p": 0.8406,
+   "dr_p": 0.00039
+  },
+  "rows": [
+   {
+    "input": "CODATA 2022, electronic H+D only (value/uncertainty from a search summary: 0.8529, relative 5.1e-3 and 2.8\u03c3 from \u03bcH)",
+    "r_H": 0.8529,
+    "dr_H": 0.0044,
+    "re2_fm2": 0.020830049999999933,
+    "sigma_fm2": 0.007534104525198998,
+    "nsigma": 2.7647678540071423,
+    "re_max_95_fm": 0.18227356348069865
+   },
+   {
+    "input": "Beyer 2017, 2S\u20134P + 1S\u20132S",
+    "r_H": 0.8335,
+    "dr_H": 0.0095,
+    "re2_fm2": -0.01188611000000006,
+    "sigma_fm2": 0.015850067279864273,
+    "nsigma": -0.7499091196350962,
+    "re_max_95_fm": 0.16147247652580526
+   },
+   {
+    "input": "Fleurbaey 2018, 1S\u20133S + 1S\u20132S",
+    "r_H": 0.877,
+    "dr_H": 0.013,
+    "re2_fm2": 0.0625206399999999,
+    "sigma_fm2": 0.02281142486839049,
+    "nsigma": 2.7407599639527116,
+    "re_max_95_fm": 0.31629959517600126
+   },
+   {
+    "input": "Bezginov 2019, 2S\u20132P",
+    "r_H": 0.833,
+    "dr_H": 0.01,
+    "re2_fm2": -0.012719360000000068,
+    "sigma_fm2": 0.016672897184539466,
+    "nsigma": -0.7628764130924135,
+    "re_max_95_fm": 0.16561073597012793
+   },
+   {
+    "input": "Grinin 2020, 1S\u20133S + 1S\u20132S",
+    "r_H": 0.8482,
+    "dr_H": 0.0038,
+    "re2_fm2": 0.012834879999999882,
+    "sigma_fm2": 0.006479578849633978,
+    "nsigma": 1.9808200961587041,
+    "re_max_95_fm": 0.15327683193375238
+   },
+   {
+    "input": "2S\u2013nS (n = 8, 9, 10) + 1S\u20132S, arXiv:2604.26401",
+    "r_H": 0.8433,
+    "dr_H": 0.0031,
+    "re2_fm2": 0.004546530000000049,
+    "sigma_fm2": 0.005269411209786535,
+    "nsigma": 0.8628155630663391,
+    "re_max_95_fm": 0.11495525842735033
+   }
+  ],
+  "note": "In M-u (r_e = r_\u03bc) the difference is r_e\u00b2 \u2212 r_\u03bc\u00b2 = 0: no bound at all."
+ }
+}
