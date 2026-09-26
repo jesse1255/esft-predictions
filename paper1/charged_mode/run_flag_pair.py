@@ -716,6 +716,51 @@ def cmd_branch(ne_r, ne_z, a, k3s=(0.2, 0.1, 0.0), eps=0.3, name="A21in02", norm
     return rows
 
 
+def cmd_saddle(ne_r, ne_z, a, k3=2.0, d=1.0, eps=0.05, max_iter=40):
+    """Fusion transition state (N3 of NS_BLOWUP_BORROW.md).  The fixed-separation state at
+    d = 1 needs almost no constraint force (multiplier 0.014 against 24 at d = 1.5), so it
+    is nearly an unconstrained critical point.  Count its Morse index (negative eigenvalues
+    of H + sM, s = 1e-4 lifting the exact zero modes; Sylvester), then displace along the
+    softest mode both ways and relax freely: one side should roll to the (0, 2) torus
+    (fusion), the other back towards separation."""
+    Gf, _ = setup(ne_r, ne_z, a)
+    T = tag(ne_r, ne_z, a)
+    fm = fmodel(Gf, k3)
+    U0 = np.load(os.path.join(DATA, f"flagpair_state_cons_{T}_k3{k3:g}_d{d:g}.npy"))
+    E1 = energy(fm, np.load(os.path.join(DATA, f"flagpair_state_single01_{T}_k3{k3:g}.npy")))
+    prob = FlagProblem(fm, U0)
+    x0 = jnp.zeros(prob.nfree)
+    g = np.asarray(prob.grad(x0))
+    H = prob.hessian()
+    M = prob.mass()
+    dH = np.abs(H.diagonal()) + 1e-300
+    E0 = float(prob.energy(x0))
+    n_neg = {s: inertia((H + s * M).tocsr())[1] for s in (1e-4, 1e-3, 1e-2)}
+    lam, v, _ = lowest_eig(H, M)
+    print(f"d = {d}: E = {E0:.5f}  E − 2E1 = {E0 - 2 * E1:+.5f}  |g/√H|max = {np.abs(g / np.sqrt(dH)).max():.2e}"
+          f"  negative eigenvalues of H + sM: {n_neg}  lowest λ = {lam:+.6f}", flush=True)
+    out = dict(d=d, E=E0, E_minus_2E1=E0 - 2 * E1, E1=E1, grad_scaled_max=float(np.abs(g / np.sqrt(dH)).max()),
+               n_negative=n_neg, lowest_eigenvalue=lam, lowest_fractions=sector_fractions(prob, v[:, None])[0],
+               rolls={})
+    x = v * (eps / np.abs(v).max())
+    for sgn in (+1, -1):
+        Us = np.asarray(prob.U_of(jnp.asarray(sgn * x)))
+        t0 = time.time()
+        Ur, Er, hist, conv = newton_relax(fm, Us, types=range(NT), max_iter=max_iter, verbose=False)
+        Q = degree_parts(fm, smooth_gauge(Gf, Ur)[0])
+        lw = [float(consistent_line_weight(fm, jnp.asarray(Ur), c)) for c in range(3)]
+        zc = [float(Gf.W @ (Gf.zq * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
+              for c in (0, 2)]
+        out["rolls"][f"{sgn:+d}"] = dict(E=Er, E_minus_2E1=Er - 2 * E1, converged=conv, iterations=len(hist),
+                                        E_path=[h["E"] for h in hist], Q=Q[0], Q_3cycle=Q[2], lines=lw, z_centroids_0_2=zc)
+        print(f"  roll {sgn:+d}: E = {Er:.5f}  E − 2E1 = {Er - 2 * E1:+.5f}  Q = {Q[0]:+.4f}  lines "
+              f"{', '.join(f'{w:.2f}' for w in lw)}  z(0,2) {zc[0]:+.2f} {zc[1]:+.2f}  conv {conv} "
+              f"({len(hist)} it, {time.time() - t0:.0f}s)", flush=True)
+        np.save(os.path.join(SCRATCH, f"flagpair_state_saddle_roll{sgn:+d}_{T}_k3{k3:g}.npy"), Ur)
+        save(f"saddle_{T}_k3{k3:g}_d{d:g}", out)
+    return out
+
+
 def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6.0, 8.0, 10.0, 12.5, 15.0,
                                                    18.0, 21.0, 24.0, 27.0, 30.0)):
     """Path from the (0, 2) torus (line 1 untouched, D₁ = 0) towards the separated
@@ -909,6 +954,8 @@ if __name__ == "__main__":
         cmd_rotpair(ne_r, ne_z, a, k3, omA, omB, ds)
     elif cmd == "branch":
         cmd_branch(ne_r, ne_z, a)
+    elif cmd == "saddle":
+        cmd_saddle(ne_r, ne_z, a, k3)
     elif cmd == "fission":
         ts = tuple(float(s) for s in sys.argv[6:])
         cmd_fission(ne_r, ne_z, a, k3, ts) if ts else cmd_fission(ne_r, ne_z, a, k3)
