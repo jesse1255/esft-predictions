@@ -44,6 +44,27 @@
     "pot": 34.73517108164418
    },
    "seed_eigenvalue": null
+  },
+  {
+   "k3": 0.0,
+   "E": 494.00347798397684,
+   "E_embedded": 510.7843510126395,
+   "dE": -16.780873028662654,
+   "converged": true,
+   "iterations": 16,
+   "Q": -1.9927826161019098,
+   "Q_3cycle": -0.6112497676024131,
+   "lines": [
+    10.261969872061194,
+    7.3097676195312875,
+    10.281426534913953
+   ],
+   "parts": {
+    "sigma": 189.01480846971106,
+    "skyrme": 277.1355054877593,
+    "pot": 27.853164026506427
+   },
+   "seed_eigenvalue": null
   }
  ],
  "note": "three-line solution reached along the softest leaking mode"
