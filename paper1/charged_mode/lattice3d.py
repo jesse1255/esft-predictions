@@ -284,15 +284,19 @@ def from_axial(lat, Gf, Uax, L=(0, 1, 2), mode=None, eps=0.0, k=1, chunk=40000, 
     return U
 
 
-def resample(U, h_old, lat):
+def resample(U, h_old, lat, coords=None):
     """Carry a lattice state to another lattice (same centre): trilinear interpolation of the
     gauge-invariant flag matrix H = U diag(3, 2, 1) U†, then its ordered eigenbasis.  Points
-    outside the old box get the vacuum."""
+    outside the old box get the vacuum.  coords: optional map of the new lattice points to the
+    points sampled in the old state (e.g. an inverse rotation and shift: U'(x) = U(R⁻¹(x − a)))."""
     from scipy.ndimage import map_coordinates
     U = np.asarray(U)
     N_old = U.shape[0]
     H = np.einsum("...ra,a,...sa->...rs", U, np.array([3.0, 2.0, 1.0]), np.conj(U))
-    idx = [(A / h_old + 0.5 * (N_old - 1)).ravel() for A in (lat.X, lat.Y, lat.Z)]
+    P = (lat.X.ravel(), lat.Y.ravel(), lat.Z.ravel())
+    if coords is not None:
+        P = coords(*P)
+    idx = [A / h_old + 0.5 * (N_old - 1) for A in P]
     Hn = np.empty((idx[0].size, 3, 3), complex)
     for r in range(3):
         for c in range(3):

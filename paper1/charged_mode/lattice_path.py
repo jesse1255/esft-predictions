@@ -19,6 +19,7 @@ finds from its seed; max_s E(s) − E_A − E_B bounds the barrier of this path 
     python lattice_path.py oscan N h O_from O_to dO tag seed [theta_deg]
                                                   # overlap O = ∫ q₀ q₂ as the coordinate (0 apart, grows on
                                                   # contact and zipping); seed 'coax<d>' (+ hinge tilt) or .npz
+    python lattice_path.py release N h state.npz tag   # drop the coordinate constraint, follow the descent
     python lattice_path.py d1scan N h D_from D_to dD tag seed.npz
                                                   # same with the line-1 weight D₁ = ∫(1 − |U₁₁|²) as the
                                                   # coordinate (D₁ ≈ 28.4 separated, 0 fused), consecutive
@@ -198,6 +199,32 @@ def cmd_oscan(N, h, o_from, o_to, do, tag, seed, theta=0.0):
                            coord="overlap", K=100.0, outer=6, max_chunks=6)
 
 
+def cmd_release(N, h, state, tag, chunks=40, save_every=5, offset=0):
+    """Drop the reaction-coordinate constraint (keep only the pair centre) and follow the descent
+    chunk by chunk: does the configuration slide into the fused ring or back apart?"""
+    lat = Lattice(N, h)
+    E_ref = refs_energy(N, h)
+    U = np.load(state)["U"]
+    cons = Constraint(lat, "centre", 0.0)
+    rows = []
+    for ch in range(chunks):
+        d = describe(lat, U)
+        E = sum(d["parts"].values())
+        p = d.get("pair", {})
+        row = dict(chunk=ch, E=E, E_int=E - E_ref, overlap02=d["overlap02"], D1=d["lines"][1],
+                   dist=p.get("dist"), rel_tilt=p.get("relative_tilt_deg"), lateral=p.get("lateral"),
+                   triple_volume=d["triple_volume"], three_cycle=d["parts"]["three_cycle"])
+        rows.append(row)
+        print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in row.items()}), flush=True)
+        if ch > 0 and abs(rows[-1]["E"] - rows[-2]["E"]) < 1e-4:
+            break
+        U, info = relax(lat, U, cons=cons, K=100.0, outer=1, chunk=100, max_chunks=1, gtol=1e-4, verbose=False)
+        if ch % save_every == save_every - 1:
+            save_state(f"release_{tag}", N, h, float(ch + offset), U)
+    add_row(N, h, dict(kind=f"release_{tag}", start=os.path.basename(state), rows=rows,
+                       state=save_state(f"release_{tag}", N, h, -1.0, U)))
+
+
 def cmd_scan(N, h, s_from, s_to, ds, kind="zip"):
     ss = np.arange(s_from, s_to + 0.5 * np.sign(ds) * abs(ds), ds)
     for s in ss:
@@ -241,6 +268,11 @@ if __name__ == "__main__":
     elif cmd == "coax":
         for d in sys.argv[4:]:
             cmd_coax(N, h, float(d))
+    elif cmd == "release":
+        cmd_release(N, h, sys.argv[4], sys.argv[5],
+                    chunks=int(sys.argv[6]) if len(sys.argv) > 6 else 40,
+                    save_every=int(sys.argv[7]) if len(sys.argv) > 7 else 5,
+                    offset=int(sys.argv[8]) if len(sys.argv) > 8 else 0)
     elif cmd == "oscan":
         cmd_oscan(N, h, float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]), sys.argv[7], sys.argv[8],
                   float(sys.argv[9]) if len(sys.argv) > 9 else 0.0)
