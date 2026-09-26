@@ -1,0 +1,45 @@
+{
+ "note": "\nCartan inertia of the static relaxed pairs (hypothesis sweep \u00a74, item 1).\n\nT(\u03a9) = \u00bd \u03a9\u00b7\u039b[U]\u00b7\u03a9 is exactly quadratic, so for each saved static state the\nco-rotating (\u03a9 = (\u03c9, 0, \u2212\u03c9)) and counter-rotating (\u03a9 = (\u03c9, 0, \u03c9)) kinetic energies\nat \u03c9 = 1 give the small-\u03c9 coefficients of the interaction at fixed \u03a9:\n    E_int(\u03a9) \u2248 E_int(0) \u2212 \u03c9\u00b2 [T_pair(\u03a9\u0302) \u2212 T_A(\u03a9\u0302) \u2212 T_B(\u03a9\u0302)]  (no re-relaxation)\n    c2_co(d), c2_ctr(d) = T_pair \u2212 T_A \u2212 T_B for the unit co / counter rotation.\nSeconds per state.  Usage: python inertia_screen.py \u2192 data/flagpair_inertia_screen.json\n",
+ "rows": [
+  {
+   "d": 3.0,
+   "c2_co": 0.38142774845928784,
+   "T_pair_co": 112.08419809015905,
+   "c2_ctr": -1.316448458899572,
+   "T_pair_ctr": 110.38632188280019,
+   "T_single": 55.85138517084988
+  },
+  {
+   "d": 2.0,
+   "c2_co": 11.549592712564788,
+   "T_pair_co": 123.25348583477401,
+   "c2_ctr": -3.385494586824933,
+   "T_pair_ctr": 108.31839853538429,
+   "T_single": 55.85194656110461
+  },
+  {
+   "d": 1.5,
+   "c2_co": 38.687465681293986,
+   "T_pair_co": 150.39047924512474,
+   "c2_ctr": 0.48463088027888546,
+   "T_pair_ctr": 112.18764444410964,
+   "T_single": 55.851506781915376
+  },
+  {
+   "d": 1.25,
+   "c2_co": 63.585157634214056,
+   "T_pair_co": 175.28750776437744,
+   "c2_ctr": 2.4070473288249588,
+   "T_pair_ctr": 114.10939745898834,
+   "T_single": 55.85117506508169
+  },
+  {
+   "d": 1.0,
+   "c2_co": 100.76359979781469,
+   "T_pair_co": 212.4658991449559,
+   "c2_ctr": 2.2055840259069583,
+   "T_pair_ctr": 113.90788337304818,
+   "T_single": 55.85114967357061
+  }
+ ]
+}
