@@ -6,7 +6,9 @@ red, line 2 (the 12 vortex) blue, line 1 (shared) small green points.  Titles gi
 chunk (100 L-BFGS iterations each), the interaction energy, the relative tilt of the two
 rings and the overlap O = ∫ q₀ q₂.
 
-Usage: python plot_release.py out.png N h tag chunk1 chunk2 ...   (states from $FLAGPAIR_SCRATCH)
+Usage: python plot_release.py out.png N h E_ref file1.npz[:label] file2.npz[:label] ...
+  E_ref: energy of the two isolated vortices on the same lattice (interaction energies are
+  quoted relative to it).
 """
 
 import json
@@ -22,34 +24,40 @@ from lattice3d import Lattice, SCRATCH, DATA
 
 
 def main():
-    out, N, h, tag = sys.argv[1], int(sys.argv[2]), float(sys.argv[3]), sys.argv[4]
-    chunks = [float(c) for c in sys.argv[5:]]
+    out, N, h, E_ref = sys.argv[1], int(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    items = []
+    for arg in sys.argv[5:]:
+        fn, _, label = arg.partition(":")
+        items.append((fn, label))
     lat = Lattice(N, h)
-    rows = {}
-    fn = os.path.join(DATA, f"flagpair_lattice_path_N{N}_h{h:g}.json")
-    for r in json.load(open(fn))["rows"]:
-        if r.get("kind") == f"release_{tag}":
-            rows = {row["chunk"]: row for row in r["rows"]}
     plt.rcParams["font.family"] = ["WenQuanYi Zen Hei", "Noto Sans CJK TC", "DejaVu Sans"]
-    fig = plt.figure(figsize=(4.2 * len(chunks), 4.6))
-    for i, ch in enumerate(chunks):
-        U = np.load(os.path.join(SCRATCH, f"lattice_release_{tag}_N{N}_h{h:g}_s{ch:.3f}.npz"))["U"]
-        ax = fig.add_subplot(1, len(chunks), i + 1, projection="3d")
-        for c, col, thr, sz in ((0, "crimson", 0.8, 4), (2, "navy", 0.8, 4), (1, "green", 0.9, 1)):
-            q = 1.0 - np.abs(U[..., c, c]) ** 2
-            m = q > thr
-            ax.scatter(lat.X[m], lat.Y[m], lat.Z[m], s=sz, c=col, alpha=0.35 if c != 1 else 0.15, linewidths=0)
-        r = rows.get(int(ch) + 1, rows.get(int(ch), {}))
-        ttl = f"第 {int(ch) + 1} 段"
-        if r:
-            ttl += f"：E_int {r['E_int']:+.2f}\n相對傾角 {r['rel_tilt']:.0f}°，重疊 {r['overlap02']:.2f}"
+    ncol = 3 if len(items) > 3 else len(items)
+    nrow = (len(items) + ncol - 1) // ncol
+    fig = plt.figure(figsize=(4.6 * ncol, 4.4 * nrow + 0.6))
+    for i, (fn, label) in enumerate(items):
+        U = np.load(fn)["U"]
+        g = lat.geometry(U)
+        q = [1.0 - np.abs(U[..., c, c]) ** 2 for c in range(3)]
+        O = float(lat.h ** 3 * np.sum(q[0] * q[2]))
+        E_int = lat.energy(U) - E_ref
+        ax = fig.add_subplot(nrow, ncol, i + 1, projection="3d")
+        for c, col, thr, sz, al in ((1, "limegreen", 0.9, 2, 0.15), (0, "red", 0.7, 12, 0.7), (2, "blue", 0.7, 12, 0.7)):
+            m = q[c] > thr
+            ax.scatter(lat.X[m], lat.Y[m], lat.Z[m], s=sz, c=col, alpha=al, linewidths=0)
+        tilt = g.get("pair", {}).get("relative_tilt_deg")
+        ttl = (label + "\n" if label else "") + f"E_int {E_int:+.1f}，重疊 {O:.2f}"
+        if tilt is not None and g[0]["weight"] > 1 and g[2]["weight"] > 1:
+            ttl += f"，相對傾角 {tilt:.0f}°"
         ax.set_title(ttl, fontsize=9)
-        lim = 3.6
+        lim = 3.0
         ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim); ax.set_zlim(-lim, lim)
         ax.set_box_aspect((1, 1, 1))
         ax.set_xticks([]); ax.set_yticks([]); ax.set_zticks([])
-    fig.suptitle("放開約束後的下坡：紅＝01 漩渦的核心（線 0），藍＝12 漩渦的核心（線 2），綠＝共享的線 1", fontsize=10)
-    fig.tight_layout()
+        ax.view_init(elev=14, azim=-50)
+    fig.suptitle("放開約束後的下坡（h = 0.3 格點，每段 100 步 L-BFGS）：紅＝01 漩渦的核心（線 0），"
+                 "藍＝12 漩渦的核心（線 2），淡綠＝共享的線 1\nE_int 相對於兩個單獨、與格線對齊的漩渦；格點釘扎約 0.6，小於 1 的差別不可解讀",
+                 fontsize=10)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
     fig.savefig(out, dpi=110)
     print("wrote", out)
 
