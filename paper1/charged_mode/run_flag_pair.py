@@ -432,7 +432,10 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
         H = prob.hessian()
         dH = np.abs(H.diagonal()) + 1e-300
         lm, *_ = np.linalg.lstsq(C, -g, rcond=None)
-        if pc is not None:
+        ps = float(np.abs((g + C @ lm) / np.sqrt(dH)).max())
+        if pc is not None and ps < 1e-2 and np.abs(c).max() < 1e-3:
+            # switch the constraint curvature on only near a KKT point, where the multiplier
+            # estimate is reliable (far away it makes the step worse)
             pc.set_base(U)
             H = (H + lm[0] * pc.hessian()).tocsr()
         ps = float(np.abs((g + C @ lm) / np.sqrt(dH)).max())
@@ -678,7 +681,7 @@ def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6
     print(f"torus E = {E0:.5f} (2E1 = {2 * E1:.5f});  seed D = {line_weights(Gf, U)}  E = {seed['E']:.5f}", flush=True)
     for s in targets:
         t0 = time.time()
-        Ur, Er, conv, hist, lm = relax_fixed(fm, U, (s,), lines=(1,), kind="weight")
+        Ur, Er, conv, hist, lm = relax_fixed(fm, U, (s,), lines=(1,), kind="weight", tol=1e-6)
         Q = degree_parts(fm, smooth_gauge(Gf, Ur)[0])
         lw = line_weights(Gf, Ur)
         zc = [float(Gf.W @ (Gf.zq * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
