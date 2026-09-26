@@ -557,6 +557,30 @@ def cmd_fused(ne_r, ne_z, a, k3=2.0, ds=(0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0), se
     return rows
 
 
+def cmd_thresh_A12(ne_r, ne_z, a, k3=2.0):
+    """Round 5's coaxial same-line bound pair A₁,₂ (Q = 2, one link) in the flag model:
+    embed in block (0, 1), relax, and find its κ₃* against leaking into line 2."""
+    from run_hopf_pair import mirror_full, freeze_A
+    Gf, Uf = setup(ne_r, ne_z, a)
+    T = tag(ne_r, ne_z, a)
+    Ghp = freeze_A(Grid(ne_r, ne_z, p=2, a=a, half=True))
+    Ub = np.load(os.path.join(DATA, f"pair_bound_state_{T}_mu1.npz"))["U"]
+    Gm, Ubf = mirror_full(Ghp, Ub)
+    assert Gm.nn == Gf.nn
+    fm = fmodel(Gf, k3)
+    E_cp1 = cp1_model(Gm).energy(Ubf, want_grad=False)[0]
+    U, E, conv, n = relaxed_state(fm, embed(Gf, Ubf[:, :3], (0, 1)), f"A12in01_{T}_k3{k3:g}")
+    E1 = energy(fm, np.load(os.path.join(DATA, f"flagpair_state_single01_{T}_k3{k3:g}.npy")))
+    Q = degree_parts(fm, smooth_gauge(Gf, U)[0])
+    out = dict(ne_r=ne_r, ne_z=ne_z, a=a, E_cp1=E_cp1, E=E, E1=E1, binding=2 * E1 - E, converged=conv,
+               iterations=n, Q=Q[0], lines=line_weights(Gf, U))
+    print(f"A12 in (0,1): E = {E:.5f} (CP¹ {E_cp1:.5f})  binding {2 * E1 - E:.4f}  Q = {Q[0]:+.4f}  conv {conv}",
+          flush=True)
+    out["threshold"] = kappa3_threshold(fm, U, (2, 3, 4, 5), label="A12in01")
+    save(f"thresh_A12_{T}", out)
+    return out
+
+
 def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6.0, 8.0, 10.0, 12.5, 15.0,
                                                    18.0, 21.0, 24.0, 27.0, 30.0)):
     """Path from the (0, 2) torus (line 1 untouched, D₁ = 0) towards the separated
@@ -674,6 +698,8 @@ if __name__ == "__main__":
         cmd_q2(ne_r, ne_z, a, tuple(float(s) for s in sys.argv[5:]) or (2.0,), nev=int(os.environ.get("NEV", "0")))
     elif cmd == "thresh":
         cmd_thresh(ne_r, ne_z, a)
+    elif cmd == "threshA12":
+        cmd_thresh_A12(ne_r, ne_z, a)
     elif cmd == "fission":
         ts = tuple(float(s) for s in sys.argv[6:])
         cmd_fission(ne_r, ne_z, a, k3, ts) if ts else cmd_fission(ne_r, ne_z, a, k3)
