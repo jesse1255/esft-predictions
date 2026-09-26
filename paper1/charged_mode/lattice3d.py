@@ -224,12 +224,26 @@ def _locate(s, s0, ds_el, ne):
     return e, t
 
 
-def from_axial(lat, Gf, Uax, L=(0, 1, 2), mode=None, eps=0.0, k=1, chunk=40000):
+def hinge(theta, width=0.3):
+    """Coordinate map for a 'hinge' seed: the upper half space is sampled rotated by +θ about
+    the y axis, the lower by −θ (smoothly, tanh(z/width)), so the ring above tilts one way and
+    the ring below the other; they approach on one side."""
+    def f(x, y, z):
+        t = theta * np.tanh(z / width)
+        c, s = np.cos(t), np.sin(t)
+        return c * x - s * z, y, s * x + c * z
+    return f
+
+
+def from_axial(lat, Gf, Uax, L=(0, 1, 2), mode=None, eps=0.0, k=1, chunk=40000, coords=None):
     """Lattice field from an axisymmetric spectral-element state (p = 2 elements).
-    mode = (Xc, Xs): nodal (n, 3, 3) sector perturbation, applied as Û Cay(ε(Xc cos kφ + Xs sin kφ))."""
+    mode = (Xc, Xs): nodal (n, 3, 3) sector perturbation, applied as Û Cay(ε(Xc cos kφ + Xs sin kφ)).
+    coords: optional map (x, y, z) → sample point (e.g. hinge(θ))."""
     assert Gf.p == 2 and not Gf.half
     a = Gf.a
     x, y, z = lat.X.ravel(), lat.Y.ravel(), lat.Z.ravel()
+    if coords is not None:
+        x, y, z = coords(x, y, z)
     rho, phi = np.hypot(x, y), np.arctan2(y, x)
     xi = (2.0 / np.pi) * np.arctan(rho / a)
     eta = (2.0 / np.pi) * np.arctan(z / a)
@@ -270,6 +284,27 @@ def from_axial(lat, Gf, Uax, L=(0, 1, 2), mode=None, eps=0.0, k=1, chunk=40000):
     return U
 
 
+def resample(U, h_old, lat):
+    """Carry a lattice state to another lattice (same centre): trilinear interpolation of the
+    gauge-invariant flag matrix H = U diag(3, 2, 1) U†, then its ordered eigenbasis.  Points
+    outside the old box get the vacuum."""
+    from scipy.ndimage import map_coordinates
+    U = np.asarray(U)
+    N_old = U.shape[0]
+    H = np.einsum("...ra,a,...sa->...rs", U, np.array([3.0, 2.0, 1.0]), np.conj(U))
+    idx = [(A / h_old + 0.5 * (N_old - 1)).ravel() for A in (lat.X, lat.Y, lat.Z)]
+    Hn = np.empty((idx[0].size, 3, 3), complex)
+    for r in range(3):
+        for c in range(3):
+            re = map_coordinates(H[..., r, c].real, idx, order=1, mode="nearest")
+            im = map_coordinates(H[..., r, c].imag, idx, order=1, mode="nearest")
+            Hn[:, r, c] = re + 1j * im
+    ev, evec = np.linalg.eigh(Hn)
+    Un = evec[..., ::-1].reshape(lat.N, lat.N, lat.N, 3, 3)
+    Un[0], Un[-1], Un[:, 0], Un[:, -1], Un[:, :, 0], Un[:, :, -1] = (np.eye(3),) * 6
+    return Un
+
+
 # ---------------------------------------------------------------------------------------
 # relaxation (L-BFGS in the local chart, augmented Lagrangian for constraints)
 # ---------------------------------------------------------------------------------------
@@ -287,6 +322,9 @@ class Constraint:
                                            0.5 * (lat.centroid(U, 0) + lat.centroid(U, 2))])
         elif kind == "D1":          # line-1 weight and the pair centre = 0
             f = lambda U: jnp.concatenate([jnp.stack([lat.weight(U, 1)]),
+                                           0.5 * (lat.centroid(U, 0) + lat.centroid(U, 2))])
+        elif kind == "overlap":     # O = ∫ q₀ q₂ (0 apart, grows on contact and zipping) and the pair centre
+            f = lambda U: jnp.concatenate([jnp.stack([lat.h ** 3 * jnp.sum(lat.q(U, 0) * lat.q(U, 2))]),
                                            0.5 * (lat.centroid(U, 0) + lat.centroid(U, 2))])
         elif kind == "centre":      # only the centre of line 0 (+ line 2 if present)
             f = lambda U: 0.5 * (lat.centroid(U, 0) + lat.centroid(U, 2))
@@ -321,7 +359,7 @@ class Precond:
 
 
 def relax(lat, U0, cons=None, K=200.0, outer=8, chunk=150, max_chunks=40, gtol=1e-4, verbose=True, log=None,
-          precond=True):
+          precond=True, ctol=1e-4):
     """Minimise E (subject to cons(U) = target, augmented Lagrangian) starting from U0.
     L-BFGS in the chart U = U_b Cay(X(x)), x = S y (S: Precond), on y; the base moves to the
     current point after each chunk.  gtol: max-norm of ∂L/∂y (∼ √(2ΔE) per mode).
@@ -374,7 +412,9 @@ def relax(lat, U0, cons=None, K=200.0, outer=8, chunk=150, max_chunks=40, gtol=1
             break
         c = np.asarray(cons.f(Ub)) - cons.target
         lam = lam + K * c
-        if np.abs(c).max() < 1e-5 and gmax < gtol:
+        # the first component is the reaction coordinate; the pair centre (a zero mode) only needs to
+        # stay put roughly
+        if abs(c[0]) < ctol and np.abs(c).max() < 20 * ctol and gmax < gtol:
             break
     info = dict(hist=hist, lam=lam.tolist(), E=float(E), gmax=gmax, iterations=it_total)
     return np.asarray(Ub), info

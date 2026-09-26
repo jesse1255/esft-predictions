@@ -93,6 +93,16 @@
     ]
    },
    "binding_fused": -132.0706182899943
+  },
+  {
+   "kind": "d1_zipout",
+   "coord": "D1",
+   "s": 26.0,
+   "E": 569.403,
+   "E_int": -72.02027999999996,
+   "gmax": 0.00032,
+   "iterations": 1900,
+   "note": "stopped by hand at 1900 L-BFGS iterations (outer 3); E changed by < 0.02 over the last 800 iterations, constraint satisfied to 1e-4; state not saved. Seed: coaxial saddle + zipper mode (eps 1). The coaxial saddle on the same lattice has D1 = 26.01 and E_int = +26.29 (unrelaxed)."
   }
  ]
 }

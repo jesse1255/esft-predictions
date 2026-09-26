@@ -14,6 +14,11 @@ finds from its seed; max_s E(s) − E_A − E_B bounds the barrier of this path 
     python lattice_path.py seed  N h s eps        # saddle + eps·(zipper mode), relaxed at fixed s
     python lattice_path.py axial N h s            # saddle without seed at fixed s (stays coaxial?)
     python lattice_path.py scan  N h s_from s_to ds   # continue from the nearest saved state
+    python lattice_path.py coax N h d [d ...]      # coaxial states at fixed centroid distance (from the
+                                                  # axial cons states d = 3, 2, 1.5, 1.25, 1)
+    python lattice_path.py oscan N h O_from O_to dO tag seed [theta_deg]
+                                                  # overlap O = ∫ q₀ q₂ as the coordinate (0 apart, grows on
+                                                  # contact and zipping); seed 'coax<d>' (+ hinge tilt) or .npz
     python lattice_path.py d1scan N h D_from D_to dD tag seed.npz
                                                   # same with the line-1 weight D₁ = ∫(1 − |U₁₁|²) as the
                                                   # coordinate (D₁ ≈ 28.4 separated, 0 fused), consecutive
@@ -79,7 +84,12 @@ def zipper_mode(Gf):
 
 def describe(lat, U):
     g = lat.geometry(U)
-    out = dict(parts=lat.parts(U), lines=[g[c]["weight"] for c in range(3)])
+    Un = np.asarray(U)
+    q0, q1, q2 = (1.0 - np.abs(Un[..., c, c]) ** 2 for c in range(3))
+    out = dict(parts=lat.parts(U), lines=[g[c]["weight"] for c in range(3)],
+               overlap02=float(lat.h ** 3 * np.sum(q0 * q2)),
+               triple_volume=float(lat.h ** 3 * np.sum((q0 > 0.1) & (q1 > 0.1) & (q2 > 0.1))),
+               core_depth=[float(np.max(1.0 - np.abs(np.asarray(U)[..., c, c]) ** 2)) for c in range(3)])
     if "pair" in g:
         out["pair"] = g["pair"]
         out["normals"] = [g[0]["normal"], g[2]["normal"]]
@@ -121,14 +131,14 @@ def refs_energy(N, h):
     raise RuntimeError("run refs first")
 
 
-def run_point(kind, N, h, s, U0, extra=None, coord="dist", K=200.0, outer=10, max_chunks=15):
+def run_point(kind, N, h, s, U0, extra=None, coord="dist", K=200.0, outer=10, max_chunks=15, gtol=1e-3):
     lat = Lattice(N, h)
     E_ref = refs_energy(N, h)
     cons = Constraint(lat, coord, s)
     t0 = time.time()
     log = os.path.join(SCRATCH, f"lattice_{kind}_{tagof(N, h)}_s{s:.3f}.log")
-    U, info = relax(lat, U0, cons=cons, K=K, outer=outer, chunk=100, max_chunks=max_chunks, gtol=2e-4, verbose=False,
-                    log=log)
+    U, info = relax(lat, U0, cons=cons, K=K, outer=outer, chunk=100, max_chunks=max_chunks, gtol=gtol, verbose=False,
+                    log=log, ctol=1e-3)
     row = dict(kind=kind, coord=coord, s=s, E=info["E"], E_int=info["E"] - E_ref, gmax=info["gmax"], iterations=info["iterations"],
                multipliers=info["lam"], c=info["hist"][-1].get("c"), t=time.time() - t0, **describe(lat, U))
     if extra:
@@ -157,6 +167,35 @@ def cmd_axial(N, h, s):
     lat = Lattice(N, h)
     U0 = from_axial(lat, Gf, np.load(AX_SADDLE))
     run_point("axial", N, h, s, U0)
+
+
+def cmd_coax(N, h, d):
+    """Coaxial pair at centroid distance d from the axial fixed-separation state (stays coaxial on
+    the lattice by the C4 symmetry): the lattice version of the coaxial curve, and string anchors."""
+    Gf, _ = axial_grid()
+    lat = Lattice(N, h)
+    U0 = from_axial(lat, Gf, np.load(os.path.join(DATA, f"flagpair_state_cons_ne24x32_a4_k32_d{d:g}.npy")))
+    run_point("coax", N, h, d, U0, K=100.0, outer=6, max_chunks=6)
+
+
+def cmd_oscan(N, h, o_from, o_to, do, tag, seed, theta=0.0):
+    """Constrained minima at fixed overlap O = ∫ q₀ q₂, consecutive from a seed:
+    seed = 'coax<d>' (axial fixed-separation state at d, optionally hinge-tilted by theta degrees)
+    or an .npz file."""
+    from lattice3d import hinge
+    lat = Lattice(N, h)
+    if seed.startswith("coax"):
+        Gf, _ = axial_grid()
+        d = float(seed[4:])
+        U = from_axial(lat, Gf, np.load(os.path.join(DATA, f"flagpair_state_cons_ne24x32_a4_k32_d{d:g}.npy")),
+                       coords=hinge(np.radians(theta)) if theta else None)
+    else:
+        U = np.load(seed)["U"]
+    d0 = describe(lat, U)
+    print("seed: O =", d0["overlap02"], "pair", json.dumps(d0.get("pair")), flush=True)
+    for O in np.arange(o_from, o_to + 0.5 * do, do):
+        U, row = run_point(f"ov_{tag}", N, h, float(round(O, 4)), U, extra=dict(seed=seed, theta=theta),
+                           coord="overlap", K=100.0, outer=6, max_chunks=6)
 
 
 def cmd_scan(N, h, s_from, s_to, ds, kind="zip"):
@@ -199,6 +238,12 @@ if __name__ == "__main__":
     elif cmd == "scan":
         cmd_scan(N, h, float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]),
                  kind=sys.argv[7] if len(sys.argv) > 7 else "zip")
+    elif cmd == "coax":
+        for d in sys.argv[4:]:
+            cmd_coax(N, h, float(d))
+    elif cmd == "oscan":
+        cmd_oscan(N, h, float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]), sys.argv[7], sys.argv[8],
+                  float(sys.argv[9]) if len(sys.argv) > 9 else 0.0)
     elif cmd == "d1scan":
         cmd_d1scan(N, h, float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]), sys.argv[7], sys.argv[8])
     else:

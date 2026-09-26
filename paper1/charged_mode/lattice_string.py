@@ -6,9 +6,12 @@ A chain of images U⁽⁰⁾ … U⁽ᴹ⁻¹⁾ between two fixed end states is
 preconditioned steepest descent (lattice3d.Precond: the vacuum Hessian is 1 in the
 variables y, x = S y, U ← U Cay(X(x))) and redistributed after every step to equal
 arc length in the gauge-invariant metric
-    d(U, V)² = h³ Σ_x Σ_a ‖P_a(U) − P_a(V)‖²,   P_a = u_a u_a†.
-Interpolation between neighbouring images: align the column phases of V to U site by
-site, Y = off-diagonal part of Cay⁻¹(U†V), U Cay(tY).  After `climb_after` steps the
+    d(U, V)² = h³ Σ_x ‖H(U) − H(V)‖²,   H = U diag(3, 2, 1) U†.
+Interpolation between neighbouring images: the flag matrix H = U diag(3, 2, 1) U† (gauge
+invariant; the flag is its ordered eigenbasis) is interpolated linearly and diagonalised
+(interpolating in the Cayley chart U Cay(t Cay⁻¹(U†V)) blows up where U†V is near a
+rotation by π, as in the cores).  Metric: d(U, V)² = h³ Σ ‖H(U) − H(V)‖².  Steps are
+capped at max|x| = 0.05.  After `climb_after` steps the
 highest interior image climbs (its gradient component along the tangent is reversed),
 so it converges to the saddle point (the transition state) of the path.
 
@@ -33,44 +36,40 @@ import jax.numpy as jnp
 from lattice3d import Lattice, Precond, cayley, SCRATCH, DATA, PAIRS
 
 
-def projectors(U):
-    return np.einsum("...ra,...sa->...ars", U, np.conj(U))
+DW = np.array([3.0, 2.0, 1.0])          # line weights of the flag matrix H = Σ_a d_a u_a u_a†
+
+
+def flagmat(U):
+    """H = U diag(3, 2, 1) U†: gauge invariant, and the flag is its ordered eigenbasis."""
+    return np.einsum("...ra,a,...sa->...rs", U, DW, np.conj(U))
 
 
 def dist2(lat, U, V):
-    return lat.h ** 3 * float(np.sum(np.abs(projectors(U) - projectors(V)) ** 2))
+    return lat.h ** 3 * float(np.sum(np.abs(flagmat(U) - flagmat(V)) ** 2))
 
 
-def align(U, V):
-    """V with column phases rotated so that diag(U†V) is real positive."""
-    w = np.einsum("...ra,...ra->...a", np.conj(U), V)
-    ph = np.where(np.abs(w) > 1e-14, np.conj(w) / np.maximum(np.abs(w), 1e-300), 1.0)
-    return V * ph[..., None, :]
-
-
-def cay_inv(W):
-    I = np.eye(3)
-    return 2.0 * np.linalg.solve((W + I).swapaxes(-1, -2), (W - I).swapaxes(-1, -2)).swapaxes(-1, -2)
-
-
-def offdiag(Y):
-    return Y - np.einsum("...aa->...a", Y)[..., None] * np.eye(3)
-
-
-def log_map(U, V):
-    """Off-diagonal Y with U Cay(Y) ≈ V (after aligning V's column phases to U)."""
-    Va = align(U, V)
-    W = np.einsum("...ba,...bc->...ac", np.conj(U), Va)
-    return offdiag(cay_inv(W))
-
-
-def exp_map(U, Y):
-    I = np.eye(3)
-    return U @ np.linalg.solve(I - 0.5 * Y, I + 0.5 * Y)
+def from_flagmat(H):
+    """Ordered eigenbasis (largest eigenvalue first): the flag of H."""
+    ev, evec = np.linalg.eigh(H)
+    return evec[..., ::-1]
 
 
 def interp(U, V, t):
-    return exp_map(U, t * log_map(U, V))
+    """Flag of (1 − t) H(U) + t H(V): bounded, smooth except where eigenvalues cross
+    (isolated points at each t)."""
+    if t <= 0.0:
+        return U
+    if t >= 1.0:
+        return V
+    return from_flagmat((1.0 - t) * flagmat(U) + t * flagmat(V))
+
+
+def tangent_X(U, dH):
+    """Off-diagonal X with δH = U[X, D]U† (the body-frame direction of a change dH of H)."""
+    A = np.einsum("...ba,...bc,...cd->...ad", np.conj(U), dH, U)
+    den = DW[None, :] - DW[:, None]                      # d_b − d_a
+    X = np.where(np.abs(den) > 0, A / np.where(den == 0, 1.0, den), 0.0)
+    return 0.5 * (X - np.conj(np.swapaxes(X, -1, -2)))
 
 
 def X_to_x(lat, Y):
@@ -137,6 +136,7 @@ def main():
     rows_fn = os.path.join(DATA, f"flagpair_lattice_string_{tag}.json")
     hist = []
     climb_after = int(0.4 * steps)
+    max_step = 0.05
     t0 = time.time()
     for it in range(steps + 1):
         E = np.array([float(Ej(jnp.asarray(U))) for U in imgs])
@@ -159,10 +159,13 @@ def main():
             g = np.asarray(gj(jnp.asarray(U), jnp.zeros(lat.nfree)))
             gy = S(g)
             if it >= climb_after and i == imax:
-                ty = S_inv(X_to_x(lat, log_map(U, imgs[i + 1]) - log_map(U, imgs[i - 1])))
+                ty = S_inv(X_to_x(lat, tangent_X(U, flagmat(imgs[i + 1]) - flagmat(imgs[i - 1]))))
                 ty /= np.linalg.norm(ty) + 1e-300
                 gy = gy - 2.0 * (ty @ gy) * ty
             x = S(-tau * gy)
+            mx = np.abs(x).max()
+            if mx > max_step:
+                x *= max_step / mx
             new.append(np.asarray(lat.U_of(jnp.asarray(U), jnp.asarray(x))))
         new.append(imgs[-1])
         imgs, _ = redistribute_to(lat, new, M)
