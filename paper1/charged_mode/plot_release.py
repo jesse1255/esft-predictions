@@ -53,9 +53,9 @@ def main():
         ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim); ax.set_zlim(-lim, lim)
         ax.set_box_aspect((1, 1, 1))
         ax.set_xticks([]); ax.set_yticks([]); ax.set_zticks([])
-        ax.view_init(elev=14, azim=-50)
-    fig.suptitle("放開約束後的下坡（h = 0.3 格點，每段 100 步 L-BFGS）：紅＝01 漩渦的核心（線 0），"
-                 "藍＝12 漩渦的核心（線 2），淡綠＝共享的線 1\nE_int 相對於兩個單獨、與格線對齊的漩渦；格點釘扎約 0.6，小於 1 的差別不可解讀",
+        ax.view_init(elev=float(os.environ.get("VIEW_ELEV", 14)), azim=float(os.environ.get("VIEW_AZIM", -50)))
+    fig.suptitle(os.environ.get("SUPTITLE", "放開約束後的下坡（h = 0.3 格點，每段 100 步 L-BFGS）：紅＝01 漩渦的核心（線 0），"
+                 "藍＝12 漩渦的核心（線 2），淡綠＝共享的線 1\nE_int 相對於兩個單獨、與格線對齊的漩渦；格點釘扎約 0.6，小於 1 的差別不可解讀"),
                  fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     fig.savefig(out, dpi=110)
