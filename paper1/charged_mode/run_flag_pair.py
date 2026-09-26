@@ -37,6 +37,8 @@ Subcommands
                                            binding, lowest Hessian eigenvalues
   thresh ne_r ne_z a                       κ₃ below which the single soliton / the
                                            torus leak into the third line (L = (0,1,2))
+  rot1   ne_r ne_z a  [k3]                 single soliton with stationary isorotation ω
+  rotpair ne_r ne_z a k3 ωA ωB [d ...]     rotating different-link pair (resonance test)
   fission ne_r ne_z a [k3] [D ...]         path from the (0, 2) torus at fixed line-1
                                            weight D₁ (0 = torus, ≈ 28.6 = separated pair)
   fused  ne_r ne_z a  [k3] [d ...]         the same constraint, continued upward in d
@@ -106,8 +108,67 @@ def line_weights(G, U):
     return [float(G.W @ (G.Pv @ line_defect(U, c))) for c in range(3)]
 
 
-def fmodel(G, k3):
+def fmodel(G, k3, Om=None):
+    if Om is not None:
+        return RotFlagModel(G, Om, L=(0, 1, 2), kappa3=k3, disc="align")
     return FlagModel(G, L=(0, 1, 2), kappa3=k3, disc="align")
+
+
+class RotFlagModel(FlagModel):
+    """Stationary isorotation U(t) = e^{iΩt} U, Ω = diag(ω₀, ω₁, ω₂).
+
+    The Lagrangian is T − V, where T has the form of the static energy with one
+    spatial direction replaced by the time direction, w_t = U†(iΩ)U (no 1/ρ): the
+    sigma term Σ r|w_t^{ab}|² and the quartic terms of the pairs (t, ρ), (t, z),
+    (t, φ).  The potential is invariant under left diagonal phases.  Stationary
+    rotating solitons are critical points of V − T at fixed Ω (energy_U below), and
+    δ(V − T)|_Ω = δ(V + T)|_J, so interaction energies at fixed Ω equal those at
+    fixed isospin charges J = ∂T/∂Ω to first order.  Link (a, b) rotates at
+    ω_a − ω_b: a soliton in (0, 1) at ω_A = ω₀ − ω₁, one in (1, 2) at ω_B = ω₁ − ω₂,
+    and the link (0, 2) that the cubic coupling x₀₁x₁₂x̄₀₂ feeds at ω_A + ω_B."""
+
+    def __init__(self, grid, Om, **kw):
+        super().__init__(grid, **kw)
+        assert self.disc == "align"
+        self.Om = jnp.asarray(np.array(Om, dtype=float))
+
+    def kinetic_terms(self, U, r=None, k3=None):
+        r = self.r if r is None else r
+        k3 = self.kappa3 if k3 is None else k3
+        Z, Zr, Zz = self._interp_aligned(U)
+        Zh = jnp.conj(jnp.swapaxes(Z, 1, 2))
+        w_r, w_z = Zh @ Zr, Zh @ Zz
+        w_f = (Zh @ (1j * self.Lvec[None, :, None] * Z)) / self.rho[:, None, None]
+        w_t = Zh @ (1j * self.Om[None, :, None] * Z)
+        a2 = lambda z: jnp.real(z) ** 2 + jnp.imag(z) ** 2
+        sig = 0.0
+        for k, (a, b) in enumerate(((0, 1), (0, 2), (1, 2))):
+            sig = sig + r[k] * 0.5 * (a2(w_t[:, a, b]) + a2(w_t[:, b, a]))
+        sk = 0.0
+        for a in range(3):
+            for wi in (w_r, w_z, w_f):
+                F = 0.0
+                for b in range(3):
+                    if b != a:
+                        F = F + 2.0 * jnp.imag(jnp.conj(w_t[:, b, a]) * wi[:, b, a])
+                sk = sk + 0.5 * self.kappa[a] * F ** 2
+        for wi in (w_r, w_z, w_f):
+            for a in range(3):
+                for c in range(3):
+                    if c == a:
+                        continue
+                    b = 3 - a - c
+                    C = w_t[:, a, b] * wi[:, b, c] - wi[:, a, b] * w_t[:, b, c]
+                    sk = sk + 0.5 * k3 * a2(C)
+        return sig, sk
+
+    def kinetic(self, U, r=None, k3=None):
+        sig, sk = self.kinetic_terms(jnp.asarray(U), r, k3)
+        return float(jnp.sum(self.W * (sig + sk)))
+
+    def energy_U(self, U, r=None, k3=None):
+        sig, sk = self.kinetic_terms(U, r, k3)
+        return super().energy_U(U, r, k3) - jnp.sum(self.W * (sig + sk))
 
 
 _JIT = {}
@@ -623,6 +684,66 @@ def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6
     return rows
 
 
+def cmd_rotpair(ne_r, ne_z, a, k3=2.0, omA=0.3, omB=0.3, ds=(2.0, 3.0)):
+    """Different-link pair with stationary isorotation Ω = diag(ω_A, 0, −ω_B): soliton A
+    (link 01) turns at ω_A, B (link 12) at ω_B, so the link 02 that the cubic coupling
+    x₀₁x₁₂x̄₀₂ feeds turns at ω_A + ω_B.  Its quanta have mass μ = 1: for ω_A + ω_B → 1
+    the field induced in link 02 becomes long ranged (decay √(1 − (ω_A + ω_B)²)), for
+    ω_A = −ω_B it stays static.  E_int = (V − T) differences at fixed Ω, centroids of
+    lines 0 and 2 fixed at ±d/2; references relaxed alone with the same Ω and constraint."""
+    Gf, Uf = setup(ne_r, ne_z, a)
+    T_ = tag(ne_r, ne_z, a)
+    Om = (omA, 0.0, -omB)
+    fm = fmodel(Gf, k3, Om)
+    fs = fmodel(Gf, k3)
+    key = f"rotpair_{T_}_k3{k3:g}_wA{omA:g}_wB{omB:g}"
+    rows = []
+    for d in ds:
+        t0 = time.time()
+        uA, uB = shifted(Gf, Uf, +d / 2), shifted(Gf, Uf, -d / 2)
+        UAr, EA, cA, _, _ = relax_fixed(fm, embed(Gf, uA, (0, 1)), (d / 2,), lines=(0,))
+        UBr, EB, cB, _, _ = relax_fixed(fm, embed(Gf, uB, (1, 2)), (-d / 2,), lines=(2,))
+        fn_static = os.path.join(DATA, f"flagpair_state_cons_{T_}_k3{k3:g}_d{d:g}.npy")
+        U0 = np.load(fn_static) if os.path.exists(fn_static) else pair_U(Gf, uA, uB, (0, 1), (1, 2), 0.0, 0.0)
+        E_static_int = energy(fs, U0) - energy(fs, embed(Gf, uA, (0, 1))) - energy(fs, embed(Gf, uB, (1, 2)))
+        Ur, Er, conv, hist, lm = relax_fixed(fm, U0, (d / 2, -d / 2))
+        Q = degree_parts(fm, smooth_gauge(Gf, Ur)[0])
+        TA, TB, Tp = fm.kinetic(UAr), fm.kinetic(UBr), fm.kinetic(Ur)
+        row = dict(d=d, omA=omA, omB=omB, E_int=Er - EA - EB, V_int=(Er + Tp) - (EA + TA) - (EB + TB),
+                   T_int=Tp - TA - TB, T_pair=Tp, T_A=TA, T_B=TB, converged=conv, ref_converged=[bool(cA), bool(cB)],
+                   iterations=len(hist), Q=Q[0], lines=line_weights(Gf, Ur), start="static relaxed pair"
+                   if os.path.exists(fn_static) else "superposition")
+        rows.append(row)
+        print(f"ω_A = {omA:+.3f} ω_B = {omB:+.3f}  d = {d:.2f}: E_int(Ω) = {row['E_int']:+.5f}   "
+              f"[V part {row['V_int']:+.5f}, −T part {-row['T_int']:+.5f}]  T_pair {Tp:.4f}  Q {Q[0]:+.4f}"
+              f"  lines {', '.join(f'{x:.2f}' for x in row['lines'])}  conv {conv}/{bool(cA)}/{bool(cB)}"
+              f" ({len(hist)} it, {time.time() - t0:.0f}s)", flush=True)
+        save(key, dict(ne_r=ne_r, ne_z=ne_z, a=a, k3=k3, Om=list(Om), rows=rows))
+    return rows
+
+
+def cmd_rot1(ne_r, ne_z, a, k3=2.0, oms=(0.1, 0.2, 0.3, 0.4, 0.45)):
+    """Single soliton (link 01) with stationary isorotation ω: V, T, V − T, leakage."""
+    Gf, Uf = setup(ne_r, ne_z, a)
+    T_ = tag(ne_r, ne_z, a)
+    U = np.load(os.path.join(DATA, f"flagpair_state_single01_{T_}_k3{k3:g}.npy"))
+    rows = []
+    for om in oms:
+        fm = fmodel(Gf, k3, (om, 0.0, 0.0))
+        t0 = time.time()
+        U, E, hist, conv = newton_relax(fm, U, types=range(NT), max_iter=60, verbose=False)
+        Tk = fm.kinetic(U)
+        Q = degree_parts(fm, smooth_gauge(Gf, U)[0])
+        row = dict(omega=om, V_minus_T=E, T=Tk, V=E + Tk, E_total=E + 2 * Tk, Lambda=2 * Tk / om ** 2,
+                   J=2 * Tk / om, converged=conv, iterations=len(hist), Q=Q[0], lines=line_weights(Gf, U))
+        rows.append(row)
+        print(f"ω = {om:.3f}: V − T = {E:.5f}  V = {E + Tk:.5f}  T = {Tk:.5f}  Λ = {row['Lambda']:.3f}"
+              f"  J = {row['J']:.3f}  Q {Q[0]:+.4f}  lines {', '.join(f'{x:.2f}' for x in row['lines'])}"
+              f"  conv {conv} ({len(hist)} it, {time.time() - t0:.0f}s)", flush=True)
+        save(f"rot1_{T_}_k3{k3:g}", dict(ne_r=ne_r, ne_z=ne_z, a=a, k3=k3, rows=rows))
+    return rows
+
+
 def cmd_cons(ne_r, ne_z, a, k3=2.0, ds=(3.0, 2.0, 1.5, 1.0, 0.5), check_B=False):
     """Shared-line pair relaxed at fixed separation d (A at +d/2, B at −d/2).
     References: A alone and B alone relaxed with their own centroid fixed at ±d/2."""
@@ -700,6 +821,12 @@ if __name__ == "__main__":
         cmd_thresh(ne_r, ne_z, a)
     elif cmd == "threshA12":
         cmd_thresh_A12(ne_r, ne_z, a)
+    elif cmd == "rot1":
+        cmd_rot1(ne_r, ne_z, a, k3)
+    elif cmd == "rotpair":
+        omA, omB = float(sys.argv[6]), float(sys.argv[7])
+        ds = tuple(float(s) for s in sys.argv[8:]) or (2.0, 3.0)
+        cmd_rotpair(ne_r, ne_z, a, k3, omA, omB, ds)
     elif cmd == "fission":
         ts = tuple(float(s) for s in sys.argv[6:])
         cmd_fission(ne_r, ne_z, a, k3, ts) if ts else cmd_fission(ne_r, ne_z, a, k3)
