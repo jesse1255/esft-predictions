@@ -362,6 +362,19 @@ def cmd_q2(ne_r, ne_z, a, k3s=(2.0,), nev=8):
 # shared-line pair at fixed separation
 # ---------------------------------------------------------------------------
 
+class WeightModel(FlagModel):
+    """'Energy' = D_c = ∫ (1 − |U_cc|²) d³x, so that FlagProblem assembles its Hessian
+    (the curvature of the constraint, needed in the Lagrangian Hessian)."""
+
+    def __init__(self, grid, line=1, **kw):
+        super().__init__(grid, **kw)
+        self.line = line
+
+    def energy_U(self, U, r=None, k3=None):
+        c = self.line
+        return jnp.sum(self.W * (self.Pv @ (1.0 - jnp.abs(U[:, c, c]) ** 2)))
+
+
 class LineWeight:
     """D_c = ∫ (1 − |U_cc|²) d³x of one line c (gauge invariant; 0 in the vacuum)."""
 
@@ -403,6 +416,9 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
     kind = "centroids": z-centroids of the given lines; "weight": D of line lines[0]."""
     prob = FlagProblem(fm, U0)
     cons = LineCentroids(prob, lines) if kind == "centroids" else LineWeight(prob, lines[0])
+    # the line weight is quadratic in the normal directions near an embedded solution, so its
+    # curvature matters: use the Lagrangian Hessian H_E + λ H_D (λ = current multiplier estimate)
+    pc = FlagProblem(WeightModel(fm.G, lines[0], L=fm.L, disc=fm.disc), U0) if kind == "weight" else None
     targets = np.asarray(targets, float)
     U = np.asarray(U0)
     x0 = jnp.zeros(prob.nfree)
@@ -416,6 +432,9 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
         H = prob.hessian()
         dH = np.abs(H.diagonal()) + 1e-300
         lm, *_ = np.linalg.lstsq(C, -g, rcond=None)
+        if pc is not None:
+            pc.set_base(U)
+            H = (H + lm[0] * pc.hessian()).tocsr()
         ps = float(np.abs((g + C @ lm) / np.sqrt(dH)).max())
         hist.append(dict(it=it, E=E, proj_grad=ps, c=c.tolist(), lam=lam))
         if verbose:
