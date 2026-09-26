@@ -273,15 +273,17 @@ def cmd_q2(ne_r, ne_z, a, k3s=(2.0,), nev=8):
         row = dict(k3=k3, E1=E1, E_A21=E2, binding=2 * E1 - E2, binding_fraction=(2 * E1 - E2) / (2 * E1),
                    converged=[c1, c2], iterations=[n1, n2], Q1=Q1[0], Q1_3cycle=Q1[2], Q2=Q2[0], Q2_3cycle=Q2[2],
                    lines_single=line_weights(Gf, U1), lines_A21=line_weights(Gf, U2),
-                   parts_single=fm.parts(U1), parts_A21=fm.parts(U2),
-                   spectrum_single=spectrum(fm, U1, nev), spectrum_A21=spectrum(fm, U2, nev))
+                   parts_single=fm.parts(U1), parts_A21=fm.parts(U2))
+        if nev:
+            row.update(spectrum_single=spectrum(fm, U1, nev), spectrum_A21=spectrum(fm, U2, nev))
         row["t"] = time.time() - t0
         rows.append(row)
         print(f"κ₃ = {k3:g}: E1 = {E1:.5f}  E(A21 in (0,2)) = {E2:.5f}  binding {2 * E1 - E2:.4f}"
               f"  Q = {Q1[0]:+.4f}, {Q2[0]:+.4f}  ({row['t']:.0f}s)", flush=True)
         for nm in ("single", "A21"):
-            print(f"   {nm:6s} " + "  ".join(f"{s['ev']:+.4f}[{s['frac_01']:.2f},{s['frac_02']:.2f},{s['frac_12']:.2f}]"
-                                          for s in row[f"spectrum_{nm}"]), flush=True)
+            if f"spectrum_{nm}" in row:
+                print(f"   {nm:6s} " + "  ".join(f"{s['ev']:+.4f}[{s['frac_01']:.2f},{s['frac_02']:.2f},"
+                                              f"{s['frac_12']:.2f}]" for s in row[f"spectrum_{nm}"]), flush=True)
         save(f"q2_{T}", dict(ne_r=ne_r, ne_z=ne_z, a=a, E_cp1=E_cp1, rows=rows,
                              note="spectrum: lowest eigenvalues of the Hessian with the L² (consistent) mass, "
                                   "with the fraction of each eigenvector in the x_01, x_02, x_12 sectors"))
@@ -372,7 +374,10 @@ def kappa3_threshold(fm, U, normal_types, tol=1e-6, hi=4.0):
     n0 = inertia(Ha)[1]
     out = dict(normal_types=list(normal_types), n_negative_k3_0=n0)
     if n0 == 0:
-        return dict(out, kappa3_star=0.0)
+        ev0, _ = pn.lowest(Ha, nev=3, sigma=-1e-3)
+        ev2, _ = pn.lowest((Ha + 2.0 * HC).tocsr(), nev=3, sigma=-1e-3)
+        return dict(out, kappa3_star=0.0, lowest_normal_eigs_k3_0=ev0.tolist(),
+                    lowest_normal_eigs_k3_2=ev2.tolist())
     if inertia(Ha + hi * HC)[1] > 0:
         return dict(out, kappa3_star=None, note=f"still unstable at κ₃ = {hi}")
     lo = 0.0
@@ -383,8 +388,10 @@ def kappa3_threshold(fm, U, normal_types, tol=1e-6, hi=4.0):
     vals, vecs = pn.lowest((Ha + k3s * HC).tocsr(), nev=4, sigma=-1e-3)
     fr = sector_fractions(pn, vecs)
     ev0, _ = pn.lowest(Ha, nev=min(n0 + 2, 6), sigma=-1.0)
+    ev2, vec2 = pn.lowest((Ha + 2.0 * HC).tocsr(), nev=3, sigma=-1e-3)
     return dict(out, kappa3_star=k3s, eigs_at_star=vals.tolist(), fractions_at_star=fr,
-                lowest_normal_eigs_k3_0=np.sort(ev0).tolist())
+                lowest_normal_eigs_k3_0=np.sort(ev0).tolist(), lowest_normal_eigs_k3_2=ev2.tolist(),
+                fractions_k3_2=sector_fractions(pn, vec2))
 
 
 def cmd_thresh(ne_r, ne_z, a):
@@ -538,7 +545,9 @@ if __name__ == "__main__":
         d0 = float(sys.argv[7]) if len(sys.argv) > 7 else 2.0
         cmd_relax(ne_r, ne_z, a, k3, kind, d0)
     elif cmd == "q2":
-        cmd_q2(ne_r, ne_z, a, tuple(float(s) for s in sys.argv[5:]) or (2.0,))
+        # the embedded solutions do not depend on κ₃ (E_C = 0 and ∇E_C = 0 on them); stability
+        # in κ₃ comes from the thresh subcommand, so by default no spectra here (nev = 0)
+        cmd_q2(ne_r, ne_z, a, tuple(float(s) for s in sys.argv[5:]) or (2.0,), nev=int(os.environ.get("NEV", "0")))
     elif cmd == "thresh":
         cmd_thresh(ne_r, ne_z, a)
     elif cmd == "fused":
