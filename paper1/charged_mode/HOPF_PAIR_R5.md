@@ -158,7 +158,7 @@ E = ∫ d³x [ f²/2 |∇n|²  +  1/(4g²) Σ_ij (n·∂_i n × ∂_j n)²  +  f
 | α₁（最吸引相位） | 66°–92°（隨 d） | < 0.1° | ±1° |
 | 結合能 A₂,₁ | 132.2 | 0.015%（132.20 → 132.22） | −2.3%／+2.2%（129.19、135.11；占 2E₁ 的比例 20.5–20.7%，幾乎不變） |
 | 結合能 A₁,₂ | 39.1 | 0.1%（39.08 → 39.12） | < 0.1%（39.09、39.08） |
-| 鬆弛交互作用，d = 2 | −26.1（最吸引）…+35.2（最排斥） | 0.2–0.3%（24×32 對 32×48，逐相位比較） | — |
+| 鬆弛交互作用，d = 2、3 | d = 2：−26.1…+35.2；d = 3：−8.44…+9.33 | 逐相位比較 24×32 對 32×48：d = 2 為 0.2–0.3%，d = 3 為 0.2–0.7%（B₁(3)：8.776 對 8.797） | — |
 | 鬆弛交互作用，d ≥ 3.5 | 見 §3 | 與疊加式相差 0.4–3% | 同 C |
 
 ## 8. 這代表什麼、不代表什麼
@@ -194,7 +194,7 @@ python3 run_hopf_pair.py spectrum 24 32 4      # §1 振動譜（一致質量）
 python3 run_hopf_pair.py pairmap 32 48 5       # §2
 python3 run_hopf_pair.py single 24 32 4 0.9    # §2 參數敏感度（再接 pairmap 24 32 4 0.9；1.1 同理）
 python3 run_hopf_pair.py constrained 24 32 4   # §3
-python3 run_hopf_pair.py constrained_check 32 48 5
+python3 run_hopf_pair.py constrained_check 32 48 5   # §7 的細網格核對（d = 2、3，8 個相位）
 python3 run_hopf_pair.py q2 24 32 4            # §4
 python3 run_hopf_pair.py bound_spectrum 24 32 4   # §5
 python3 summarize_hopf_pair.py                 # §3 的表
