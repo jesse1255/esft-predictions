@@ -37,6 +37,8 @@ Subcommands
                                            binding, lowest Hessian eigenvalues
   thresh ne_r ne_z a                       κ₃ below which the single soliton / the
                                            torus leak into the third line (L = (0,1,2))
+  fission ne_r ne_z a [k3] [D ...]         path from the (0, 2) torus at fixed line-1
+                                           weight D₁ (0 = torus, ≈ 28.6 = separated pair)
   fused  ne_r ne_z a  [k3] [d ...]         the same constraint, continued upward in d
                                            from the (0, 2) torus (fused branch)
   cons   ne_r ne_z a  [k3] [d ...]         shared-line pair relaxed at fixed
@@ -299,6 +301,21 @@ def cmd_q2(ne_r, ne_z, a, k3s=(2.0,), nev=8):
 # shared-line pair at fixed separation
 # ---------------------------------------------------------------------------
 
+class LineWeight:
+    """D_c = ∫ (1 − |U_cc|²) d³x of one line c (gauge invariant; 0 in the vacuum)."""
+
+    def __init__(self, prob, line=1):
+        fm, G = prob.fm, prob.G
+        W, Pv = jnp.asarray(G.W), fm.Pv
+
+        def w(U0, x):
+            U = prob._U_of(U0, x)
+            return jnp.stack([jnp.sum(W * (Pv @ (1.0 - jnp.abs(U[:, line, line]) ** 2)))])
+
+        self.c = jax.jit(w)
+        self.J = jax.jit(jax.jacrev(w, argnums=1))
+
+
 class LineCentroids:
     """z-centroids of (1 − |U_00|²)² and (1 − |U_22|²)²: line 0 is excited only by
     soliton A (block (0, 1)), line 2 only by B (block (1, 2)).  Gauge invariant."""
@@ -319,11 +336,12 @@ class LineCentroids:
         self.J = jax.jit(jax.jacrev(cents, argnums=1))
 
 
-def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0, 2)):
-    """Newton–KKT: minimise E with the two centroids fixed at targets (Lagrange
-    multipliers; Levenberg damping on the energy block; merit E + λ·c + 10³|c|²)."""
+def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0, 2), kind="centroids"):
+    """Newton–KKT: minimise E with the constraint values fixed at targets (Lagrange
+    multipliers; Levenberg damping on the energy block; merit E + λ·c + 10³|c|²).
+    kind = "centroids": z-centroids of the given lines; "weight": D of line lines[0]."""
     prob = FlagProblem(fm, U0)
-    cons = LineCentroids(prob, lines)
+    cons = LineCentroids(prob, lines) if kind == "centroids" else LineWeight(prob, lines[0])
     targets = np.asarray(targets, float)
     U = np.asarray(U0)
     x0 = jnp.zeros(prob.nfree)
@@ -340,7 +358,7 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
         ps = float(np.abs((g + C @ lm) / np.sqrt(dH)).max())
         hist.append(dict(it=it, E=E, proj_grad=ps, c=c.tolist(), lam=lam))
         if verbose:
-            print(f"    it {it:2d} E = {E:.10f}  |Pg|/√H = {ps:.2e}  c = {c[0]:+.1e} {c[1]:+.1e}  λ {lam:.0e}",
+            print(f"    it {it:2d} E = {E:.10f}  |Pg|/√H = {ps:.2e}  c = {np.abs(c).max():.1e}  λ {lam:.0e}",
                   flush=True)
         if ps < tol and np.abs(c).max() < 1e-9:
             return U, E, True, hist, lm
@@ -539,6 +557,48 @@ def cmd_fused(ne_r, ne_z, a, k3=2.0, ds=(0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0), se
     return rows
 
 
+def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6.0, 8.0, 10.0, 12.5, 15.0,
+                                                   18.0, 21.0, 24.0, 27.0, 30.0)):
+    """Path from the (0, 2) torus (line 1 untouched, D₁ = 0) towards the separated
+    (0, 1) + (1, 2) pair (D₁ ≈ 2 × 14.3): minimise E at fixed line-1 weight D₁.
+    Seeded with the softest localised line-1 mode (the κ₃ = 0 instability of the torus),
+    then continued in D₁."""
+    Gf, Uf = setup(ne_r, ne_z, a)
+    fm = fmodel(Gf, k3)
+    T = tag(ne_r, ne_z, a)
+    U = np.load(os.path.join(DATA, f"flagpair_state_A21in02_{T}_k3{k3:g}.npy"))
+    E1 = energy(fm, np.load(os.path.join(DATA, f"flagpair_state_single01_{T}_k3{k3:g}.npy")))
+    E0 = energy(fm, U)
+    rows = [dict(D1=0.0, E=E0, E_minus_2E1=E0 - 2 * E1, converged=True, lines=line_weights(Gf, U))]
+    U, seed = fission_seed(fm, U, eps=0.3)
+    print(f"torus E = {E0:.5f} (2E1 = {2 * E1:.5f});  seed D = {line_weights(Gf, U)}  E = {seed['E']:.5f}", flush=True)
+    for s in targets:
+        t0 = time.time()
+        Ur, Er, conv, hist, lm = relax_fixed(fm, U, (s,), lines=(1,), kind="weight")
+        Q = degree_parts(fm, smooth_gauge(Gf, Ur)[0])
+        lw = line_weights(Gf, Ur)
+        zc = [float(Gf.W @ (Gf.zq * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
+              for c in (0, 2)]
+        rc = [float(Gf.W @ (Gf.rho * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
+              for c in (0, 1, 2)]
+        row = dict(D1=s, E=Er, E_minus_2E1=Er - 2 * E1, converged=conv, iterations=len(hist), Q=Q[0],
+                   Q_3cycle=Q[2], lines=lw, z_centroids_0_2=zc, rho_centroids=rc, parts=fm.parts(Ur),
+                   multiplier=None if lm is None else float(lm[0]))
+        rows.append(row)
+        print(f"D₁ = {s:5.2f}: E = {Er:.5f}  E − 2E1 = {Er - 2 * E1:+9.4f}  dE/dD₁ = {row['multiplier'] if lm is not None else float('nan'):+.4f}"
+              f"  Q = {Q[0]:+.4f}  lines {', '.join(f'{x:.2f}' for x in lw)}  z(0,2) {zc[0]:+.2f} {zc[1]:+.2f}"
+              f"  ρ {', '.join(f'{x:.2f}' for x in rc)}  conv {conv} ({len(hist)} it, {time.time() - t0:.0f}s)", flush=True)
+        if conv and abs(Q[0] + 2) < 0.02:
+            U = Ur
+            np.save(os.path.join(SCRATCH, f"flagpair_state_fission_{T}_k3{k3:g}_D{s:g}.npy"), Ur)
+        save(f"fission_{T}_k3{k3:g}", dict(ne_r=ne_r, ne_z=ne_z, a=a, k3=k3, E1=E1, rows=rows, seed=seed,
+                                           note="minimum of E at fixed line-1 weight D1 = int(1-|U_11|^2), "
+                                                "continued from the (0,2) torus"))
+        if not conv:
+            break
+    return rows
+
+
 def cmd_cons(ne_r, ne_z, a, k3=2.0, ds=(3.0, 2.0, 1.5, 1.0, 0.5), check_B=False):
     """Shared-line pair relaxed at fixed separation d (A at +d/2, B at −d/2).
     References: A alone and B alone relaxed with their own centroid fixed at ±d/2."""
@@ -614,6 +674,9 @@ if __name__ == "__main__":
         cmd_q2(ne_r, ne_z, a, tuple(float(s) for s in sys.argv[5:]) or (2.0,), nev=int(os.environ.get("NEV", "0")))
     elif cmd == "thresh":
         cmd_thresh(ne_r, ne_z, a)
+    elif cmd == "fission":
+        ts = tuple(float(s) for s in sys.argv[6:])
+        cmd_fission(ne_r, ne_z, a, k3, ts) if ts else cmd_fission(ne_r, ne_z, a, k3)
     elif cmd == "fused":
         ds = tuple(float(s) for s in sys.argv[6:])
         cmd_fused(ne_r, ne_z, a, k3, ds) if ds else cmd_fused(ne_r, ne_z, a, k3)
