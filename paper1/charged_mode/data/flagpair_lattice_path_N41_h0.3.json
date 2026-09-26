@@ -864,6 +864,140 @@
     }
    ],
    "state": "/tmp/flagpair/lattice_release_smith_linkm_gs_N41_h0.3_s-1.000.npz"
+  },
+  {
+   "kind": "release_linkmsnap",
+   "start": "lattice_seed_smith_linkm_gs_N41_h0.3.npz",
+   "rows": [
+    {
+     "chunk": 0,
+     "E": 733.8813989173246,
+     "E_int": 92.45812577089077,
+     "overlap02": 2.2107396190898734,
+     "D1": 24.097357402922057,
+     "dist": 1.0434485842866859,
+     "rel_tilt": 90.0,
+     "lateral": 1.0434485842866859,
+     "triple_volume": 12.986999999999998,
+     "three_cycle": 117.95766726757562
+    },
+    {
+     "chunk": 1,
+     "E": 325.59708363422476,
+     "E_int": -315.8261895122091,
+     "overlap02": 6.382581920781519,
+     "D1": 0.3280418100841049,
+     "dist": 0.005480962830957962,
+     "rel_tilt": 0.4829331729963343,
+     "lateral": 0.005480934787318144,
+     "triple_volume": 0.0,
+     "three_cycle": 4.166118213891026
+    }
+   ],
+   "state": "/tmp/flagpair/lattice_release_linkmsnap_N41_h0.3_s-1.000.npz"
+  },
+  {
+   "kind": "release_smith_linkp_gs",
+   "start": "lattice_seed_smith_linkp_gs_N41_h0.3.npz",
+   "rows": [
+    {
+     "chunk": 0,
+     "E": 1043.2684,
+     "E_int": 401.8451,
+     "overlap02": 2.2107,
+     "D1": 24.0974,
+     "dist": 1.0434,
+     "rel_tilt": 90.0,
+     "lateral": 1.0434,
+     "triple_volume": 12.987,
+     "three_cycle": 142.1446
+    },
+    {
+     "chunk": 1,
+     "E": 818.2238,
+     "E_int": 176.8005,
+     "overlap02": 4.5042,
+     "D1": 29.5568,
+     "dist": 2.0078,
+     "rel_tilt": 52.3117,
+     "lateral": 2.0078,
+     "triple_volume": 18.846,
+     "three_cycle": 80.4773
+    },
+    {
+     "chunk": 2,
+     "E": 724.6935,
+     "E_int": 83.2703,
+     "overlap02": 0.8924,
+     "D1": 28.9275,
+     "dist": 1.5978,
+     "rel_tilt": 23.2756,
+     "lateral": 1.5978,
+     "triple_volume": 3.672,
+     "three_cycle": 11.686
+    },
+    {
+     "chunk": 3,
+     "E": 708.2156,
+     "E_int": 66.7923,
+     "overlap02": 0.0004,
+     "D1": 28.132,
+     "dist": 1.5029,
+     "rel_tilt": 26.7719,
+     "lateral": 1.5029,
+     "triple_volume": 0.0,
+     "three_cycle": 0.006
+    },
+    {
+     "chunk": 4,
+     "E": 708.1956,
+     "E_int": 66.7723,
+     "overlap02": 0.0001,
+     "D1": 28.129,
+     "dist": 1.5054,
+     "rel_tilt": 4.1037,
+     "lateral": 1.5052,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0024
+    },
+    {
+     "chunk": 5,
+     "E": 708.1878,
+     "E_int": 66.7645,
+     "overlap02": 0.0,
+     "D1": 28.1243,
+     "dist": 1.5063,
+     "rel_tilt": 9.7791,
+     "lateral": 1.506,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0007
+    },
+    {
+     "chunk": 6,
+     "E": 708.1847,
+     "E_int": 66.7615,
+     "overlap02": 0.0,
+     "D1": 28.1225,
+     "dist": 1.5061,
+     "rel_tilt": 20.8057,
+     "lateral": 1.506,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0005
+    },
+    {
+     "chunk": 7,
+     "E": 708.182,
+     "E_int": 66.7587,
+     "overlap02": 0.0,
+     "D1": 28.1209,
+     "dist": 1.5062,
+     "rel_tilt": 25.8206,
+     "lateral": 1.504,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0006
+    }
+   ],
+   "note": "relaxed into ONE Q = 3 vortex in link 01 (lines 0 and 1 weight 28.12, line 2 empty), E = 708.19, lattice charge -2.950 (seed -2.859), E3/E1 = 2.21; stopped by hand at chunk ~8 while a soft rotation was still changing the tilt (dE/chunk ~ 0.003)"
   }
  ]
 }
