@@ -371,20 +371,27 @@ class WeightModel(FlagModel):
         self.line = line
 
     def energy_U(self, U, r=None, k3=None):
-        c = self.line
-        return jnp.sum(self.W * (self.Pv @ (1.0 - jnp.abs(U[:, c, c]) ** 2)))
+        return consistent_line_weight(self, U, self.line)
+
+
+def consistent_line_weight(fm, U, c):
+    """D_c = ∫ Σ_{d≠c} |Ẑ_dc|² d³x with Ẑ the element-aligned interpolation used by the
+    energy: the same form as the potential of line c, so D_c ≤ V_c/m² and no field
+    pattern can raise D_c for free.  (Interpolating the nodal 1 − |U_cc|² instead acts
+    like a lumped mass: node-to-node alternating patterns on the stretched outer elements
+    raise it at almost no energy cost.)"""
+    Z, _, _ = fm._interp_aligned(U)
+    return jnp.sum(fm.W * sum(jnp.real(Z[:, d, c]) ** 2 + jnp.imag(Z[:, d, c]) ** 2 for d in range(3) if d != c))
 
 
 class LineWeight:
-    """D_c = ∫ (1 − |U_cc|²) d³x of one line c (gauge invariant; 0 in the vacuum)."""
+    """Consistent weight D_c of one line c (see consistent_line_weight)."""
 
     def __init__(self, prob, line=1):
-        fm, G = prob.fm, prob.G
-        W, Pv = jnp.asarray(G.W), fm.Pv
+        fm = prob.fm
 
         def w(U0, x):
-            U = prob._U_of(U0, x)
-            return jnp.stack([jnp.sum(W * (Pv @ (1.0 - jnp.abs(U[:, line, line]) ** 2)))])
+            return jnp.stack([consistent_line_weight(fm, prob._U_of(U0, x), line)])
 
         self.c = jax.jit(w)
         self.J = jax.jit(jax.jacrev(w, argnums=1))
@@ -443,7 +450,7 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
         if verbose:
             print(f"    it {it:2d} E = {E:.10f}  |Pg|/√H = {ps:.2e}  c = {np.abs(c).max():.1e}  λ {lam:.0e}",
                   flush=True)
-        if ps < tol and np.abs(c).max() < 1e-9:
+        if ps < tol and np.abs(c).max() < 1e-9 * max(1.0, float(np.abs(targets).max())):
             return U, E, True, hist, lm
         accepted = False
         for _ in range(14):
@@ -678,18 +685,23 @@ def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6
     E0 = energy(fm, U)
     rows = [dict(D1=0.0, E=E0, E_minus_2E1=E0 - 2 * E1, converged=True, lines=line_weights(Gf, U))]
     U, seed = fission_seed(fm, U, eps=0.3)
-    print(f"torus E = {E0:.5f} (2E1 = {2 * E1:.5f});  seed D = {line_weights(Gf, U)}  E = {seed['E']:.5f}", flush=True)
+    # D₁ below uses the consistent weight (consistent_line_weight); the lumped nodal form
+    # admitted cheap spurious far-field patterns (first attempt: ΔE = 0.004 at D₁ = 0.25,
+    # below the harmonic bound λ_min·D₁ = 0.5)
+    print(f"torus E = {E0:.5f} (2E1 = {2 * E1:.5f});  seed D = {line_weights(Gf, U)}  "
+          f"D1(consistent) = {float(consistent_line_weight(fm, jnp.asarray(U), 1)):.4f}  E = {seed['E']:.5f}", flush=True)
     for s in targets:
         t0 = time.time()
         Ur, Er, conv, hist, lm = relax_fixed(fm, U, (s,), lines=(1,), kind="weight", tol=1e-6)
         Q = degree_parts(fm, smooth_gauge(Gf, Ur)[0])
         lw = line_weights(Gf, Ur)
+        lwc = [float(consistent_line_weight(fm, jnp.asarray(Ur), c)) for c in range(3)]
         zc = [float(Gf.W @ (Gf.zq * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
               for c in (0, 2)]
         rc = [float(Gf.W @ (Gf.rho * (Gf.Pv @ line_defect(Ur, c) ** 2)) / (Gf.W @ (Gf.Pv @ line_defect(Ur, c) ** 2)))
               for c in (0, 1, 2)]
         row = dict(D1=s, E=Er, E_minus_2E1=Er - 2 * E1, converged=conv, iterations=len(hist), Q=Q[0],
-                   Q_3cycle=Q[2], lines=lw, z_centroids_0_2=zc, rho_centroids=rc, parts=fm.parts(Ur),
+                   Q_3cycle=Q[2], lines=lw, lines_consistent=lwc, z_centroids_0_2=zc, rho_centroids=rc, parts=fm.parts(Ur),
                    multiplier=None if lm is None else float(lm[0]))
         rows.append(row)
         print(f"D₁ = {s:5.2f}: E = {Er:.5f}  E − 2E1 = {Er - 2 * E1:+9.4f}  dE/dD₁ = {row['multiplier'] if lm is not None else float('nan'):+.4f}"
