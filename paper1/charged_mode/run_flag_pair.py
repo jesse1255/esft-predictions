@@ -64,6 +64,7 @@ from run_hopf_pair import relax_single, shifted, model as cp1_model, tag
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
+SCRATCH = os.environ.get("FLAGPAIR_SCRATCH", os.path.join(HERE, "data"))   # large Hessian caches (.npz, gitignored)
 
 
 def save(name, obj):
@@ -118,8 +119,12 @@ def energy(fm, U):
     return float(f(jnp.asarray(U)))
 
 
+grid_of = {}
+
+
 def setup(ne_r, ne_z, a):
     Gh, Uh, Gf, Uf = relax_single(ne_r, ne_z, a, verbose=False)
+    grid_of[id(Gf)] = (ne_r, ne_z, a)
     return Gf, Uf
 
 
@@ -359,39 +364,86 @@ def relax_fixed(fm, U0, targets, max_iter=80, tol=1e-8, verbose=False, lines=(0,
     return U, E, False, hist, None
 
 
-def kappa3_threshold(fm, U, normal_types, tol=1e-6, hi=4.0):
+def _pardiso(A):
+    import pypardiso
+    s = pypardiso.PyPardisoSolver()
+    s.set_matrix_type(11)
+    A = sp.csr_matrix(A)
+    s.factorize(A)
+    return lambda b: s.solve(A, np.asarray(b, dtype=float))
+
+
+def lowest_eig(H, M, lo=-4.0, hi=4.0, tol=1e-6, iters=6):
+    """Lowest eigenvalue of H v = λ M v from the inertia of H − sM (Sylvester; bisection
+    in s), eigenvector by shifted inverse iteration.  Robust where shift-invert Lanczos
+    stalls on clustered spectra."""
+    nneg = lambda s: inertia((H - s * M).tocsr())[1]
+    while nneg(lo) > 0:
+        lo = 2 * lo - 1.0
+    while nneg(hi) == 0:
+        hi = 2 * hi + 1.0
+    while hi - lo > tol * max(1.0, abs(hi)):
+        mid = 0.5 * (lo + hi)
+        lo, hi = (mid, hi) if nneg(mid) == 0 else (lo, mid)
+    shift = lo - 1e-5 * max(1.0, abs(lo))
+    solve = _pardiso(H - shift * M)
+    v = np.random.default_rng(0).standard_normal(H.shape[0])
+    for _ in range(iters):
+        v = solve(M @ v)
+        v /= np.sqrt(v @ (M @ v))
+    return float(v @ (H @ v)), v, (lo, hi)
+
+
+def normal_hessians(fm, U, normal_types, cache=None):
+    """H(κ₃ = 0) and H_C = ∂H/∂κ₃ in the normal block (cached as .npz in the scratch dir)."""
+    pn = FlagProblem(fm, U, types=normal_types)
+    if cache and os.path.exists(cache):
+        z = np.load(cache)
+        Ha = sp.csr_matrix((z["a_data"], z["a_ind"], z["a_ptr"]), shape=tuple(z["shape"]))
+        HC = sp.csr_matrix((z["c_data"], z["c_ind"], z["c_ptr"]), shape=tuple(z["shape"]))
+        return pn, Ha, HC
+    pn.set_couplings(kappa3=0.0)
+    Ha = pn.hessian()
+    pn.set_couplings(kappa3=1.0)
+    HC = (pn.hessian() - Ha).tocsr()
+    if cache:
+        np.savez(cache, a_data=Ha.data, a_ind=Ha.indices, a_ptr=Ha.indptr, c_data=HC.data,
+                 c_ind=HC.indices, c_ptr=HC.indptr, shape=np.array(Ha.shape))
+    return pn, Ha, HC
+
+
+def kappa3_threshold(fm, U, normal_types, tol=1e-6, hi=4.0, cache=None, label=""):
     """Smallest κ₃ at which the Hessian of an embedded solution has no negative
     eigenvalue in the normal (third-line) block.  H(κ₃) = H(0) + κ₃ H_C with
     H_C ⪰ 0 (the three-cycle energy is ≥ 0 and vanishes on embedded
     configurations), so the negative index can only drop as κ₃ grows: bisection
     on the inertia (Sylvester).  The embedded solution itself does not depend on
     κ₃, and the in-block and normal blocks decouple (U(1) of the third line)."""
-    pn = FlagProblem(fm, U, types=normal_types)
-    pn.set_couplings(kappa3=0.0)
-    Ha = pn.hessian()
-    pn.set_couplings(kappa3=1.0)
-    HC = (pn.hessian() - Ha).tocsr()
+    pn, Ha, HC = normal_hessians(fm, U, normal_types, cache)
+    M = pn.mass()
     n0 = inertia(Ha)[1]
     out = dict(normal_types=list(normal_types), n_negative_k3_0=n0)
+    print(f"   {label}: negative normal eigenvalues at κ₃ = 0: {n0}", flush=True)
     if n0 == 0:
-        ev0, _ = pn.lowest(Ha, nev=3, sigma=-1e-3)
-        ev2, _ = pn.lowest((Ha + 2.0 * HC).tocsr(), nev=3, sigma=-1e-3)
-        return dict(out, kappa3_star=0.0, lowest_normal_eigs_k3_0=ev0.tolist(),
-                    lowest_normal_eigs_k3_2=ev2.tolist())
-    if inertia(Ha + hi * HC)[1] > 0:
+        k3s = 0.0
+    elif inertia(Ha + hi * HC)[1] > 0:
         return dict(out, kappa3_star=None, note=f"still unstable at κ₃ = {hi}")
-    lo = 0.0
-    while hi - lo > tol:
-        mid = 0.5 * (lo + hi)
-        lo, hi = (mid, hi) if inertia(Ha + mid * HC)[1] > 0 else (lo, mid)
-    k3s = 0.5 * (lo + hi)
-    vals, vecs = pn.lowest((Ha + k3s * HC).tocsr(), nev=4, sigma=-1e-3)
-    fr = sector_fractions(pn, vecs)
-    ev0, _ = pn.lowest(Ha, nev=min(n0 + 2, 6), sigma=-1.0)
-    ev2, vec2 = pn.lowest((Ha + 2.0 * HC).tocsr(), nev=3, sigma=-1e-3)
-    return dict(out, kappa3_star=k3s, eigs_at_star=vals.tolist(), fractions_at_star=fr,
-                lowest_normal_eigs_k3_0=np.sort(ev0).tolist(), lowest_normal_eigs_k3_2=ev2.tolist(),
-                fractions_k3_2=sector_fractions(pn, vec2))
+    else:
+        lo = 0.0
+        while hi - lo > tol:
+            mid = 0.5 * (lo + hi)
+            lo, hi = (mid, hi) if inertia(Ha + mid * HC)[1] > 0 else (lo, mid)
+        k3s = 0.5 * (lo + hi)
+    out["kappa3_star"] = k3s
+    print(f"   {label}: κ₃* = {k3s:.6f}", flush=True)
+    for k3, key in ((0.0, "k3_0"), (2.0, "k3_2")):
+        lam, v, br = lowest_eig((Ha + k3 * HC).tocsr(), M)
+        out[f"lowest_normal_eig_{key}"] = lam
+        out[f"fractions_{key}"] = sector_fractions(pn, v[:, None])[0]
+        out[f"a1_{key}"] = float(v @ (HC @ v))            # dλ/dκ₃ of this mode
+        print(f"   {label}: lowest normal eigenvalue at κ₃ = {k3:g}: {lam:+.6f}  "
+              f"(fractions {out[f'fractions_{key}']}, dλ/dκ₃ = {out[f'a1_{key}']:.5f})", flush=True)
+    return out
 
 
 def cmd_thresh(ne_r, ne_z, a):
@@ -400,11 +452,12 @@ def cmd_thresh(ne_r, ne_z, a):
     T = tag(ne_r, ne_z, a)
     fm = fmodel(Gf, 2.0)
     out = dict(ne_r=ne_r, ne_z=ne_z, a=a, L=[0, 1, 2])
-    for name, fn, types in (("single01", f"flagpair_state_single01_{T}_k32.npy", (2, 3, 4, 5)),
-                            ("A21in02", f"flagpair_state_A21in02_{T}_k32.npy", (0, 1, 4, 5))):
+    for name, fn, types in (("A21in02", f"flagpair_state_A21in02_{T}_k32.npy", (0, 1, 4, 5)),
+                            ("single01", f"flagpair_state_single01_{T}_k32.npy", (2, 3, 4, 5))):
         t0 = time.time()
         U = np.load(os.path.join(DATA, fn))
-        out[name] = kappa3_threshold(fm, U, types)
+        out[name] = kappa3_threshold(fm, U, types, cache=os.path.join(SCRATCH, f"normal_hess_{name}_{T}.npz"),
+                                     label=name)
         print(f"{name}: κ₃* = {out[name]['kappa3_star']}  (negative normal modes at κ₃ = 0: "
               f"{out[name]['n_negative_k3_0']}, {time.time() - t0:.0f}s)", flush=True)
         save(f"thresh_{T}", out)
@@ -414,13 +467,15 @@ def cmd_thresh(ne_r, ne_z, a):
 def fission_seed(fm, U, normal_types=(0, 1, 4, 5), eps=0.1):
     """Displace the (0, 2) torus along its softest line-1 (normal) mode, max |x| = eps."""
     G = fm.G
-    pn = FlagProblem(fm, U, types=normal_types)
-    vals, vecs = pn.lowest(pn.hessian(), nev=2, sigma=-1e-3)
-    fr = sector_fractions(pn, vecs[:, :1])[0]
+    T = tag(*grid_of.get(id(G), (0, 0, 0)))
+    pn, Ha, HC = normal_hessians(fm, U, normal_types, os.path.join(SCRATCH, f"normal_hess_A21in02_{T}.npz"))
+    lam, v, _ = lowest_eig((Ha + fm.kappa3 * HC).tocsr(), pn.mass())
+    vals = [lam]
+    fr = sector_fractions(pn, v[:, None])[0]
     x6 = np.zeros((G.nn, NT))
     for t in normal_types:
         sel = pn.dof[:, t] >= 0
-        x6[sel, t] = vecs[pn.dof[sel, t], 0]
+        x6[sel, t] = v[pn.dof[sel, t]]
     pf = FlagProblem(fm, U)
     x = np.zeros(pf.nfree)
     for t in range(NT):
