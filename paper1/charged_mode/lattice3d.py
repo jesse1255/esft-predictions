@@ -422,3 +422,60 @@ def relax(lat, U0, cons=None, K=200.0, outer=8, chunk=150, max_chunks=40, gtol=1
             break
     info = dict(hist=hist, lam=lam.tolist(), E=float(E), gmax=gmax, iterations=it_total)
     return np.asarray(Ub), info
+
+
+# ---------------------------------------------------------------------------------------
+# the three-dimensional charge (π₃(F₂) = ℤ) on the lattice
+# ---------------------------------------------------------------------------------------
+
+def charge(lat, U, pad=2):
+    """Q = (1/8π²) Σ_a ∫ A_a · B_a d³x, B_a the Berry curvature of line a (plaquette phases of the
+    diagonal link overlaps), A_a its Coulomb-gauge vector potential (Fourier space, zero padding).
+    For a field in one 2 × 2 block this is the Hopf invariant (1/4π²)∫A·B of that CP¹ (the two
+    active lines contribute equally); in general the Chern–Simons forms of the three line bundles
+    enter with equal weights, i.e. the quadratic form Σ_a x_a² = the Killing form on π₂(F₂).
+    Returns (Q, [Q_0, Q_1, Q_2], max |div B| / max |B|)."""
+    U = np.asarray(U)
+    h = lat.h
+    Uh = np.conj(np.swapaxes(U, -1, -2))
+    O = [np.einsum("...ij,...jk->...ik", Uh[:-1], U[1:]),
+         np.einsum("...ij,...jk->...ik", Uh[:, :-1], U[:, 1:]),
+         np.einsum("...ij,...jk->...ik", Uh[:, :, :-1], U[:, :, 1:])]
+    N = U.shape[0]
+    Qs, divs = [], []
+    for a in range(3):
+        d = [Oi[..., a, a] for Oi in O]
+        def flux(i, j):
+            A = d[i]
+            Bj = d[j]
+            s = [slice(None)] * 3
+            A0 = A[tuple(slice(0, -1) if k == j else slice(None) for k in range(3))]
+            A1 = A[tuple(slice(1, None) if k == j else slice(None) for k in range(3))]
+            B0 = Bj[tuple(slice(0, -1) if k == i else slice(None) for k in range(3))]
+            B1 = Bj[tuple(slice(1, None) if k == i else slice(None) for k in range(3))]
+            return np.angle(A0 * B1 * np.conj(A1) * np.conj(B0)) / h ** 2
+        Fyz, Fzx, Fxy = flux(1, 2), -flux(0, 2), flux(0, 1)
+        # to cell centres (N-1)^3: average the four parallel faces of each cell edge direction
+        def centre(F, axis):
+            # F has size N along `axis` and N-1 along the other two: average over the two ends of `axis`
+            sl0 = [slice(None)] * 3; sl1 = [slice(None)] * 3
+            sl0[axis] = slice(0, -1); sl1[axis] = slice(1, None)
+            return 0.5 * (F[tuple(sl0)] + F[tuple(sl1)])
+        Bx, By, Bz = centre(Fyz, 0), centre(Fzx, 1), centre(Fxy, 2)
+        B = np.stack([Bx, By, Bz])
+        M = B.shape[1] + 2 * pad * B.shape[1]
+        Bp = np.zeros((3, M, M, M))
+        o = pad * B.shape[1]
+        Bp[:, o:o + B.shape[1], o:o + B.shape[1], o:o + B.shape[1]] = B
+        k1 = 2 * np.pi * np.fft.fftfreq(M, d=h)
+        KX, KY, KZ = np.meshgrid(k1, k1, k1, indexing="ij")
+        K = np.stack([KX, KY, KZ])
+        K2 = KX ** 2 + KY ** 2 + KZ ** 2
+        K2[0, 0, 0] = 1.0
+        Bk = np.fft.fftn(Bp, axes=(1, 2, 3))
+        Ak = 1j * np.cross(K, Bk, axis=0) / K2
+        A = np.real(np.fft.ifftn(Ak, axes=(1, 2, 3)))
+        Qs.append(float(np.sum(A * Bp) * h ** 3 / (8 * np.pi ** 2)))
+        div = np.abs(np.real(np.fft.ifftn(1j * np.sum(K * Bk, axis=0), axes=(0, 1, 2))))
+        divs.append(float(div.max() / (np.abs(Bp).max() + 1e-300)))
+    return sum(Qs), Qs, max(divs)
