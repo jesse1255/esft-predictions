@@ -731,7 +731,8 @@ def cmd_rotpair(ne_r, ne_z, a, k3=2.0, omA=0.3, omB=0.3, ds=(2.0, 3.0)):
     fm = fmodel(Gf, k3, Om)
     fs = fmodel(Gf, k3)
     key = f"rotpair_{T_}_k3{k3:g}_wA{omA:g}_wB{omB:g}"
-    rows = []
+    fn_out = os.path.join(DATA, f"flagpair_{key}.json")
+    rows = [r for r in json.load(open(fn_out))["rows"] if r["d"] not in ds] if os.path.exists(fn_out) else []
     for d in ds:
         t0 = time.time()
         uA, uB = shifted(Gf, Uf, +d / 2), shifted(Gf, Uf, -d / 2)
