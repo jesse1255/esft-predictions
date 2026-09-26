@@ -469,7 +469,10 @@ def fission_seed(fm, U, normal_types=(0, 1, 4, 5), eps=0.1):
     G = fm.G
     T = tag(*grid_of.get(id(G), (0, 0, 0)))
     pn, Ha, HC = normal_hessians(fm, U, normal_types, os.path.join(SCRATCH, f"normal_hess_A21in02_{T}.npz"))
-    lam, v, _ = lowest_eig((Ha + fm.kappa3 * HC).tocsr(), pn.mass())
+    # At κ₃ = 2 the torus has no bound line-1 mode (the lowest normal eigenvalue is the
+    # continuum edge 2m² = 2), so the seed direction is the softest *localised* line-1 mode:
+    # the lowest mode of the κ₃ = 0 Hessian, where the torus splits most easily.
+    lam, v, _ = lowest_eig(Ha, pn.mass())
     vals = [lam]
     fr = sector_fractions(pn, v[:, None])[0]
     x6 = np.zeros((G.nn, NT))
@@ -542,15 +545,21 @@ def cmd_cons(ne_r, ne_z, a, k3=2.0, ds=(3.0, 2.0, 1.5, 1.0, 0.5), check_B=False)
     Gf, Uf = setup(ne_r, ne_z, a)
     fm = fmodel(Gf, k3)
     T = tag(ne_r, ne_z, a)
-    rows = []
+    fn_out = os.path.join(DATA, f"flagpair_cons_{T}_k3{k3:g}.json")
+    rows = json.load(open(fn_out))["rows"] if os.path.exists(fn_out) else []      # append to earlier scans
+    rows = [r for r in rows if r["d"] not in ds]
     Uprev = None
+    done = sorted({r["d"] for r in rows if r["d"] > max(ds)})
+    if done:                                     # continue from the saved state of the nearest larger d
+        fn_prev = os.path.join(DATA, f"flagpair_state_cons_{T}_k3{k3:g}_d{done[0]:g}.npy")
+        Uprev = np.load(fn_prev) if os.path.exists(fn_prev) else None
     for d in ds:
         t0 = time.time()
         uA, uB = shifted(Gf, Uf, +d / 2), shifted(Gf, Uf, -d / 2)
         UA0, UB0 = embed(Gf, uA, (0, 1)), embed(Gf, uB, (1, 2))
         # single references: fix the one centroid that exists (line 0 for A, line 2 for B)
         UAr, EA, cA, hA, _ = relax_fixed(fm, UA0, (d / 2,), lines=(0,))
-        if check_B or not rows:
+        if check_B or not any(r["d"] != d for r in rows):
             UBr, EB, cB, hB, _ = relax_fixed(fm, UB0, (-d / 2,), lines=(2,))
             print(f"   references at d = {d:.2f}: E_A = {EA:.6f}  E_B = {EB:.6f}  (B − A {EB - EA:+.1e})", flush=True)
         else:
@@ -571,7 +580,7 @@ def cmd_cons(ne_r, ne_z, a, k3=2.0, ds=(3.0, 2.0, 1.5, 1.0, 0.5), check_B=False)
                 best = (cand, Ur)
             cand["E_int"] = Er - EA - EB
             rows.append(dict(d=d, E_sup_int=E0 - energy(fm, UA0) - energy(fm, UB0), EA=EA, EB=EB,
-                             ref_converged=[cA, cB], **cand))
+                             ref_converged=[bool(cA), bool(cB)], **cand))
         if best is not None:
             Uprev = best[1]
             np.save(os.path.join(DATA, f"flagpair_state_cons_{T}_k3{k3:g}_d{d:g}.npy"), best[1])
