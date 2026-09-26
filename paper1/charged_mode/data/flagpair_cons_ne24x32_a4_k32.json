@@ -1,0 +1,40 @@
+{
+ "ne_r": 24,
+ "ne_z": 32,
+ "a": 4.0,
+ "k3": 2.0,
+ "rows": [
+  {
+   "d": 3.0,
+   "E_sup_int": 2.6700874154139456,
+   "EA": 321.50140408935727,
+   "EB": 321.50140408935727,
+   "ref_converged": [
+    true,
+    true
+   ],
+   "start": "superposition",
+   "E": 644.4429306990057,
+   "converged": true,
+   "iterations": 6,
+   "Q": -1.9993141292510725,
+   "Q_3cycle": -0.0026444765695628307,
+   "multipliers": [
+    3.6064176949050886,
+    -3.606421458462852
+   ],
+   "lines": [
+    13.906018901349164,
+    27.784046032410046,
+    13.906008300359089
+   ],
+   "parts": {
+    "sigma": 205.14865105164864,
+    "skyrme": 383.6986421404175,
+    "pot": 55.59563750693968
+   },
+   "E_int": 1.4401225202911974
+  }
+ ],
+ "note": "A (block (0,1)) and B (block (1,2)) on the axis; centroids of (1-|U_00|^2)^2 and (1-|U_22|^2)^2 fixed at +d/2, -d/2; references relaxed alone with their own centroid fixed"
+}
