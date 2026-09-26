@@ -404,7 +404,35 @@ def cmd_thresh(ne_r, ne_z, a):
     return out
 
 
-def cmd_fused(ne_r, ne_z, a, k3=2.0, ds=(0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)):
+def fission_seed(fm, U, normal_types=(0, 1, 4, 5), eps=0.1):
+    """Displace the (0, 2) torus along its softest line-1 (normal) mode, max |x| = eps."""
+    G = fm.G
+    pn = FlagProblem(fm, U, types=normal_types)
+    vals, vecs = pn.lowest(pn.hessian(), nev=2, sigma=-1e-3)
+    fr = sector_fractions(pn, vecs[:, :1])[0]
+    x6 = np.zeros((G.nn, NT))
+    for t in normal_types:
+        sel = pn.dof[:, t] >= 0
+        x6[sel, t] = vecs[pn.dof[sel, t], 0]
+    pf = FlagProblem(fm, U)
+    x = np.zeros(pf.nfree)
+    for t in range(NT):
+        sel = pf.dof[:, t] >= 0
+        x[pf.dof[sel, t]] = x6[sel, t]
+    x *= eps / np.abs(x).max()
+    cons = LineCentroids(pf)
+    best = None
+    for s in (+1.0, -1.0):
+        xs = jnp.asarray(s * x)
+        z = np.asarray(cons.c(pf.U0, xs))
+        if best is None or z[0] - z[1] > best[1]:
+            best = (xs, float(z[0] - z[1]))
+    Us = np.asarray(pf.U_of(best[0]))
+    return Us, dict(eigenvalue=float(vals[0]), fractions={k: round(v, 4) for k, v in fr.items()},
+                    dZ=best[1], E=energy(fm, Us), eps=eps)
+
+
+def cmd_fused(ne_r, ne_z, a, k3=2.0, ds=(0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0), seed_eps=0.1):
     """Fused branch: start from the relaxed Q = 2 torus in block (0, 2) (d = 0) and
     pull the line-0 and line-2 centroids apart step by step (continuation in d)."""
     Gf, Uf = setup(ne_r, ne_z, a)
@@ -417,6 +445,13 @@ def cmd_fused(ne_r, ne_z, a, k3=2.0, ds=(0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)):
     rows = [dict(d=0.0, E=E0, E_int=E0 - 2 * E1, converged=True, Q=degree_parts(fm, smooth_gauge(Gf, U)[0])[0],
                  lines=line_weights(Gf, U), note="relaxed torus in block (0,2); reference 2 E1 (unconstrained)")]
     print(f"d = 0.00: E = {E0:.5f}  E_int = {E0 - 2 * E1:+.5f}", flush=True)
+    # On the embedded torus |U_00| = |U_22| identically and the normal (line-1) directions move
+    # them only at second order, so the constraint Jacobian of Z_A − Z_B vanishes there.  Seed
+    # the continuation with the softest normal mode, signed so that Z_A − Z_B > 0.
+    U, seed = fission_seed(fm, U, eps=seed_eps)
+    rows[0]["seed"] = seed
+    print(f"seed: softest normal eigenvalue {seed['eigenvalue']:+.5f}, fractions {seed['fractions']}, "
+          f"Z_A − Z_B = {seed['dZ']:+.4f}, E = {seed['E']:.5f}", flush=True)
     for d in ds:
         t0 = time.time()
         UA0, UB0 = embed(Gf, shifted(Gf, Uf, +d / 2), (0, 1)), embed(Gf, shifted(Gf, Uf, -d / 2), (1, 2))
