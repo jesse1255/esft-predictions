@@ -49,6 +49,30 @@
    },
    "lowest_omega2_full": 1.0000305541656331,
    "t": 58.311845779418945
+  },
+  {
+   "name": "A21in02",
+   "types": [
+    2,
+    3
+   ],
+   "full_metric": {
+    "continuum_edge": 1.0,
+    "n_negative": 0,
+    "n_below_small": 2,
+    "n_below_edge": 3,
+    "bound_vibrations": 1
+   },
+   "L2_metric": {
+    "continuum_edge": 2.0,
+    "n_negative": 0,
+    "n_below_small": 2,
+    "n_below_edge": 2,
+    "bound_vibrations": 0
+   },
+   "lowest_omega2_full": -2.4787721383321176e-05,
+   "lowest_bound_omega2_full": 0.46471990203857416,
+   "t": 31.933168411254883
   }
  ]
 }
