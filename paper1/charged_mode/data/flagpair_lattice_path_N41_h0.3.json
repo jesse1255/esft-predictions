@@ -998,6 +998,109 @@
     }
    ],
    "note": "relaxed into ONE Q = 3 vortex in link 01 (lines 0 and 1 weight 28.12, line 2 empty), E = 708.19, lattice charge -2.950 (seed -2.859), E3/E1 = 2.21; stopped by hand at chunk ~8 while a soft rotation was still changing the tilt (dE/chunk ~ 0.003)"
+  },
+  {
+   "kind": "release_smith_touch_gs",
+   "start": "lattice_seed_smith_touch_gs_N41_h0.3.npz (cores meet at one point: singular)",
+   "rows": [
+    {
+     "chunk": 0,
+     "E": 1066.8027,
+     "E_int": 425.3794,
+     "overlap02": 1.611,
+     "D1": 25.299,
+     "dist": 2.0512,
+     "rel_tilt": 90.0,
+     "lateral": 2.0512,
+     "triple_volume": 9.45,
+     "three_cycle": 84.9212
+    },
+    {
+     "chunk": 1,
+     "E": 454.835,
+     "E_int": -186.5882,
+     "overlap02": 0.3072,
+     "D1": 15.6525,
+     "dist": 2.2422,
+     "rel_tilt": 73.6464,
+     "lateral": 2.2422,
+     "triple_volume": 2.376,
+     "three_cycle": 5.5359
+    },
+    {
+     "chunk": 2,
+     "E": 446.1737,
+     "E_int": -195.2496,
+     "overlap02": 0.294,
+     "D1": 14.7338,
+     "dist": 2.3493,
+     "rel_tilt": 73.3127,
+     "lateral": 2.3493,
+     "triple_volume": 0.999,
+     "three_cycle": 7.8649
+    },
+    {
+     "chunk": 3,
+     "E": 445.8371,
+     "E_int": -195.5862,
+     "overlap02": 0.3317,
+     "D1": 14.3924,
+     "dist": 2.0718,
+     "rel_tilt": 64.7114,
+     "lateral": 2.0718,
+     "triple_volume": 0.999,
+     "three_cycle": 9.7953
+    },
+    {
+     "chunk": 4,
+     "E": 435.8189,
+     "E_int": -205.6044,
+     "overlap02": 1.08,
+     "D1": 13.0448,
+     "dist": 0.5314,
+     "rel_tilt": 85.5558,
+     "lateral": 0.5311,
+     "triple_volume": 4.941,
+     "three_cycle": 53.5405
+    },
+    {
+     "chunk": 5,
+     "E": 122.731,
+     "E_int": -518.6923,
+     "overlap02": 0.012,
+     "D1": 0.6643,
+     "dist": 0.3361,
+     "rel_tilt": 46.5271,
+     "lateral": 0.3361,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2906
+    },
+    {
+     "chunk": 6,
+     "E": 120.7687,
+     "E_int": -520.6546,
+     "overlap02": 0.0,
+     "D1": 0.5627,
+     "dist": 0.3027,
+     "rel_tilt": 17.7966,
+     "lateral": 0.3026,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0006
+    },
+    {
+     "chunk": 7,
+     "E": 120.7641,
+     "E_int": -520.6592,
+     "overlap02": 0.0,
+     "D1": 0.5628,
+     "dist": 0.3006,
+     "rel_tilt": 64.5469,
+     "lateral": 0.3006,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0001
+    }
+   ],
+   "note": "LATTICE ARTEFACT: the seed is singular at the touching point (charge -1.82, not an integer); the lattice unwound it completely: E 1066.8 -> 120.8, charge 0.0001, a lattice-pinned remnant with line weights 0.17/0.66/0.62. In the continuum a configuration with a point where both cores meet is not a finite-energy smooth field."
   }
  ]
 }

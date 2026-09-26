@@ -93,6 +93,340 @@
     ]
    },
    "binding_fused": -132.25413382981083
+  },
+  {
+   "kind": "release_hinge10d3",
+   "start": "lattice_seed_hinge10_d3_N49_h0.25.npz (axial cons d = 3, hinge 10\u00b0)",
+   "rows": [
+    {
+     "chunk": 0,
+     "E": 645.6522,
+     "E_int": 3.4118,
+     "overlap02": 0.0361,
+     "D1": 27.6608,
+     "dist": 2.9613,
+     "rel_tilt": 18.5516,
+     "lateral": 0.0,
+     "triple_volume": 0.0,
+     "three_cycle": 1.1092
+    },
+    {
+     "chunk": 1,
+     "E": 643.0612,
+     "E_int": 0.8208,
+     "overlap02": 0.0259,
+     "D1": 27.8923,
+     "dist": 3.2659,
+     "rel_tilt": 16.0518,
+     "lateral": 0.3105,
+     "triple_volume": 0.0,
+     "three_cycle": 0.5758
+    },
+    {
+     "chunk": 2,
+     "E": 642.5917,
+     "E_int": 0.3514,
+     "overlap02": 0.0133,
+     "D1": 28.5178,
+     "dist": 3.596,
+     "rel_tilt": 18.9983,
+     "lateral": 0.5311,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2573
+    },
+    {
+     "chunk": 3,
+     "E": 642.4435,
+     "E_int": 0.2032,
+     "overlap02": 0.0115,
+     "D1": 28.2709,
+     "dist": 3.6997,
+     "rel_tilt": 21.19,
+     "lateral": 0.7074,
+     "triple_volume": 0.0,
+     "three_cycle": 0.208
+    },
+    {
+     "chunk": 4,
+     "E": 642.3506,
+     "E_int": 0.1103,
+     "overlap02": 0.0127,
+     "D1": 28.5753,
+     "dist": 3.7961,
+     "rel_tilt": 26.8237,
+     "lateral": 0.9796,
+     "triple_volume": 0.0,
+     "three_cycle": 0.189
+    },
+    {
+     "chunk": 5,
+     "E": 642.269,
+     "E_int": 0.0287,
+     "overlap02": 0.0126,
+     "D1": 28.3228,
+     "dist": 3.8705,
+     "rel_tilt": 31.5069,
+     "lateral": 1.2473,
+     "triple_volume": 0.0,
+     "three_cycle": 0.1787
+    },
+    {
+     "chunk": 6,
+     "E": 642.2088,
+     "E_int": -0.0315,
+     "overlap02": 0.0163,
+     "D1": 28.5801,
+     "dist": 3.898,
+     "rel_tilt": 36.6953,
+     "lateral": 1.4706,
+     "triple_volume": 0.0,
+     "three_cycle": 0.1977
+    },
+    {
+     "chunk": 7,
+     "E": 642.1607,
+     "E_int": -0.0797,
+     "overlap02": 0.0166,
+     "D1": 28.3705,
+     "dist": 3.9448,
+     "rel_tilt": 40.1889,
+     "lateral": 1.6774,
+     "triple_volume": 0.0,
+     "three_cycle": 0.1945
+    },
+    {
+     "chunk": 8,
+     "E": 642.1217,
+     "E_int": -0.1186,
+     "overlap02": 0.0205,
+     "D1": 28.5883,
+     "dist": 3.957,
+     "rel_tilt": 43.8737,
+     "lateral": 1.8427,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2171
+    },
+    {
+     "chunk": 9,
+     "E": 642.0827,
+     "E_int": -0.1576,
+     "overlap02": 0.0216,
+     "D1": 28.4083,
+     "dist": 3.9874,
+     "rel_tilt": 46.7584,
+     "lateral": 2.0272,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2213
+    },
+    {
+     "chunk": 10,
+     "E": 642.0464,
+     "E_int": -0.194,
+     "overlap02": 0.0267,
+     "D1": 28.6153,
+     "dist": 3.9828,
+     "rel_tilt": 49.3766,
+     "lateral": 2.1475,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2534
+    },
+    {
+     "chunk": 11,
+     "E": 642.0141,
+     "E_int": -0.2263,
+     "overlap02": 0.0284,
+     "D1": 28.4256,
+     "dist": 3.9949,
+     "rel_tilt": 51.1413,
+     "lateral": 2.2815,
+     "triple_volume": 0.0,
+     "three_cycle": 0.2632
+    },
+    {
+     "chunk": 12,
+     "E": 641.9803,
+     "E_int": -0.2601,
+     "overlap02": 0.0351,
+     "D1": 28.6339,
+     "dist": 3.9769,
+     "rel_tilt": 53.1519,
+     "lateral": 2.3742,
+     "triple_volume": 0.0,
+     "three_cycle": 0.3084
+    },
+    {
+     "chunk": 13,
+     "E": 641.944,
+     "E_int": -0.2963,
+     "overlap02": 0.0404,
+     "D1": 28.4498,
+     "dist": 3.969,
+     "rel_tilt": 55.1669,
+     "lateral": 2.5223,
+     "triple_volume": 0.0,
+     "three_cycle": 0.3463
+    },
+    {
+     "chunk": 14,
+     "E": 641.9013,
+     "E_int": -0.339,
+     "overlap02": 0.0508,
+     "D1": 28.6629,
+     "dist": 3.9347,
+     "rel_tilt": 56.8387,
+     "lateral": 2.5881,
+     "triple_volume": 0.0,
+     "three_cycle": 0.4185
+    },
+    {
+     "chunk": 15,
+     "E": 641.8526,
+     "E_int": -0.3877,
+     "overlap02": 0.065,
+     "D1": 28.4766,
+     "dist": 3.8878,
+     "rel_tilt": 59.1738,
+     "lateral": 2.731,
+     "triple_volume": 0.0,
+     "three_cycle": 0.5279
+    },
+    {
+     "chunk": 16,
+     "E": 641.786,
+     "E_int": -0.4543,
+     "overlap02": 0.0865,
+     "D1": 28.7183,
+     "dist": 3.8276,
+     "rel_tilt": 60.9844,
+     "lateral": 2.7685,
+     "triple_volume": 0.1094,
+     "three_cycle": 0.6813
+    },
+    {
+     "chunk": 17,
+     "E": 641.7027,
+     "E_int": -0.5376,
+     "overlap02": 0.1228,
+     "D1": 28.5415,
+     "dist": 3.7236,
+     "rel_tilt": 64.1543,
+     "lateral": 2.8593,
+     "triple_volume": 0.3125,
+     "three_cycle": 0.9783
+    },
+    {
+     "chunk": 18,
+     "E": 641.5245,
+     "E_int": -0.7159,
+     "overlap02": 0.2045,
+     "D1": 28.9429,
+     "dist": 3.5824,
+     "rel_tilt": 67.8492,
+     "lateral": 2.8536,
+     "triple_volume": 0.8906,
+     "three_cycle": 1.5952
+    },
+    {
+     "chunk": 19,
+     "E": 641.1479,
+     "E_int": -1.0925,
+     "overlap02": 0.4018,
+     "D1": 28.6705,
+     "dist": 3.3072,
+     "rel_tilt": 75.2862,
+     "lateral": 2.8178,
+     "triple_volume": 2.3594,
+     "three_cycle": 3.3571
+    },
+    {
+     "chunk": 20,
+     "E": 638.0687,
+     "E_int": -4.1716,
+     "overlap02": 1.9543,
+     "D1": 29.2623,
+     "dist": 2.5479,
+     "rel_tilt": 86.8645,
+     "lateral": 2.3829,
+     "triple_volume": 11.75,
+     "three_cycle": 18.4476
+    },
+    {
+     "chunk": 21,
+     "E": 601.4173,
+     "E_int": -40.823,
+     "overlap02": 6.0384,
+     "D1": 21.0026,
+     "dist": 0.9764,
+     "rel_tilt": 9.191,
+     "lateral": 0.8296,
+     "triple_volume": 26.625,
+     "three_cycle": 88.2694
+    },
+    {
+     "chunk": 22,
+     "E": 510.9023,
+     "E_int": -131.338,
+     "overlap02": 0.0142,
+     "D1": 20.641,
+     "dist": 0.6469,
+     "rel_tilt": 35.0095,
+     "lateral": 0.632,
+     "triple_volume": 0.0,
+     "three_cycle": 0.1596
+    },
+    {
+     "chunk": 23,
+     "E": 510.2908,
+     "E_int": -131.9495,
+     "overlap02": 0.0005,
+     "D1": 21.0101,
+     "dist": 0.5922,
+     "rel_tilt": 21.828,
+     "lateral": 0.327,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0049
+    },
+    {
+     "chunk": 24,
+     "E": 510.2635,
+     "E_int": -131.9768,
+     "overlap02": 0.0002,
+     "D1": 21.0506,
+     "dist": 0.5893,
+     "rel_tilt": 57.5332,
+     "lateral": 0.3905,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0016
+    },
+    {
+     "chunk": 25,
+     "E": 510.2546,
+     "E_int": -131.9858,
+     "overlap02": 0.0002,
+     "D1": 21.0779,
+     "dist": 0.5854,
+     "rel_tilt": 55.5441,
+     "lateral": 0.3827,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0007
+    }
+   ],
+   "state": "/tmp/flagpair/lattice_release_hinge10d3_N49_h0.25_s24.000.npz",
+   "end": {
+    "E": 510.2545550430905,
+    "Q": -1.9725029059661652,
+    "Q_per_line": [
+     -6.976366058868477e-13,
+     -0.9862518312224222,
+     -0.9862510747430454
+    ],
+    "line_weights": [
+     0.0011859729161233633,
+     21.07793772067687,
+     21.078770013059177
+    ]
+   },
+   "note": "stopped by hand after fusion (chunk 24 saved)"
   }
  ]
 }
