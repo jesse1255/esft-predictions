@@ -671,6 +671,51 @@ def cmd_thresh_A12(ne_r, ne_z, a, k3=2.0):
     return out
 
 
+def cmd_branch(ne_r, ne_z, a, k3s=(0.2, 0.1, 0.0), eps=0.3, name="A21in02", normal_types=(0, 1, 4, 5)):
+    """Below its threshold κ₃* an embedded solution has negative line-leaking modes;
+    follow the softest one to the stable three-line solution it decays into (a new
+    'species' of the same charge), continuing downward in κ₃.  Same logic as the
+    families of unstable self-similar profiles in the fluid blow-up searches: every
+    unstable direction of a known solution points to another solution."""
+    Gf, _ = setup(ne_r, ne_z, a)
+    T = tag(ne_r, ne_z, a)
+    U_emb = np.load(os.path.join(DATA, f"flagpair_state_{name}_{T}_k32.npy"))
+    E_emb = energy(fmodel(Gf, 2.0), U_emb)
+    pn, Ha, HC = normal_hessians(fmodel(Gf, 2.0), U_emb, normal_types,
+                                 os.path.join(SCRATCH, f"normal_hess_{name}_{T}.npz"))
+    rows, U = [], None
+    for k3 in k3s:
+        fm = fmodel(Gf, k3)
+        t0 = time.time()
+        if U is None:                                    # first κ₃: seed from the embedded solution
+            lam, v, _ = lowest_eig((Ha + k3 * HC).tocsr(), pn.mass())
+            x6 = np.zeros((Gf.nn, NT))
+            for t in normal_types:
+                sel = pn.dof[:, t] >= 0
+                x6[sel, t] = v[pn.dof[sel, t]]
+            pf = FlagProblem(fm, U_emb)
+            x = np.zeros(pf.nfree)
+            for t in range(NT):
+                sel = pf.dof[:, t] >= 0
+                x[pf.dof[sel, t]] = x6[sel, t]
+            U = np.asarray(pf.U_of(jnp.asarray(x * eps / np.abs(x).max())))
+        else:
+            lam = None
+        U, E, hist, conv = newton_relax(fm, U, types=range(NT), max_iter=80, verbose=False)
+        Q = degree_parts(fm, smooth_gauge(Gf, U)[0])
+        lw = [float(consistent_line_weight(fm, jnp.asarray(U), c)) for c in range(3)]
+        row = dict(k3=k3, E=E, E_embedded=E_emb, dE=E - E_emb, converged=conv, iterations=len(hist), Q=Q[0],
+                   Q_3cycle=Q[2], lines=lw, parts=fm.parts(U), seed_eigenvalue=lam)
+        rows.append(row)
+        print(f"κ₃ = {k3:g}: E = {E:.5f}  E − E_embedded = {E - E_emb:+.5f}  Q = {Q[0]:+.4f}  Q₃ = {Q[2]:+.4f}"
+              f"  lines {', '.join(f'{x:.2f}' for x in lw)}  conv {conv} ({len(hist)} it, {time.time() - t0:.0f}s)",
+              flush=True)
+        np.save(os.path.join(SCRATCH, f"flagpair_state_branch_{name}_{T}_k3{k3:g}.npy"), U)
+        save(f"branch_{name}_{T}", dict(ne_r=ne_r, ne_z=ne_z, a=a, rows=rows,
+                                         note="three-line solution reached along the softest leaking mode"))
+    return rows
+
+
 def cmd_fission(ne_r, ne_z, a, k3=2.0, targets=(0.25, 0.5, 1.0, 2.0, 3.0, 4.5, 6.0, 8.0, 10.0, 12.5, 15.0,
                                                    18.0, 21.0, 24.0, 27.0, 30.0)):
     """Path from the (0, 2) torus (line 1 untouched, D₁ = 0) towards the separated
@@ -862,6 +907,8 @@ if __name__ == "__main__":
         omA, omB = float(sys.argv[6]), float(sys.argv[7])
         ds = tuple(float(s) for s in sys.argv[8:]) or (2.0, 3.0)
         cmd_rotpair(ne_r, ne_z, a, k3, omA, omB, ds)
+    elif cmd == "branch":
+        cmd_branch(ne_r, ne_z, a)
     elif cmd == "fission":
         ts = tuple(float(s) for s in sys.argv[6:])
         cmd_fission(ne_r, ne_z, a, k3, ts) if ts else cmd_fission(ne_r, ne_z, a, k3)
