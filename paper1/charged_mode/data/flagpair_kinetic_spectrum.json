@@ -123,6 +123,31 @@
    "lowest_omega2_full": -6.419675716199379e-11,
    "lowest_bound_omega2_full": 0.028544136047363285,
    "t": 32.106165647506714
+  },
+  {
+   "name": "A12in01",
+   "types": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "full_metric": {
+    "continuum_edge": 1.0,
+    "n_negative": 0,
+    "n_below_small": 0,
+    "n_below_edge": 0,
+    "bound_vibrations": 0
+   },
+   "L2_metric": {
+    "continuum_edge": 2.0,
+    "n_negative": 0,
+    "n_below_small": 0,
+    "n_below_edge": 0,
+    "bound_vibrations": 0
+   },
+   "lowest_omega2_full": 1.000030554158976,
+   "t": 56.2623336315155
   }
  ]
 }
