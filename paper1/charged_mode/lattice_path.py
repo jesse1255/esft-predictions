@@ -41,12 +41,18 @@ import jax.numpy as jnp
 from lattice3d import Lattice, from_axial, relax, Constraint, SCRATCH, DATA
 
 AX_SADDLE = os.path.join(DATA, "flagpair_state_cons_ne24x32_a4_k32_d1.npy")
+K3 = float(os.environ.get("LATTICE_KAPPA3", "2.0"))     # three-cycle coupling (embedded references do not depend on it)
+_Lattice = Lattice
+
+
+def Lattice(N, h):
+    return _Lattice(N, h, kappa3=K3)
 AX_FUSED = os.path.join(DATA, "flagpair_state_A21in02_ne24x32_a4_k32.npy")
 MODE = os.path.join(SCRATCH, "sector_mode_flagpair_state_cons_ne24x32_a4_k32_d1_k1_negative_1.npy")
 
 
 def tagof(N, h):
-    return f"N{N}_h{h:g}"
+    return f"N{N}_h{h:g}" + ("" if K3 == 2.0 else f"_k3{K3:g}")
 
 
 def out_json(N, h):
@@ -126,9 +132,12 @@ def cmd_refs(N, h):
 
 
 def refs_energy(N, h):
-    for r in load_rows(N, h)["rows"]:
-        if r["kind"] == "refs":
-            return r["A01"]["E"] + r["B12"]["E"]
+    # the isolated vortices are embedded solutions: their energy does not depend on κ₃
+    for fn in (out_json(N, h), os.path.join(DATA, f"flagpair_lattice_path_N{N}_h{h:g}.json")):
+        if os.path.exists(fn):
+            for r in json.load(open(fn))["rows"]:
+                if r["kind"] == "refs":
+                    return r["A01"]["E"] + r["B12"]["E"]
     raise RuntimeError("run refs first")
 
 
