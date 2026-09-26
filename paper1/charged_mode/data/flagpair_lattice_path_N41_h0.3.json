@@ -1101,6 +1101,99 @@
     }
    ],
    "note": "LATTICE ARTEFACT: the seed is singular at the touching point (charge -1.82, not an integer); the lattice unwound it completely: E 1066.8 -> 120.8, charge 0.0001, a lattice-pinned remnant with line weights 0.17/0.66/0.62. In the continuum a configuration with a point where both cores meet is not a finite-energy smooth field."
+  },
+  {
+   "kind": "release_smith_cross2_gs",
+   "start": "lattice_seed_smith_cross2_gs_N41_h0.3.npz (concentric perpendicular rings: cores cross at two points, singular)",
+   "rows": [
+    {
+     "chunk": 0,
+     "E": 1185.0081,
+     "E_int": 543.5848,
+     "overlap02": 2.9558,
+     "D1": 22.6108,
+     "dist": 0.0,
+     "rel_tilt": 90.0,
+     "lateral": 0.0,
+     "triple_volume": 21.33,
+     "three_cycle": 185.2981
+    },
+    {
+     "chunk": 1,
+     "E": 356.8261,
+     "E_int": -284.5972,
+     "overlap02": 4.4255,
+     "D1": 5.3124,
+     "dist": 0.0217,
+     "rel_tilt": 24.7105,
+     "lateral": 0.0213,
+     "triple_volume": 13.635,
+     "three_cycle": 21.5621
+    },
+    {
+     "chunk": 2,
+     "E": 239.522,
+     "E_int": -401.9013,
+     "overlap02": 0.0022,
+     "D1": 1.2321,
+     "dist": 0.0145,
+     "rel_tilt": 77.1803,
+     "lateral": 0.0039,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0752
+    },
+    {
+     "chunk": 3,
+     "E": 239.1163,
+     "E_int": -402.307,
+     "overlap02": 0.0,
+     "D1": 1.2583,
+     "dist": 0.0013,
+     "rel_tilt": 36.0022,
+     "lateral": 0.0011,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0009
+    },
+    {
+     "chunk": 4,
+     "E": 239.1124,
+     "E_int": -402.3108,
+     "overlap02": 0.0,
+     "D1": 1.2606,
+     "dist": 0.0008,
+     "rel_tilt": 50.5537,
+     "lateral": 0.0006,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0001
+    },
+    {
+     "chunk": 5,
+     "E": 239.1118,
+     "E_int": -402.3114,
+     "overlap02": 0.0,
+     "D1": 1.2612,
+     "dist": 0.0003,
+     "rel_tilt": 53.5557,
+     "lateral": 0.0001,
+     "triple_volume": 0.0,
+     "three_cycle": 0.0
+    }
+   ],
+   "end": {
+    "E": 239.1118244439594,
+    "Q": 3.884501627539225e-06,
+    "Q_per_line": [
+     2.9103598113473092e-15,
+     1.9441917577727516e-06,
+     1.9403098668561134e-06
+    ],
+    "line_weights": [
+     4.950226116144962e-05,
+     1.2612187888440733,
+     1.261239963914346
+    ]
+   },
+   "note": "LATTICE ARTEFACT: singular seed (charge -1.64, not an integer); the lattice cut the topology at the crossing points"
   }
  ]
 }
