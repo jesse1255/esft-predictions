@@ -111,6 +111,23 @@ def smooth_pair(UA, UB):
     return U, int(bad.sum())
 
 
+def smooth_pair_lines(UA, la, UB, lb):
+    """General smooth construction: line la from A, line lb from B (la ≠ lb), Gram–Schmidt,
+    the third line = the conjugated cross product, columns in the order 0, 1, 2."""
+    x = UA[..., :, la]
+    y = UB[..., :, lb]
+    y = y - np.einsum("...i,...i->...", np.conj(x), y)[..., None] * x
+    y = y / np.maximum(np.linalg.norm(y, axis=-1, keepdims=True), 1e-300)
+    lc = 3 - la - lb
+    z = np.conj(np.cross(x, y))              # orthogonal to both; its phase is a gauge
+    z /= np.linalg.norm(z, axis=-1, keepdims=True)
+    U = np.zeros(x.shape + (3,), complex)
+    U[..., :, la] = x
+    U[..., :, lb] = y
+    U[..., :, lc] = z
+    return U
+
+
 def configs(Rc):
     Ry = rot_x(-90.0)          # normal ẑ → ŷ (ring in the xz plane)
     Rym = rot_x(90.0)          # normal ẑ → −ŷ (same plane, reversed orientation)
@@ -187,6 +204,29 @@ def preimage_loop(Gf, u, nstar, tri=None):
     arg = np.asarray(np.arctan2(np.asarray(i2(rho, z)), np.asarray(i1(rho, z))))
     phi = np.arctan2(nstar[1], nstar[0]) - arg
     return np.stack([rho * np.cos(phi), rho * np.sin(phi), z], axis=1)
+
+
+def cmd_mixed(N, h, Rc=0.93):
+    """Linked rings of links 01 and 02 (α₁·α₁₂ = +1): the charges should be those of the 01 + 12
+    pair with the linking sign reversed (Killing form)."""
+    from run_flag_pair import setup
+    from lattice3d import charge
+    Gf, Uf = setup(24, 32, 4)
+    u = Uf[:, :3]
+    lat = Lattice(N, h)
+    out = {}
+    for name, ((RA, aA), (RB, aB)) in configs(Rc).items():
+        if not name.startswith("link"):
+            continue
+        UA = ring(Gf, u, lat, RA, aA, (0, 1))
+        for blkB, la, lb, tag in (((1, 2), 0, 2, "01+12"), ((0, 2), 1, 2, "01+02"), ((0, 2), 0, 2, "01+02(line0)")):
+            UB = ring(Gf, u, lat, RB, aB, blkB)
+            U = smooth_pair_lines(UA, la, UB, lb)
+            Q, Qa, _ = charge(lat, U, pad=1)
+            out[f"{name} {tag}"] = dict(Q=Q, per_line=Qa, E=lat.energy(U))
+            print(f"{name:6s} {tag:13s} Q = {Q:+.4f}  per line {[round(v, 4) for v in Qa]}  E = {lat.energy(U):.1f}", flush=True)
+    json.dump(out, open(os.path.join(DATA, f"flagpair_lattice_linking_rule_N{N}_h{h:g}.json"), "w"), indent=1)
+    return out
 
 
 def cmd_chart():
@@ -268,3 +308,5 @@ if __name__ == "__main__":
         cmd_seeds(int(sys.argv[2]), float(sys.argv[3]), smooth=len(sys.argv) > 4 and sys.argv[4] == "smooth")
     elif sys.argv[1] == "chart":
         cmd_chart()
+    elif sys.argv[1] == "mixed":
+        cmd_mixed(int(sys.argv[2]), float(sys.argv[3]))
