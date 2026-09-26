@@ -103,12 +103,14 @@ class FlagSector:
 
         eye = jnp.eye(3, dtype=jnp.complex128)
 
+        cs = jnp.asarray(np.stack([np.cos(self.k * self.phis), np.sin(self.k * self.phis)], axis=1))
+
         def energy(x):
             xc, xs = fields(x)
             Xc, Xs = _x6_to_X(xc), _x6_to_X(xs)
-            tot = 0.0
-            for ph in self.phis:
-                c, s = np.cos(self.k * ph), np.sin(self.k * ph)
+
+            def one(carry, csj):
+                c, s = csj[0], csj[1]
                 X = c * Xc + s * Xs
                 Xp = self.k * (-s * Xc + c * Xs)
                 A = jnp.linalg.inv(eye[None] - 0.5 * X)
@@ -116,18 +118,21 @@ class FlagSector:
                 W = self.U0 @ Cay
                 Wp = self.U0 @ (A @ (0.5 * Xp) @ (Cay + eye[None]))
                 sig, sk, pot = self._density(W, Wp)
-                tot = tot + jnp.sum(fm.W * (sig + sk + pot))
+                return carry + jnp.sum(fm.W * (sig + sk + pot)), None
+
+            tot, _ = jax.lax.scan(one, jnp.asarray(0.0), cs)
             return tot / self.M
 
         def mass_energy(x):
             xc, xs = fields(x)
-            tot = 0.0
-            for ph in self.phis:
-                c, s = np.cos(self.k * ph), np.sin(self.k * ph)
-                x6 = c * xc + s * xs
+
+            def one(carry, csj):
+                x6 = csj[0] * xc + csj[1] * xs
                 # consistent L² form: interpolate the six real fields to quadrature points
                 q = fm.Pv @ x6
-                tot = tot + jnp.sum(fm.W[:, None] * q ** 2)
+                return carry + jnp.sum(fm.W[:, None] * q ** 2), None
+
+            tot, _ = jax.lax.scan(one, jnp.asarray(0.0), cs)
             return tot / self.M
 
         self._energy = jax.jit(energy)
