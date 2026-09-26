@@ -1,0 +1,29 @@
+{
+ "note": "\nVibrational spectra with the full kinetic metric (hypothesis sweep \u00a73b, \u00a74 item 3).\n\nRounds 5-6 used the L\u00b2 metric \u222b|\u03b4U|\u00b2 for the small-oscillation problem.  The true\nkinetic energy of M2\u2032 also has the quartic terms with one time index, so\n    G(\u03b4U, \u03b4U) = 2 T[\u03b4U\u0307 = \u03b4U],   T = \u222b [\u03a3 r|w_t^{ab}|\u00b2 + \u03a3_a \u03ba_a/2 \u03a3_i (F^{(a)}_{ti})\u00b2 + \u03ba\u2083/2 \u03a3 |C_{ti}|\u00b2],\nw_t = \u1e90\u2020\u00b7(aligned interpolation of \u03b4U) with the element phases of the base state.\nSquared frequencies are the eigenvalues of H v = \u03c9\u00b2 G v.  Far away G \u2192 the L\u00b2 form, so\nthe continuum still starts at \u03c9\u00b2 = \u03bc\u00b2 = 1.  With inertia counts (Sylvester) of H \u2212 sG:\n    N(s) = number of \u03c9\u00b2 < s;  bound vibrations = N(1 \u2212 \u03b4) \u2212 N(\u03b4)  (zero modes excluded),\nand the lowest \u03c9\u00b2 by bisection.  Blocks: in-block (the CP\u00b9 spectrum of round 5) and\nnormal (leaking into the third line).\nUsage: python kinetic_spectrum.py \u2192 data/flagpair_kinetic_spectrum.json\n",
+ "rows": [
+  {
+   "name": "single01",
+   "types": [
+    0,
+    1
+   ],
+   "full_metric": {
+    "continuum_edge": 1.0,
+    "n_negative": 0,
+    "n_below_small": 2,
+    "n_below_edge": 3,
+    "bound_vibrations": 1
+   },
+   "L2_metric": {
+    "continuum_edge": 2.0,
+    "n_negative": 0,
+    "n_below_small": 2,
+    "n_below_edge": 2,
+    "bound_vibrations": 0
+   },
+   "lowest_omega2_full": -2.2598436666290162e-05,
+   "lowest_bound_omega2_full": 0.7807522201538085,
+   "t": 34.02218461036682
+  }
+ ]
+}
