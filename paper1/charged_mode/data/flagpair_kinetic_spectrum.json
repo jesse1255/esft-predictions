@@ -24,6 +24,31 @@
    "lowest_omega2_full": -2.2598436666290162e-05,
    "lowest_bound_omega2_full": 0.7807522201538085,
    "t": 34.02218461036682
+  },
+  {
+   "name": "single01",
+   "types": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "full_metric": {
+    "continuum_edge": 1.0,
+    "n_negative": 0,
+    "n_below_small": 0,
+    "n_below_edge": 0,
+    "bound_vibrations": 0
+   },
+   "L2_metric": {
+    "continuum_edge": 2.0,
+    "n_negative": 0,
+    "n_below_small": 0,
+    "n_below_edge": 0,
+    "bound_vibrations": 0
+   },
+   "lowest_omega2_full": 1.0000305541656331,
+   "t": 58.311845779418945
   }
  ]
 }
