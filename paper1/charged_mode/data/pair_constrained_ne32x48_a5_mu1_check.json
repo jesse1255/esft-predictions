@@ -1,0 +1,186 @@
+{
+ "ne_r": 32,
+ "ne_z": 48,
+ "a": 5.0,
+ "mu": 1.0,
+ "E1": 321.46905170508967,
+ "rows": [
+  {
+   "d": 2.0,
+   "alpha": 0.0,
+   "E_sup_int": 59.5092324073438,
+   "E_relaxed_int": 0.5434749981933464,
+   "relaxation_gain": 58.965757409150456,
+   "converged": true,
+   "iterations": 13,
+   "Q": -1.9980800592449834,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 0.7853981633974483,
+   "E_sup_int": 5.567997336833514,
+   "E_relaxed_int": -18.005626901609048,
+   "relaxation_gain": 23.573624238442562,
+   "converged": true,
+   "iterations": 11,
+   "Q": -1.9983620637360915,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 1.5707963267948966,
+   "E_sup_int": -17.73544983316276,
+   "E_relaxed_int": -26.176815253581594,
+   "relaxation_gain": 8.441365420418833,
+   "converged": true,
+   "iterations": 9,
+   "Q": -1.998463933359596,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 2.356194490192345,
+   "E_sup_int": -14.770667909792792,
+   "E_relaxed_int": -24.16800144422598,
+   "relaxation_gain": 9.397333534433187,
+   "converged": true,
+   "iterations": 11,
+   "Q": -1.9984319234812797,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 3.141592653589793,
+   "E_sup_int": 8.210052430177825,
+   "E_relaxed_int": -13.718992089753556,
+   "relaxation_gain": 21.92904451993138,
+   "converged": true,
+   "iterations": 12,
+   "Q": -1.9982912467764635,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 3.9269908169872414,
+   "E_sup_int": 50.64718910281192,
+   "E_relaxed_int": 2.9801775230948806,
+   "relaxation_gain": 47.66701157971704,
+   "converged": true,
+   "iterations": 17,
+   "Q": -1.9979989005396974,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 4.71238898038469,
+   "E_sup_int": 105.31757761703034,
+   "E_relaxed_int": 23.797535487072423,
+   "relaxation_gain": 81.52004212995791,
+   "converged": true,
+   "iterations": 17,
+   "Q": -1.9975090961992232,
+   "ref_converged": true
+  },
+  {
+   "d": 2.0,
+   "alpha": 5.497787143782138,
+   "E_sup_int": 115.90552461085906,
+   "E_relaxed_int": 26.36413563193355,
+   "relaxation_gain": 89.54138897892551,
+   "converged": true,
+   "iterations": 20,
+   "Q": -1.9975424671644841,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 0.0,
+   "E_sup_int": 0.5702761753217374,
+   "E_relaxed_int": -0.7060094839649764,
+   "relaxation_gain": 1.2762856592867138,
+   "converged": true,
+   "iterations": 7,
+   "Q": -1.998136916750799,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 0.7853981633974483,
+   "E_sup_int": -6.079768647055403,
+   "E_relaxed_int": -6.51536085758255,
+   "relaxation_gain": 0.43559221052714747,
+   "converged": true,
+   "iterations": 6,
+   "Q": -1.9982539154627468,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 1.5707963267948966,
+   "E_sup_int": -8.331952158179774,
+   "E_relaxed_int": -8.4617027603324,
+   "relaxation_gain": 0.12975060215262602,
+   "converged": true,
+   "iterations": 7,
+   "Q": -1.9982807579265807,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 2.356194490192345,
+   "E_sup_int": -5.887755685696561,
+   "E_relaxed_int": -6.3295819119168755,
+   "relaxation_gain": 0.4418262262203143,
+   "converged": true,
+   "iterations": 8,
+   "Q": -1.998226868031771,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 3.141592653589793,
+   "E_sup_int": 0.027820242016787233,
+   "E_relaxed_int": -1.1563420322527236,
+   "relaxation_gain": 1.1841622742695108,
+   "converged": true,
+   "iterations": 8,
+   "Q": -1.9981125568345206,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 3.9269908169872414,
+   "E_sup_int": 7.040142313368392,
+   "E_relaxed_int": 5.193570418367244,
+   "relaxation_gain": 1.8465718950011478,
+   "converged": true,
+   "iterations": 8,
+   "Q": -1.9979708261482974,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 4.71238898038469,
+   "E_sup_int": 10.921369927130854,
+   "E_relaxed_int": 9.354316964502004,
+   "relaxation_gain": 1.5670529626288499,
+   "converged": true,
+   "iterations": 8,
+   "Q": -1.9978709890396642,
+   "ref_converged": true
+  },
+  {
+   "d": 3.0,
+   "alpha": 5.497787143782138,
+   "E_sup_int": 8.109887442297804,
+   "E_relaxed_int": 6.497129150302499,
+   "relaxation_gain": 1.6127582919953056,
+   "converged": true,
+   "iterations": 8,
+   "Q": -1.997955526275229,
+   "ref_converged": true
+  }
+ ],
+ "note": "pair in the reflection-symmetric half plane; core centroid Z = d/2 and isorotation angle fixed by Lagrange multipliers; reference = single soliton at z = d/2 with the same constraints on the full plane"
+}

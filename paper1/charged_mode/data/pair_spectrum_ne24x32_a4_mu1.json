@@ -1,0 +1,122 @@
+{
+ "ne_r": 24,
+ "ne_z": 32,
+ "a": 4.0,
+ "mu": 1.0,
+ "continuum": 1.0,
+ "modes": [
+  {
+   "eigenvalue": -0.00021124512623280078,
+   "overlap": {
+    "isorotation": 0.010782046680557626,
+    "z_translation": 0.9961156278775034
+   },
+   "weight_r_lt_5": 0.9998929640823201
+  },
+  {
+   "eigenvalue": -3.871807383738768e-06,
+   "overlap": {
+    "isorotation": 0.9999418720447473,
+    "z_translation": 0.08797920645405401
+   },
+   "weight_r_lt_5": 0.9994666819690428
+  },
+  {
+   "eigenvalue": 1.0000305043240438,
+   "overlap": {
+    "isorotation": 3.129237363137729e-15,
+    "z_translation": 6.514184027382105e-14
+   },
+   "weight_r_lt_5": 1.4088961578565443e-09
+  },
+  {
+   "eigenvalue": 1.0000305044299669,
+   "overlap": {
+    "isorotation": 5.228406451238898e-10,
+    "z_translation": 1.0818949909383171e-08
+   },
+   "weight_r_lt_5": 5.303295293250499e-10
+  },
+  {
+   "eigenvalue": 1.0000559874399462,
+   "overlap": {
+    "isorotation": 1.5931303073987997e-13,
+    "z_translation": 2.687538054756045e-10
+   },
+   "weight_r_lt_5": 1.641103523163117e-13
+  },
+  {
+   "eigenvalue": 1.0000559874399522,
+   "overlap": {
+    "isorotation": 7.90413432347406e-14,
+    "z_translation": 1.3334521621767732e-10
+   },
+   "weight_r_lt_5": 1.8723575368699697e-13
+  },
+  {
+   "eigenvalue": 1.0001771730772286,
+   "overlap": {
+    "isorotation": 2.3142400489815335e-15,
+    "z_translation": 4.884340821962949e-14
+   },
+   "weight_r_lt_5": 5.154808744626181e-09
+  },
+  {
+   "eigenvalue": 1.0001771734646296,
+   "overlap": {
+    "isorotation": 9.990276315177354e-10,
+    "z_translation": 2.0674198690888585e-08
+   },
+   "weight_r_lt_5": 1.9377554127897694e-09
+  },
+  {
+   "eigenvalue": 1.0005251401562334,
+   "overlap": {
+    "isorotation": 6.772339185054267e-16,
+    "z_translation": 1.1509701022793527e-12
+   },
+   "weight_r_lt_5": 7.60146164589993e-12
+  },
+  {
+   "eigenvalue": 1.000525140156512,
+   "overlap": {
+    "isorotation": 1.1096066919822343e-12,
+    "z_translation": 1.872816596351551e-09
+   },
+   "weight_r_lt_5": 6.104469209100721e-12
+  },
+  {
+   "eigenvalue": 1.0009470606743875,
+   "overlap": {
+    "isorotation": 5.397035991902183e-16,
+    "z_translation": 1.9838602474918783e-14
+   },
+   "weight_r_lt_5": 5.962305331276129e-07
+  },
+  {
+   "eigenvalue": 1.0009471053669436,
+   "overlap": {
+    "isorotation": 1.301503549634112e-09,
+    "z_translation": 2.2158465603123906e-07
+   },
+   "weight_r_lt_5": 2.2222949759305724e-07
+  },
+  {
+   "eigenvalue": 1.000972643205594,
+   "overlap": {
+    "isorotation": 5.4196804218215694e-15,
+    "z_translation": 9.0691114882185e-12
+   },
+   "weight_r_lt_5": 8.230549653565165e-11
+  },
+  {
+   "eigenvalue": 1.0009726432086186,
+   "overlap": {
+    "isorotation": 3.648354941470246e-12,
+    "z_translation": 6.11087621971142e-09
+   },
+   "weight_r_lt_5": 6.605628712482499e-11
+  }
+ ],
+ "note": "H v = \u03bb M v with the consistent L\u00b2 mass; \u03bb < \u03bc\u00b2 = 1 and localised (weight(r<5) \u2248 1) are bound modes of the soliton"
+}
