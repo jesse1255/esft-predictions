@@ -303,8 +303,39 @@ def cmd_chart():
     print("wrote", fn)
 
 
+def cmd_crossing(Rc=0.93, cases=((35, 0.35), (41, 0.3), (49, 0.25), (61, 0.2), (81, 0.15)), only=None):
+    """§5.6: energy of the unrelaxed smooth seeds (touching cores, the two links, and the touching
+    configuration pulled apart, A by −1.5 and B by +1.5 along x) at several lattice spacings, same box ±6.  The touching
+    configuration minus the separated one grows like 1/h (the crossing point is singular)."""
+    from run_flag_pair import setup
+    Gf, Uf = setup(24, 32, 4)
+    u = Uf[:, :3]
+    out = []
+    for N, h in cases:
+        if only is not None and N not in only:
+            continue
+        lat = Lattice(N, h)
+        cf = configs(Rc)
+        (RA, aA), (RB, aB) = cf["touch"]
+        cf["apart"] = ((RA, (aA[0] - 1.5, 0.0, 0.0)), (RB, (aB[0] + 1.5, 0.0, 0.0)))
+        row = dict(N=N, h=h)
+        for name in ("touch", "linkm", "linkp", "apart"):
+            (RA, aA), (RB, aB) = cf[name]
+            # the outer layer is left as constructed (not reset to the vacuum), as in the original run
+            U, _ = smooth_pair(ring(Gf, u, lat, RA, aA, (0, 1)), ring(Gf, u, lat, RB, aB, (1, 2)))
+            p = lat.parts(U)
+            row[name] = dict(E=sum(p.values()), parts=p)
+        print(N, h, {k: round(v["E"], 2) for k, v in row.items() if isinstance(v, dict)}, flush=True)
+        out.append(row)
+    if only is None:
+        json.dump(out, open(os.path.join(DATA, "flagpair_lattice_crossing_scaling.json"), "w"), indent=1)
+    return out
+
+
 if __name__ == "__main__":
-    if sys.argv[1] == "seeds":
+    if sys.argv[1] == "crossing":
+        cmd_crossing(only=[int(v) for v in sys.argv[2:]] or None)
+    elif sys.argv[1] == "seeds":
         cmd_seeds(int(sys.argv[2]), float(sys.argv[3]), smooth=len(sys.argv) > 4 and sys.argv[4] == "smooth")
     elif sys.argv[1] == "chart":
         cmd_chart()

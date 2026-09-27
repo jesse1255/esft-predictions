@@ -43,9 +43,15 @@ jax.config.update("jax_enable_x64", True)
 
 
 class OpenLattice(Lattice):
-    def __init__(self, N, h, lam=10.0, **kw):
+    def __init__(self, N, h, lam=10.0, amp="square", **kw):
+        """amp = "square": ρ = r² with r the free variable, so ρ ≥ 0 (default since 2026-09-27);
+        amp = "linear": ρ itself is free and may change sign (the first runs).  The continuum model
+        has the redundancy (ρ_a, u_a) → (−ρ_a, −u_a); the lattice weights below are not invariant
+        under it, so with amp = "linear" a site can flip sign and switch off the couplings on its
+        links at a cost independent of λ (a lattice cut through which a knot can untie)."""
         super().__init__(N, h, **kw)
         self.lam = float(lam)
+        self.amp = amp
         n = self.N - 2
         self.nfree = 9 * n ** 3
 
@@ -119,6 +125,8 @@ class OpenLattice(Lattice):
         x = x.reshape(n, n, n, 9)
         x6 = jnp.zeros((self.N, self.N, self.N, 6)).at[1:-1, 1:-1, 1:-1].set(x[..., :6])
         dR = jnp.zeros((self.N, self.N, self.N, 3)).at[1:-1, 1:-1, 1:-1].set(x[..., 6:])
+        if self.amp == "square":
+            return Ub @ cayley(x6_to_X(x6)), (jnp.sqrt(jnp.maximum(Rb, 0.0)) + dR) ** 2
         return Ub @ cayley(x6_to_X(x6)), Rb + dR
 
 
@@ -134,6 +142,8 @@ class Precond9:
         L = lam1[:, None, None] + lam1[None, :, None] + lam1[None, None, :]
         f6 = (4.0 * lat.h ** 3 * (L + 1.0)) ** -0.5
         f3 = (2.0 * lat.h ** 3 * (L + max(lat.lam, 1.0))) ** -0.5
+        if getattr(lat, "amp", "linear") == "square":
+            f3 = 0.5 * f3
         self.f = np.concatenate([np.repeat(f6[..., None], 6, -1), np.repeat(f3[..., None], 3, -1)], -1)
         self.shape = (n, n, n, 9)
 
@@ -143,14 +153,48 @@ class Precond9:
         return self.dstn(a, type=1, axes=(0, 1, 2), norm="ortho").ravel()
 
 
-def relax_open(lat, U0, R0=None, chunk=100, max_chunks=40, gtol=1e-3, log=None, verbose=True, describe=None):
-    """Unconstrained L-BFGS for the open model (frame chart + amplitudes), base moved every chunk."""
+def flow_open(lat, Ub, Rb, S, vg, steps, dmax=0.02, log=None, verbose=True, describe=None, every=50):
+    """Preconditioned steepest descent with the largest change of any variable capped at dmax per
+    step (Armijo backtracking): a continuous downhill path, so a barrier cannot be jumped the way a
+    long L-BFGS line search can."""
+    hist, t0 = [], time.time()
+    E, g = vg(Ub, Rb, jnp.zeros(lat.nfree))
+    E = float(E)
+    for n in range(steps):
+        d = -S(S(np.asarray(g)))
+        a = dmax / max(float(np.abs(d).max()), 1e-300)
+        while True:
+            Un, Rn = lat.UR_of(Ub, Rb, jnp.asarray(a * d))
+            En, gn = vg(Un, Rn, jnp.zeros(lat.nfree))
+            if float(En) <= E or a < 1e-8:
+                break
+            a *= 0.5
+        Ub, Rb, E, g = Un, Rn, float(En), gn
+        if n % every == 0 or n == steps - 1:
+            row = dict(flow_step=n, E=E, rho_min=[float(v) for v in jnp.min(Rb, axis=(0, 1, 2))], t=round(time.time() - t0, 1))
+            if describe is not None:
+                row.update(describe(np.asarray(Ub), np.asarray(Rb)))
+            hist.append(row)
+            if verbose:
+                print(json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in row.items()}), flush=True)
+            if log:
+                with open(log, "a") as fh:
+                    fh.write(json.dumps(row) + "\n")
+    return Ub, Rb, hist
+
+
+def relax_open(lat, U0, R0=None, chunk=100, max_chunks=40, gtol=1e-3, log=None, verbose=True, describe=None,
+               flow_steps=0, flow_dmax=0.02):
+    """Unconstrained L-BFGS for the open model (frame chart + amplitudes), base moved every chunk;
+    optionally preceded by flow_steps of capped-step descent (flow_open)."""
     Ub = jnp.asarray(U0)
     Rb = jnp.ones(U0.shape[:3] + (3,)) if R0 is None else jnp.asarray(R0)
     S = Precond9(lat)
     vg = jax.jit(jax.value_and_grad(lambda Ub, Rb, x: lat.energy_UR(*lat.UR_of(Ub, Rb, x)), argnums=2))
     y0 = np.zeros(lat.nfree)
     hist, t0, it = [], time.time(), 0
+    if flow_steps:
+        Ub, Rb, hist = flow_open(lat, Ub, Rb, S, vg, flow_steps, flow_dmax, log, verbose, describe)
     for ch in range(max_chunks):
         def fun(y):
             E, g = vg(Ub, Rb, jnp.asarray(S(y)))
