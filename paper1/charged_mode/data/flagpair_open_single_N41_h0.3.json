@@ -340,7 +340,8 @@
       0.0
      ]
     }
-   ]
+   ],
+   "note": "not converged: the relaxation stopped on the energy criterion after an L-BFGS line-search failure caused by a gradient spike (the chord-to-arc factor of some link diverges as |O_ab| -> 1); the vortex was still shrinking. Do not read this row as a converged state."
   },
   {
    "lam": 10000.0,
