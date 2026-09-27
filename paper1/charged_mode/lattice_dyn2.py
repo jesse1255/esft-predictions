@@ -32,6 +32,7 @@ leave instead of reflecting; the energy it removes is the radiated energy.
 Usage:
     python lattice_dyn2.py test  N h dt            → rest; σ-only vs lattice_dyn; boosted vortex (E ≈ γM?)
     python lattice_dyn2.py collide N h V cfg dt T [sponge]  → two Lorentz-contracted rings at ±V
+    python lattice_dyn2.py ring N h eps dt T                → free ringing of the relaxed Q = 2 ring
 """
 
 import json
@@ -328,6 +329,14 @@ class SpaceTime:
         return U1, p1, y, gV1, k, float(res)
 
 
+def link_content(lat, U):
+    """P_ab = h³ Σ_x ½(|U_ab|² + |U_ba|²) for the pairs 01, 12, 02: how much of each link the field
+    carries (14.2 for one Q = 1 vortex, 21.0 for the Q = 2 ring, h = 0.3)."""
+    Un = np.asarray(U)
+    return {f"{a}{b}": float(lat.h ** 3 * np.sum(0.5 * (np.abs(Un[..., a, b]) ** 2 + np.abs(Un[..., b, a]) ** 2)))
+            for a, b in ((0, 1), (1, 2), (0, 2))}
+
+
 def radiated_energy_outside(lat, U, radius):
     Un = np.asarray(U)
     q = sum(1.0 - np.abs(Un[..., c, c]) ** 2 for c in range(3))
@@ -335,17 +344,23 @@ def radiated_energy_outside(lat, U, radius):
     return float(lat.h ** 3 * np.sum(q * (r > radius)))
 
 
-def run(st, U, v0, steps, every, tag, extra=None, save_every=None):
+def run(st, U, v0, steps, every, tag, extra=None, save_every=None, trace_every=None):
+    """trace_every: also record cheap observables (V, line weights and rms radii) every so many steps,
+    for spectra of the ringing."""
     lat = st.lat
     U = jnp.asarray(U)
     p = st.momentum_from_velocity(U, jnp.asarray(v0))
     y = st.dt * jnp.asarray(v0)
     gV = st.gradV(U)
-    rows, t0 = [], time.time()
+    rows, trace, t0 = [], [], time.time()
     E0 = None
     y_prev = None
     for n in range(steps + 1):
         Vn = float(st.V(U))
+        if trace_every and n % trace_every == 0:
+            gm = lat.geometry(np.asarray(U))
+            trace.append(dict(t=n * st.dt, V=Vn, w=[gm[c]["weight"] for c in range(3)],
+                              R=[gm[c].get("radius") for c in range(3)], m=[gm[c].get("moments") for c in range(3)]))
         # guess: linear extrapolation of the chart displacement (the charts of consecutive steps
         # differ by O(dt|v|), so this is only a starting point for Newton)
         yg = y if y_prev is None else 2.0 * y - y_prev
@@ -360,7 +375,7 @@ def run(st, U, v0, steps, every, tag, extra=None, save_every=None):
             gm = lat.geometry(np.asarray(U))
             row = dict(step=n, t=n * st.dt, T=K, V=Vn, E=E, Q=Q, lines=[gm[c]["weight"] for c in range(3)],
                        centroid0=gm[0].get("centroid"), centroid2=gm[2].get("centroid"),
-                       outside4=radiated_energy_outside(lat, U, 4.0), newton=nk, res=res,
+                       outside4=radiated_energy_outside(lat, U, 4.0), links=link_content(lat, U), newton=nk, res=res,
                        wall=round(time.time() - t0, 1))
             rows.append(row)
             print(json.dumps({k: (round(x, 5) if isinstance(x, float) else x) for k, x in row.items()}), flush=True)
@@ -368,6 +383,8 @@ def run(st, U, v0, steps, every, tag, extra=None, save_every=None):
                 np.savez_compressed(os.path.join(SCRATCH, f"dyn2_{tag}_t{n * st.dt:.2f}.npz"), U=np.asarray(U), p=np.asarray(p))
         U, p, gV = U1, p1, gV1
     out = dict(tag=tag, N=lat.N, h=lat.h, dt=st.dt, full=st.full, rows=rows)
+    if trace:
+        out["trace"] = trace
     if extra:
         out.update(extra)
     json.dump(out, open(os.path.join(DATA, f"flagpair_dyn2_{tag}.json"), "w"), indent=1)
@@ -448,11 +465,35 @@ def cmd_collide(N, h, V, cfg, dt, T, sponge=None, s=1.2):
         save_every=max(1, int(round(5.0 / dt))))
 
 
+def cmd_ring(N, h, eps, dt, T, sponge=(1.5, 3.0), ref="fused02"):
+    """Ringing of the relaxed Q = 2 ring (§4.1/§5.4, link 02): start at the static solution with the
+    velocity of a slow dilation, U(x, t) = U(x/(1 + ε t)), i.e. ∂_tU = −ε (x·∇)U, and follow the
+    free oscillation with the full kinetic term.  The rms radius of the ring oscillates at the
+    frequencies of the axisymmetric in-block vibrations; §4.4 found one bound one, ω² = 0.465, with
+    the full kinetic metric (the continuum starts at ω = 1)."""
+    from lattice_dyn import log_map
+    from lattice_string import X_to_x
+    lat = Lattice(N, h)
+    U = np.load(os.path.join(SCRATCH, f"lattice_ref_{ref}_N{N}_h{h:g}.npz"))["U"]
+    P = [lat.X, lat.Y, lat.Z]
+    Wt = 0.0
+    for i in range(3):
+        Wi = (log_map(U, np.roll(U, -1, axis=i)) - log_map(U, np.roll(U, 1, axis=i))) / (2.0 * h)
+        Wt = Wt - eps * P[i][..., None, None] * Wi
+    v = X_to_x(lat, Wt)
+    st = SpaceTime(lat, dt, full=True, sponge=sponge)
+    tag = f"ring_{ref}_eps{eps:g}_N{N}"
+    run(st, U, v, int(round(T / dt)), max(1, int(round(1.0 / dt))), tag, extra=dict(eps=eps, ref=ref, sponge=sponge),
+        trace_every=2)
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1]
     N, h = int(sys.argv[2]), float(sys.argv[3])
     if cmd == "test":
         cmd_test(N, h, float(sys.argv[4]))
+    elif cmd == "ring":
+        cmd_ring(N, h, float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
     elif cmd == "collide":
         sp = (1.5, 3.0) if len(sys.argv) > 8 and sys.argv[8] == "sponge" else None
         cmd_collide(N, h, float(sys.argv[4]), sys.argv[5], float(sys.argv[6]), float(sys.argv[7]), sponge=sp)
