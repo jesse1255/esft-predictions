@@ -196,6 +196,9 @@ class SpaceTime:
         """Inverse of the site-local continuum kinetic metric G(x) (6 × 6, interior sites), from the
         centred gauge-covariant spatial connection Ω_i (centred_connection):
         T(x)/h³ = Σ_{a<b} r|ω₀^{ab}|² + Σ_a ½κ_a Σ_i (2 Im Σ_b ω̄₀^{ba}Ω_i^{ba})² + ½κ₃ Σ_i Σ_{a≠c}|ω₀^{ab}Ω_i^{bc} − Ω_i^{ab}ω₀^{bc}|²."""
+        if not self.full:
+            n = (self.lat.N - 2) ** 3
+            return jnp.asarray(np.broadcast_to(np.eye(6) / self.M, (n, 6, 6)).copy())
         f = getattr(self, "_lmi", None)
         if f is None:
             from lattice3d import x6_to_X
