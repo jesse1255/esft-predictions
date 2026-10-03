@@ -347,9 +347,11 @@ def radiated_energy_outside(lat, U, radius):
     return float(lat.h ** 3 * np.sum(q * (r > radius)))
 
 
-def run(st, U, v0, steps, every, tag, extra=None, save_every=None, trace_every=None):
+def run(st, U, v0, steps, every, tag, extra=None, save_every=None, trace_every=None, probes=None):
     """trace_every: also record cheap observables (V, line weights and rms radii) every so many steps,
-    for spectra of the ringing."""
+    for spectra of the ringing; with probes (a list of lattice index triples) also the total energy
+    E_half and the deviation from the vacuum q = Σ_c (1 − |U_cc|²) at each probe point (the waves
+    that leave the object)."""
     lat = st.lat
     U = jnp.asarray(U)
     p = st.momentum_from_velocity(U, jnp.asarray(v0))
@@ -369,6 +371,11 @@ def run(st, U, v0, steps, every, tag, extra=None, save_every=None, trace_every=N
         yg = y if y_prev is None else 2.0 * y - y_prev
         y_prev = y
         U1, p1, y, gV1, nk, res = st.step(U, p, yg, gV)
+        if trace_every and probes is not None and n % trace_every == 0:
+            Kt = float(st.kin(U, U1))
+            trace[-1]["E"] = Kt + 0.5 * (Vn + float(st.V(U1)))
+            Un_ = np.asarray(U)
+            trace[-1]["probe_q"] = [float(sum(1.0 - abs(Un_[i, j, k, c, c]) ** 2 for c in range(3))) for i, j, k in probes]
         if n % every == 0:
             K = float(st.kin(U, U1))
             V1 = float(st.V(U1))
@@ -384,6 +391,14 @@ def run(st, U, v0, steps, every, tag, extra=None, save_every=None, trace_every=N
             print(json.dumps({k: (round(x, 5) if isinstance(x, float) else x) for k, x in row.items()}), flush=True)
             if save_every and n % save_every == 0:
                 np.savez_compressed(os.path.join(SCRATCH, f"dyn2_{tag}_t{n * st.dt:.2f}.npz"), U=np.asarray(U), p=np.asarray(p))
+        if n % 100 == 0 and n > 0:
+            # partial dump, so that a long run that is interrupted still leaves its record
+            part = dict(tag=tag, N=lat.N, h=lat.h, dt=st.dt, full=st.full, rows=rows, partial=True)
+            if trace:
+                part["trace"] = trace
+            if extra:
+                part.update(extra)
+            json.dump(part, open(os.path.join(DATA, f"flagpair_dyn2_{tag}.json"), "w"), indent=1)
         U, p, gV = U1, p1, gV1
     out = dict(tag=tag, N=lat.N, h=lat.h, dt=st.dt, full=st.full, rows=rows)
     if trace:
@@ -485,9 +500,11 @@ def cmd_ring(N, h, eps, dt, T, sponge=(1.5, 3.0), ref="fused02"):
         Wt = Wt - eps * P[i][..., None, None] * Wi
     v = X_to_x(lat, Wt)
     st = SpaceTime(lat, dt, full=True, sponge=sponge)
-    tag = f"ring_{ref}_eps{eps:g}_N{N}"
-    run(st, U, v, int(round(T / dt)), max(1, int(round(1.0 / dt))), tag, extra=dict(eps=eps, ref=ref, sponge=sponge),
-        trace_every=2)
+    tag = f"ring_{ref}_eps{eps:g}_N{N}" + (f"_T{T:g}" if T > 25 else "")
+    c0, d = N // 2, 12
+    probes = [(c0 + d, c0, c0), (c0 - d, c0, c0), (c0, c0 + d, c0), (c0, c0 - d, c0), (c0, c0, c0 + d), (c0, c0, c0 - d)]
+    run(st, U, v, int(round(T / dt)), max(1, int(round(1.0 / dt))), tag, extra=dict(eps=eps, ref=ref, sponge=sponge,
+        probe_radius=d * h), trace_every=4 if T > 25 else 2, probes=probes if T > 25 else None)
 
 
 if __name__ == "__main__":
