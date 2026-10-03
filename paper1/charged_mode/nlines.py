@@ -22,7 +22,19 @@ Linking rule (§5.5) for rings in links α = e_a − e_b and β = e_c − e_d:
    not computed: the σ and Faddeev terms have mixed second-order terms there.)
 2. Charge: lattice3d.charge for n lines (sum over the n line bundles).
 
+3. Can they really pass (`offblock`)?  The block-diagonal set is invariant, so the energy is even in the
+   off-block perturbation X = [[0, Y], [−Y†, 0]] (Y couples lines 0, 1 with 2, 3) and its Hessian H_off
+   decouples, even where the pair is not relaxed.  H_off is computed through U → U (1 + X + X²/2) (exact
+   to second order) with a Hessian-vector product; its lowest eigenvalues by LOBPCG with a
+   (α L + β)⁻¹ preconditioner (L the open-boundary lattice Laplacian, diagonal in the DCT;
+   α = 2 r h, β = 4 m² h³ = the bottom of the vacuum continuum).  Configurations from the relaxed
+   single ring (exact lattice symmetries only: rolls by whole sites, 90° rotations):
+   single 01 ring; the 01 + 23 pair coaxial on top of each other; crossed at right angles; linked
+   (crossed and shifted by ±2 sites).  λ_min < 0 would mean the passage is unstable (they would
+   start to mix); 0 < λ_min < β is a bound leakage mode; ≥ β none.
+
 Usage: python nlines.py check      → n = 3 equals lattice3d; four-line decoupling; charges
+       python nlines.py offblock   → lowest eigenvalues of H_off for the single ring and the pairs
 """
 
 import os
@@ -188,6 +200,104 @@ def cmd_check():
     json.dump(out, open(os.path.join(DATA, "nlines_four_decoupling.json"), "w"), indent=1)
 
 
+def offblock_hvp(nl):
+    """H_off(U) v as a jitted function of (U, v); U is an argument, so one compilation serves every U."""
+    N = nl.N
+
+    def build_X(th):
+        Y = (th[..., 0:4] + 1j * th[..., 4:8]).reshape(th.shape[:3] + (2, 2))
+        Z = jnp.zeros(th.shape[:3] + (2, 2), complex)
+        top = jnp.concatenate([Z, Y], -1)
+        bot = jnp.concatenate([-jnp.conj(jnp.swapaxes(Y, -1, -2)), Z], -1)
+        return jnp.concatenate([top, bot], -2)
+
+    def f(th, U):
+        X = build_X(th)
+        return nl.energy_U(U @ (jnp.eye(4) + X + 0.5 * X @ X))
+
+    g = jax.grad(f)
+    zero = jnp.zeros((N, N, N, 8))
+    return jax.jit(lambda U, v: jax.jvp(lambda th: g(th, U), (zero,), (v,))[1])
+
+
+def swap_blocks(v):
+    """The off-block vector seen from the other block: lines (0, 1) <-> (2, 3) sends Y to −Y†."""
+    Y = (v[..., 0:4] + 1j * v[..., 4:8]).reshape(v.shape[:3] + (2, 2))
+    Y = -np.conj(np.swapaxes(Y, -1, -2)).reshape(v.shape[:3] + (4,))
+    return np.concatenate([Y.real, Y.imag], -1)
+
+
+def cmd_offblock(maxiter=60, tol=2e-3):
+    import time
+    from scipy.fft import dctn, idctn
+    from scipy.sparse.linalg import LinearOperator, lobpcg
+    N, h = 41, 0.3
+    nl = NLattice(N, h, 4)
+    hvp = offblock_hvp(nl)
+    UA = np.load(os.path.join(SCRATCH, "lattice_ref_A01_N41_h0.3.npz"))["U"]
+    rot = lambda F: np.rot90(F, 1, axes=(1, 2))                        # ring axis z -> y (exact on the lattice)
+    shift = lambda F, k, ax: np.roll(F, k, axis=ax)
+    configs = {
+        "single": (embed(UA, (0, 1), 4), None, None),
+        "coaxial_on_top": (embed(UA, (0, 1), 4) @ embed(UA, (2, 3), 4), lambda v: v, lambda v: v),
+        "crossed": (embed(UA, (0, 1), 4) @ embed(rot(UA), (2, 3), 4), lambda v: v, rot),
+        "linked": (embed(shift(UA, -2, 0), (0, 1), 4) @ embed(shift(rot(UA), 2, 0), (2, 3), 4),
+                   lambda v: shift(v, -2, 0), lambda v: shift(rot(v), 2, 0)),
+    }
+    alpha, beta = 2 * 2.0 * h, 4 * 1.0 * h ** 3
+    k = np.arange(N)
+    l1 = 2 - 2 * np.cos(np.pi * k / N)
+    Lk = l1[:, None, None] + l1[None, :, None] + l1[None, None, :]
+    shape = (N, N, N, 8)
+
+    def prec(V):
+        V = np.asarray(V).reshape(shape + (-1,))
+        out = np.empty_like(V)
+        for j in range(V.shape[-1]):
+            c = dctn(V[..., j], type=2, axes=(0, 1, 2), norm="ortho")
+            out[..., j] = idctn(c / (alpha * Lk[..., None] + beta), type=2, axes=(0, 1, 2), norm="ortho")
+        return out.reshape(-1, V.shape[-1])
+    M = LinearOperator((np.prod(shape),) * 2, matmat=prec, matvec=lambda v: prec(v[:, None])[:, 0], dtype=float)
+    results, vecs = {}, {}
+    fn = os.path.join(DATA, "nlines_offblock.json")
+    for name, (U, tA, tB) in configs.items():
+        Uj = jnp.asarray(U)
+        ncall = [0]
+
+        def mv(V):
+            V = np.asarray(V).reshape(shape + (-1,))
+            out = np.empty_like(V)
+            for j in range(V.shape[-1]):
+                out[..., j] = np.asarray(hvp(Uj, jnp.asarray(V[..., j])))
+                ncall[0] += 1
+            return out.reshape(-1, V.shape[-1])
+        A = LinearOperator((np.prod(shape),) * 2, matmat=mv, matvec=lambda v: mv(v[:, None])[:, 0], dtype=float)
+        if name == "single":
+            rng = np.random.default_rng(0)
+            env = np.exp(-((np.indices((N, N, N)) - (N - 1) / 2) ** 2).sum(0) * h ** 2 / 4.0)[..., None]
+            X0 = np.stack([(env * rng.normal(size=shape)).reshape(-1) for _ in range(3)], 1)
+        else:
+            vA = [vecs["single"][:, j].reshape(shape) for j in range(2)]
+            vB = [tB(swap_blocks(v)) for v in vA]
+            X0 = np.stack([tA(v).reshape(-1) for v in vA] + [v.reshape(-1) for v in vB], 1)
+        t0 = time.time()
+        lam, V, hist = lobpcg(A, X0, M=M, largest=False, tol=tol, maxiter=maxiter, retLambdaHistory=True)
+        o = np.argsort(lam)
+        lam, V = lam[o], V[:, o]
+        res = [float(np.linalg.norm(mv(V[:, [j]])[:, 0] - lam[j] * V[:, j]) / np.linalg.norm(V[:, j])) for j in range(len(lam))]
+        vecs[name] = V
+        E = nl.energy(U)
+        results[name] = dict(E=E, lam=[float(x) for x in lam], residual=res, hvp_calls=ncall[0],
+                             iterations=len(hist), seconds=time.time() - t0, continuum_bottom=beta)
+        print(f"{name:15s} E = {E:9.3f}   lowest off-block eigenvalues {np.round(lam, 5).tolist()}   residuals "
+              f"{np.round(res, 5).tolist()}   ({len(hist)} iterations, {ncall[0]} products, {time.time() - t0:.0f} s)", flush=True)
+        json.dump(results, open(fn, "w"), indent=1)
+    np.save(os.path.join(SCRATCH, "nlines_offblock_vecs.npy"), {k: v for k, v in vecs.items()}, allow_pickle=True)
+    print(f"continuum bottom beta = {beta:.4f}")
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "check":
         cmd_check()
+    elif sys.argv[1] == "offblock":
+        cmd_offblock()
