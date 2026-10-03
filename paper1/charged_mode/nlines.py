@@ -18,8 +18,9 @@ Linking rule (§5.5) for rings in links α = e_a − e_b and β = e_c − e_d:
    no three-cycle path a → b → c across the blocks, potential additive).  The block-diagonal fields
    are the fixed set of the symmetry U → diag(1, 1, −1, −1) U (up to gauge), so the dynamics keeps
    them block diagonal: two such rings pass through each other without any interaction, and their
-   charge is 1 + 1 whatever their linking.  (Whether a small off-block perturbation grows while they overlap is
-   not computed: the σ and Faddeev terms have mixed second-order terms there.)
+   charge is 1 + 1 whatever their linking.  (Whether a small off-block perturbation grows while they overlap: see
+   `offblock` below — crossed and linked pairs show no growing mode, but the pair exactly on top of
+   each other has one, λ = −0.024: a saddle.)
 2. Charge: lattice3d.charge for n lines (sum over the n line bundles).
 
 3. Can they really pass (`offblock`)?  The block-diagonal set is invariant, so the energy is even in the
@@ -34,7 +35,8 @@ Linking rule (§5.5) for rings in links α = e_a − e_b and β = e_c − e_d:
    start to mix); 0 < λ_min < β is a bound leakage mode; ≥ β none.
 
 Usage: python nlines.py check      → n = 3 equals lattice3d; four-line decoupling; charges
-       python nlines.py offblock   → lowest eigenvalues of H_off for the single ring and the pairs
+       python nlines.py offblock [names] [block] [maxiter]   → lowest eigenvalues of H_off (default: all four, 2, 30)
+       python nlines.py refine <name> [maxiter]             → follow the softest mode of one configuration down
 """
 
 import os
@@ -48,6 +50,8 @@ import jax.numpy as jnp
 from lattice3d import Lattice, _abs2, _dag, _sl, _arc, SCRATCH, DATA
 
 jax.config.update("jax_enable_x64", True)
+jax.config.update("jax_compilation_cache_dir", os.path.join(SCRATCH, "jax_cache"))
+jax.config.update("jax_persistent_cache_min_compile_time_secs", 5.0)
 
 
 def _arc_n(O):
@@ -227,7 +231,11 @@ def swap_blocks(v):
     return np.concatenate([Y.real, Y.imag], -1)
 
 
-def cmd_offblock(maxiter=60, tol=2e-3):
+def cmd_offblock(names=None, block=2, maxiter=30, tol=2e-3):
+    """Lowest eigenvalues of H_off.  The single ring has no off-block bound mode (its lowest eigenvalues
+    sit on the vacuum continuum β), so a full convergence only resolves box modes near β; the question is
+    whether any configuration has a mode clearly below β (overlap binding) or below 0 (instability), and
+    for that the same short budget (block 2, 30 iterations, localized random start) is used for all."""
     import time
     from scipy.fft import dctn, idctn
     from scipy.sparse.linalg import LinearOperator, lobpcg
@@ -237,18 +245,20 @@ def cmd_offblock(maxiter=60, tol=2e-3):
     UA = np.load(os.path.join(SCRATCH, "lattice_ref_A01_N41_h0.3.npz"))["U"]
     rot = lambda F: np.rot90(F, 1, axes=(1, 2))                        # ring axis z -> y (exact on the lattice)
     shift = lambda F, k, ax: np.roll(F, k, axis=ax)
-    configs = {
-        "single": (embed(UA, (0, 1), 4), None, None),
-        "coaxial_on_top": (embed(UA, (0, 1), 4) @ embed(UA, (2, 3), 4), lambda v: v, lambda v: v),
-        "crossed": (embed(UA, (0, 1), 4) @ embed(rot(UA), (2, 3), 4), lambda v: v, rot),
+    configs = {                                                         # field, ring centres
+        "single": (embed(UA, (0, 1), 4), [(0.0, 0.0, 0.0)]),
+        "coaxial_on_top": (embed(UA, (0, 1), 4) @ embed(UA, (2, 3), 4), [(0.0, 0.0, 0.0)]),
+        "crossed": (embed(UA, (0, 1), 4) @ embed(rot(UA), (2, 3), 4), [(0.0, 0.0, 0.0)]),
         "linked": (embed(shift(UA, -2, 0), (0, 1), 4) @ embed(shift(rot(UA), 2, 0), (2, 3), 4),
-                   lambda v: shift(v, -2, 0), lambda v: shift(rot(v), 2, 0)),
+                   [(-2 * h, 0.0, 0.0), (2 * h, 0.0, 0.0)]),
     }
+    names = names or list(configs)
     alpha, beta = 2 * 2.0 * h, 4 * 1.0 * h ** 3
     k = np.arange(N)
     l1 = 2 - 2 * np.cos(np.pi * k / N)
     Lk = l1[:, None, None] + l1[None, :, None] + l1[None, None, :]
     shape = (N, N, N, 8)
+    X = (np.indices((N, N, N)) - (N - 1) / 2) * h
 
     def prec(V):
         V = np.asarray(V).reshape(shape + (-1,))
@@ -258,9 +268,10 @@ def cmd_offblock(maxiter=60, tol=2e-3):
             out[..., j] = idctn(c / (alpha * Lk[..., None] + beta), type=2, axes=(0, 1, 2), norm="ortho")
         return out.reshape(-1, V.shape[-1])
     M = LinearOperator((np.prod(shape),) * 2, matmat=prec, matvec=lambda v: prec(v[:, None])[:, 0], dtype=float)
-    results, vecs = {}, {}
     fn = os.path.join(DATA, "nlines_offblock.json")
-    for name, (U, tA, tB) in configs.items():
+    results = json.load(open(fn)) if os.path.exists(fn) else {}
+    for name in names:
+        U, centres = configs[name]
         Uj = jnp.asarray(U)
         ncall = [0]
 
@@ -272,32 +283,117 @@ def cmd_offblock(maxiter=60, tol=2e-3):
                 ncall[0] += 1
             return out.reshape(-1, V.shape[-1])
         A = LinearOperator((np.prod(shape),) * 2, matmat=mv, matvec=lambda v: mv(v[:, None])[:, 0], dtype=float)
-        if name == "single":
-            rng = np.random.default_rng(0)
-            env = np.exp(-((np.indices((N, N, N)) - (N - 1) / 2) ** 2).sum(0) * h ** 2 / 4.0)[..., None]
-            X0 = np.stack([(env * rng.normal(size=shape)).reshape(-1) for _ in range(3)], 1)
-        else:
-            vA = [vecs["single"][:, j].reshape(shape) for j in range(2)]
-            vB = [tB(swap_blocks(v)) for v in vA]
-            X0 = np.stack([tA(v).reshape(-1) for v in vA] + [v.reshape(-1) for v in vB], 1)
+        env = sum(np.exp(-sum((X[i] - c[i]) ** 2 for i in range(3)) / 2.0) for c in centres)[..., None]
+        rng = np.random.default_rng(1)
+        X0 = np.stack([(env * rng.normal(size=shape)).reshape(-1) for _ in range(block)], 1)
         t0 = time.time()
         lam, V, hist = lobpcg(A, X0, M=M, largest=False, tol=tol, maxiter=maxiter, retLambdaHistory=True)
         o = np.argsort(lam)
         lam, V = lam[o], V[:, o]
         res = [float(np.linalg.norm(mv(V[:, [j]])[:, 0] - lam[j] * V[:, j]) / np.linalg.norm(V[:, j])) for j in range(len(lam))]
-        vecs[name] = V
+        # how localized is the softest mode: fraction of its weight within 2.5 of a ring centre
+        w = (V[:, 0].reshape(shape) ** 2).sum(-1)
+        near = sum(np.exp(-sum((X[i] - c[i]) ** 2 for i in range(3)) / (2 * 1.25 ** 2)) for c in centres) > 0.5
+        frac = float(w[near].sum() / w.sum())
+        np.save(os.path.join(SCRATCH, f"nlines_offblock_vec_{name}.npy"), V)
         E = nl.energy(U)
-        results[name] = dict(E=E, lam=[float(x) for x in lam], residual=res, hvp_calls=ncall[0],
-                             iterations=len(hist), seconds=time.time() - t0, continuum_bottom=beta)
+        results[name] = dict(E=E, lam=[float(x) for x in lam], residual=res, hvp_calls=ncall[0], iterations=len(hist),
+                             history_min=[float(np.min(x)) for x in hist], weight_near_rings=frac,
+                             seconds=time.time() - t0, continuum_bottom=beta, block=block, maxiter=maxiter,
+                             start="random, Gaussian envelope on the rings")
         print(f"{name:15s} E = {E:9.3f}   lowest off-block eigenvalues {np.round(lam, 5).tolist()}   residuals "
-              f"{np.round(res, 5).tolist()}   ({len(hist)} iterations, {ncall[0]} products, {time.time() - t0:.0f} s)", flush=True)
+              f"{np.round(res, 4).tolist()}   weight near rings {frac:.2f}   ({len(hist)} iterations, {ncall[0]} products,"
+              f" {time.time() - t0:.0f} s)", flush=True)
         json.dump(results, open(fn, "w"), indent=1)
-    np.save(os.path.join(SCRATCH, "nlines_offblock_vecs.npy"), {k: v for k, v in vecs.items()}, allow_pickle=True)
     print(f"continuum bottom beta = {beta:.4f}")
 
 
+def lobpcg1(mv, prec, x, maxiter=60, log=None):
+    """Single-vector LOBPCG that keeps the lowest Rayleigh quotient (one operator product per iteration)."""
+    x = x / np.linalg.norm(x)
+    Ax = mv(x)
+    lam = float(x @ Ax)
+    p = Ap = None
+    hist = [lam]
+    for it in range(maxiter):
+        r = Ax - lam * x
+        w = prec(r)
+        w -= x * (x @ w)
+        w /= np.linalg.norm(w)
+        Aw = mv(w)
+        S = [x, w] + ([p] if p is not None else [])
+        AS = [Ax, Aw] + ([Ap] if Ap is not None else [])
+        G = np.array([[a @ b for b in S] for a in S])
+        H = np.array([[a @ b for b in AS] for a in S])
+        H = 0.5 * (H + H.T)
+        ev, Q = np.linalg.eigh(G)
+        keep = ev > 1e-10 * ev.max()
+        T = Q[:, keep] / np.sqrt(ev[keep])
+        mu, C = np.linalg.eigh(T.T @ H @ T)
+        c = T @ C[:, 0]
+        xn = sum(ci * si for ci, si in zip(c, S))
+        Axn = sum(ci * ai for ci, ai in zip(c, AS))
+        p = sum(ci * si for ci, si in zip(c[1:], S[1:]))
+        Ap = sum(ci * ai for ci, ai in zip(c[1:], AS[1:]))
+        nrm = np.linalg.norm(xn)
+        x, Ax = xn / nrm, Axn / nrm
+        np_ = np.linalg.norm(p)
+        p, Ap = p / np_, Ap / np_
+        lam = float(x @ Ax)
+        hist.append(lam)
+        res = float(np.linalg.norm(Ax - lam * x))
+        if log:
+            log(it + 1, lam, res)
+    return lam, x, hist, res
+
+
+def cmd_refine(name="coaxial_on_top", maxiter=60):
+    """Follow the softest off-block mode of one configuration down with lobpcg1 (start: the saved vector)."""
+    import time
+    from scipy.fft import dctn, idctn
+    N, h = 41, 0.3
+    nl = NLattice(N, h, 4)
+    hvp = offblock_hvp(nl)
+    UA = np.load(os.path.join(SCRATCH, "lattice_ref_A01_N41_h0.3.npz"))["U"]
+    rot = lambda F: np.rot90(F, 1, axes=(1, 2))
+    shift = lambda F, k, ax: np.roll(F, k, axis=ax)
+    U = {"single": embed(UA, (0, 1), 4),
+         "coaxial_on_top": embed(UA, (0, 1), 4) @ embed(UA, (2, 3), 4),
+         "crossed": embed(UA, (0, 1), 4) @ embed(rot(UA), (2, 3), 4),
+         "linked": embed(shift(UA, -2, 0), (0, 1), 4) @ embed(shift(rot(UA), 2, 0), (2, 3), 4)}[name]
+    Uj = jnp.asarray(U)
+    shape = (N, N, N, 8)
+    alpha, beta = 2 * 2.0 * h, 4 * 1.0 * h ** 3
+    k = np.arange(N)
+    l1 = 2 - 2 * np.cos(np.pi * k / N)
+    Lk = (l1[:, None, None] + l1[None, :, None] + l1[None, None, :])[..., None]
+    mv = lambda v: np.asarray(hvp(Uj, jnp.asarray(v.reshape(shape)))).reshape(-1)
+    prec = lambda v: idctn(dctn(v.reshape(shape), type=2, axes=(0, 1, 2), norm="ortho") / (alpha * Lk + beta),
+                           type=2, axes=(0, 1, 2), norm="ortho").reshape(-1)
+    x0 = np.load(os.path.join(SCRATCH, f"nlines_offblock_vec_{name}.npy"))[:, 0]
+    t0 = time.time()
+    lam, x, hist, res = lobpcg1(mv, prec, x0, maxiter,
+                                log=lambda it, l, r: print(f"   {name} iteration {it:3d}: lambda {l:.5f}  residual {r:.4f}"
+                                                           f"  ({time.time() - t0:.0f} s)", flush=True))
+    X = (np.indices((N, N, N)) - (N - 1) / 2) * h
+    w = (x.reshape(shape) ** 2).sum(-1)
+    r2 = (X ** 2).sum(0)
+    out = dict(lam=lam, residual=res, history=hist, weight_within_1p5=float(w[r2 < 1.5 ** 2].sum() / w.sum()),
+               rms_radius=float(np.sqrt((w * r2).sum() / w.sum())), continuum_bottom=beta, iterations=len(hist) - 1)
+    np.save(os.path.join(SCRATCH, f"nlines_offblock_vec_{name}_refined.npy"), x)
+    fn = os.path.join(DATA, "nlines_offblock.json")
+    d = json.load(open(fn))
+    d.setdefault(name, {})["refined"] = out
+    json.dump(d, open(fn, "w"), indent=1)
+    print(f"{name} refined: lowest off-block eigenvalue {lam:.5f} (residual {res:.4f}), continuum bottom {beta:.4f},"
+          f" rms radius {out['rms_radius']:.2f}, weight within 1.5: {out['weight_within_1p5']:.2f}")
+
+
 if __name__ == "__main__":
-    if sys.argv[1] == "check":
+    if sys.argv[1] == "refine":
+        cmd_refine(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 60)
+    elif sys.argv[1] == "check":
         cmd_check()
     elif sys.argv[1] == "offblock":
-        cmd_offblock()
+        cmd_offblock(sys.argv[2].split(",") if len(sys.argv) > 2 else None,
+                     *(int(a) for a in sys.argv[3:5]))
