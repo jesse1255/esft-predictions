@@ -14,7 +14,19 @@ segment; turning it by 180 degrees; 0 … 6 all have their modes; five should al
 4. Pascal's triangle: n lines have C(n, k) groups of k lines — 1-line terms (Faddeev, mass),
    2-line terms (σ, links), 3-line terms (three-cycle) …
 
-Usage: python lines_family.py [table|figure|all]
+5. One Lagrangian for every n (clock class, `clock`): the field M = g Z g† with Z = diag(1, ζ, …, ζ^(n−1)),
+   ζ = e^(2πi/n) (the clock matrix), and the Skyrme Lagrangian with mass term,
+       Tr(∂M†∂M) + Skyrme Tr([L_i, L_j]²) (L = M†∂M) + Tr|M − Z|².
+   With A = g†dg: L = g (Z†AZ − A) g†, components (z̄_a z_b − 1) A_ab, so the link (a, b) gets
+       σ weight |z_a − z_b|² = 4 sin²(πk/n),  quartic weights products (z̄_a z_b − 1)(z̄_b z_c − 1),
+       mass weight |z_a − z_b|²  (Tr|M − Z|² = Σ_ab |g_ab|² |z_a − z_b|²).
+   n = 2: the Skyrme model on the equatorial S² (Faddeev–Skyrme).  n = 3: all weights equal, the quartic is
+   the full commutator (κ₃ = κ) and the mass term is Σ_a (1 − |g_aa|²): exactly our model M2′ up to units.
+   n = 5: an embedded vortex in a pentagram link has σ weight φ² and quartic weight φ⁴ times a pentagon
+   link's; the scaling x → φx makes E_long = φ³ E_short and size_long = φ size_short exactly, for a mass
+   term per line; with the clock mass term (weight ∝ φ²) the ratio is estimated below (Derrick, rigid shape).
+
+Usage: python lines_family.py [table|figure|clock|all]
 """
 
 import itertools
@@ -113,9 +125,69 @@ def cmd_figure(out="figures/lines_family_R6.png"):
     print("wrote", out)
 
 
+def cmd_clock():
+    """Clock-class weights, exact massless ratios, Derrick estimates with mass, and the cheapest data test."""
+    from scipy.optimize import minimize_scalar
+    # parts of the relaxed single vortex, lattice3d.Lattice(41, 0.3).parts(lattice_ref_A01_N41_h0.3): σ, quartic, mass
+    Es, E4, EV = 102.067, 190.199, 28.445
+
+    def Emin(sr, s4, sv):
+        return minimize_scalar(lambda l: sr * Es * l + s4 * E4 / l + sv * EV * l ** 3, bounds=(0.05, 20), method="bounded").fun
+    E1 = Emin(1, 1, 1)
+    out = {}
+    for n in (3, 4, 5, 6, 10):
+        r = {k: 4 * np.sin(np.pi * k / n) ** 2 for k in range(1, n // 2 + 1)}
+        ratio = {k: r[k] / r[1] for k in r}
+        mass_less = {k: ratio[k] ** 1.5 for k in r}
+        per_line = {k: Emin(ratio[k], ratio[k] ** 2, 1.0) / E1 for k in r}
+        clock = {k: Emin(ratio[k], ratio[k] ** 2, ratio[k]) / E1 for k in r}
+        out[n] = {key: {int(k): float(v) for k, v in d.items()} for key, d in
+                  (("weights", r), ("massless", mass_less), ("mass_per_line", per_line), ("mass_clock", clock))}
+        fmt = lambda d: [round(float(v), 3) for v in d.values()]
+        print(f"n = {n:2d}: sigma weights {fmt(r)};  E_k/E_1 massless (= ratio^1.5) {fmt(mass_less)};"
+              f"  per-line mass {fmt(per_line)};  clock mass (Derrick, rigid) {fmt(clock)}")
+    print(f"   five lines: phi^2 = {PHI ** 2:.4f}, phi^3 = {PHI ** 3:.4f}")
+    # the cheapest data test: classical masses ∝ (sin(πk/n)/sin(πj/n))^3, no free parameter but n and the k's
+    mu_e, tau_e = 206.768, 3477.23
+    hits = []
+    for n in range(3, 121):
+        c = {k: np.sin(np.pi * k / n) for k in range(1, n // 2 + 1)}
+        for j in c:
+            for k in c:
+                for l in c:
+                    if j < k < l:
+                        a, b = (c[k] / c[j]) ** 3, (c[l] / c[j]) ** 3
+                        if abs(np.log(a / mu_e)) < 0.03 and abs(np.log(b / tau_e)) < 0.03:
+                            hits.append((n, j, k, l, a, b))
+    print(f"   lepton test (massless clock masses, both ratios within 3 %, n <= 120): {len(hits)} hits")
+    for h in hits[:6]:
+        print(f"      n = {h[0]}, links k = {h[1]}, {h[2]}, {h[3]}: mu/e -> {h[4]:.1f}, tau/e -> {h[5]:.0f}")
+    # chance: random targets, log-uniform over the same decades, same tolerance
+    rng = np.random.default_rng(1)
+    trials, lucky = 400, 0
+    for _ in range(trials):
+        t1 = np.exp(rng.uniform(np.log(50), np.log(1000)))
+        t2 = np.exp(rng.uniform(np.log(1000), np.log(10000)))
+        found = False
+        for n in range(3, 121):
+            c = np.sin(np.pi * np.arange(1, n // 2 + 1) / n)
+            R = (c[None, :] / c[:, None]) ** 3
+            if (np.abs(np.log(R / t1)) < 0.03).any() and (np.abs(np.log(R / t2)) < 0.03).any():
+                found = True
+                break
+        lucky += found
+    print(f"   random target pairs with at least one such hit: {lucky}/{trials} = {lucky / trials:.0%}")
+    out["lepton_hits"] = [(int(h[0]), int(h[1]), int(h[2]), int(h[3]), float(h[4]), float(h[5])) for h in hits]
+    out["chance"] = lucky / trials
+    json.dump({str(k): v for k, v in out.items()}, open(os.path.join(DATA, "lines_clock.json"), "w"), indent=1)
+    return out
+
+
 if __name__ == "__main__":
     what = sys.argv[1] if len(sys.argv) > 1 else "all"
     if what in ("table", "all"):
         cmd_table()
     if what in ("figure", "all"):
         cmd_figure()
+    if what in ("clock", "all"):
+        cmd_clock()
