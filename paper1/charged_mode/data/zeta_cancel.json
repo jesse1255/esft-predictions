@@ -1,0 +1,27 @@
+{
+ "zeros": {
+  "total": 0.0017050454159051947,
+  "at_prime_powers": 0.0015335604304465129,
+  "fraction_at_prime_powers": 0.8994249749249982,
+  "rms_between": 0.006777010146691821
+ },
+ "gue": {
+  "total": 0.0019510029585326056,
+  "at_prime_powers": 0.00017041921221582618,
+  "fraction_at_prime_powers": 0.08734954064037012,
+  "rms_between": 0.021837200431877524
+ },
+ "poisson": {
+  "total": 0.0038860467453589592,
+  "at_prime_powers": 0.00013267850120629745,
+  "fraction_at_prime_powers": 0.03414228132092162,
+  "rms_between": 0.031705065299638235
+ },
+ "random_phase": {
+  "total": 0.003845147533435768,
+  "at_prime_powers": 0.0002656618083894018,
+  "fraction_at_prime_powers": 0.06909014701759027,
+  "rms_between": 0.030963645388234828
+ },
+ "window_fraction": 0.05468354430379747
+}

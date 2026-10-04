@@ -14,7 +14,8 @@ Controls with K frequencies each:
 Sound: the sums played with u = 0.25 + 3t (frequencies γ·3/2π = 7–680 Hz; the start skips the u = 0 pulse),
 so the clicks come at t = (log n − 0.25)/3 seconds.
 
-Usage: python zeta_sound.py
+Usage: python zeta_sound.py           → pulses, controls, sound files
+       python zeta_sound.py cancel    → where each spectrum puts its weight (resonance vs cancellation)
 """
 
 import json
@@ -207,5 +208,35 @@ def figure(u, sig, out, fn="figures/zeta_sound_R6.png"):
     print("wrote", fn)
 
 
+def cmd_cancel(lo=0.25, hi=4.2, tol=0.004):
+    """Resonance and cancellation (the user's word 共振相消): where does each spectrum put its weight ∫|A|²?
+    A random-matrix (GUE) spectrum spreads it as a smooth ramp; the zeros put it into the prime-power
+    pulses and cancel in between (explicit formula)."""
+    g = zeros()
+    sp = spectra(g)
+    u = np.arange(lo, hi, 2e-4)
+    n, lam = prime_powers(int(np.exp(hi)) + 1)
+    near = np.zeros(len(u), bool)
+    for v in np.log(n):
+        near |= np.abs(u - v) < tol
+    out = {}
+    for name in ("zeros", "gue", "poisson", "random_phase"):
+        A = signal(*sp[name], u)
+        w = np.abs(A) ** 2
+        tot = float(np.trapezoid(w, u))
+        at = float(np.trapezoid(w * near, u))
+        out[name] = dict(total=tot, at_prime_powers=at, fraction_at_prime_powers=at / tot,
+                         rms_between=float(np.sqrt(np.mean(w[~near]))))
+        print(f"{name:13s} total ∫|A|² = {tot:.5f}; within ±{tol} of log(prime powers): {at / tot:6.1%};"
+              f" rms between them {out[name]['rms_between']:.4f}  (those windows cover {near.mean():.1%} of u)")
+    out["window_fraction"] = float(near.mean())
+    json.dump(out, open(os.path.join(DATA, "zeta_cancel.json"), "w"), indent=1)
+    return out
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "cancel":
+        cmd_cancel()
+    else:
+        main()
