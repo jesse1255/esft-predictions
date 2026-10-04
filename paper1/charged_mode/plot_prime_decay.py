@@ -55,16 +55,16 @@ def main(fn="figures/prime_decay_R6.png"):
     # undeformed relaxations, relative to the same ring embedded at a lattice site (as the decays are)
     site = {r["key"]: r["E_axial_lattice"] for r in allruns if not any(r.get("shift", [0]))}
     xmax = max(h[0] for r in runs for h in r["history"])
-    for j, r in enumerate(sorted(refs, key=lambda r: r["E_final"] / site.get(r["key"], r["E_axial_lattice"]))):
+    for j, r in enumerate(sorted(refs, key=lambda r: -r["E_final"] / site.get(r["key"], r["E_axial_lattice"]))):
         y = 100 * (r["E_final"] / site.get(r["key"], r["E_axial_lattice"]) - 1)
         ax.plot([0.62 * xmax, xmax], [y, y], color=INK2, lw=0.9, ls=":")
         ax.annotate(f"{r['m']}×{r['n']} 不推，只讓格點鬆弛" + ("，環心在格子中心" if any(r.get("shift", [0])) else "，環心在格點上")
-                    + f"：{y:+.2f}%", (0.62 * xmax, y), xytext=(0, 3 if j % 2 else -11), textcoords="offset points",
+                    + f"：{y:+.2f}%", (0.62 * xmax, y), xytext=(0, -11 if j % 2 else 3), textcoords="offset points",
                     fontsize=8, color=INK2)
     ax.axhline(0, color=INK2, lw=0.8)
     ax.set_xlabel("L-BFGS 步數", color=INK2)
     ax.set_ylabel("相對軸對稱環的能量（%）", color=INK2)
-    ax.legend(frameon=False, fontsize=8.5, loc="lower left", ncol=2)
+    ax.legend(frameon=False, fontsize=8.5, loc="center right", bbox_to_anchor=(1.0, 0.42), ncol=2)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     for s in ("left", "bottom"):
