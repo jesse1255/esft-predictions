@@ -25,12 +25,20 @@ def main(fn="figures/prime_charges_R6.png"):
     plt.rcParams["axes.unicode_minus"] = False
     SURF, INK, INK2, GRID, C1, C2, C3, C4 = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df", "#2a78d6", "#eb6834", "#1baf7a", "#9a9890"
     d = json.load(open(os.path.join(HERE, "data", "prime_charges_ne32x48_a5.json")))
-    per = d["per_factorization"]
+    per = dict(d["per_factorization"])
+    big_fn = os.path.join(HERE, "data", "prime_charges_big_ne40x64_a7.json")
+    if os.path.exists(big_fn):                      # large rings near Q = 11: keep the lowest energy found
+        for k, r in json.load(open(big_fn))["best"].items():
+            if k not in per or r["E"] < per[k]["E"]:
+                per[k] = dict(r, grid="40x64_a7")
     chk_fn = os.path.join(HERE, "data", "prime_charges_check_ne40x64_a7.json")
     chk = {f"{r['m']}x{r['n']}": r for r in json.load(open(chk_fn))["results"]} if os.path.exists(chk_fn) else {}
-    fam = {"azimuthal": ([(q, 1) for q in range(1, 9)], C1, "o", "Q×1：全部繞環方向"),
-           "two": ([(2, 2), (3, 2), (4, 2)], C2, "s", "m×2：繞管 2 圈"),
-           "m2": ([(2, 3), (2, 4)], C3, "^", "2×n：繞環 2 圈、繞管 n 圈"),
+    QMAX = 12
+    fam = {"azimuthal": ([(q, 1) for q in range(1, QMAX + 1)], C1, "o", "Q×1：全部繞環方向"),
+           "two": ([(2, 2), (3, 2), (4, 2), (5, 2), (6, 2)], C2, "s", "m×2：繞管 2 圈"),
+           "m3": ([(3, 3), (4, 3)], "#eda100", "D", "m×3：繞管 3 圈"),
+           "m2": ([(2, 3), (2, 4), (2, 5), (2, 6)], C3, "^", "2×n（n ≥ 3）與 3×4：繞管比繞環多"),
+           "m34": ([(3, 4)], C3, "^", None),
            "merid": ([(1, q) for q in range(2, 9)], C4, "x", "1×n：全部繞管方向（分裂成幾個環）")}
     fig = plt.figure(figsize=(14, 8.4), facecolor=SURF)
     gs = fig.add_gridspec(2, 4, height_ratios=[1.25, 1])
@@ -57,7 +65,7 @@ def main(fn="figures/prime_charges_R6.png"):
             ys.append(y)
             if Q not in best or r["E"] < best[Q][1]:
                 best[Q] = ((m, n), r["E"], y)
-        ax.plot(xs, ys, color=col, lw=1.4 if key != "merid" else 0, marker=mk, ms=8, mew=1.6,
+        ax.plot(xs, ys, color=col, lw=1.4 if key not in ("merid", "m34") else 0, marker=mk, ms=8, mew=1.6,
                 mfc=col if mk not in ("x",) else None, label=lab, zorder=3)
     bx = sorted(best)
     ax.plot(bx, [best[q][2] for q in bx], color=INK, lw=0.8, ls=":", zorder=2)
@@ -67,22 +75,25 @@ def main(fn="figures/prime_charges_R6.png"):
         (m, n), E, y = best[q]
         prime = q > 1 and all(q % k for k in range(2, q))
         ax.annotate(f"{m}×{n}", (q, y - 9), ha="center", va="top", fontsize=9, color=INK)
-    comp = [best[q][2] for q in (1, 4, 6, 8)]
-    trend = float(np.mean(comp))
-    ax.axhline(trend, color=INK2, lw=0.8, ls="--")
-    ax.annotate(f"合數 1、4、6、8 的平均 {trend:.0f}", (4.55, trend - 1.5), ha="left", va="top", color=INK2, fontsize=9)
-    ax.set_xticks(range(1, 9))
-    ax.set_xticklabels([f"{q}\n{'質數' if q > 1 and all(q % k for k in range(2, q)) else ''}" for q in range(1, 9)])
-    ax.set_xlim(0.5, 8.6)
-    ax.set_ylim(280, 440)
+    isprime = lambda q: q > 1 and all(q % k for k in range(2, q))
+    cq = [q for q in bx if not isprime(q)]
+    coef = np.polyfit(cq, [best[q][2] for q in cq], 2)          # smooth trend through 1 and the composites
+    qq = np.linspace(1, QMAX, 200)
+    ax.plot(qq, np.polyval(coef, qq), color=INK2, lw=0.9, ls="--")
+    ax.annotate("虛線：合數（與 1）的平滑趨勢", (9.3, 310), ha="left", va="top", color=INK2, fontsize=9)
+    trend = {q: float(np.polyval(coef, q)) for q in bx}
+    ax.set_xticks(range(1, QMAX + 1))
+    ax.set_xticklabels([f"{q}\n{'質數' if isprime(q) else ''}" for q in range(1, QMAX + 1)])
+    ax.set_xlim(0.5, QMAX + 0.6)
+    ax.set_ylim(280, 460)
     ax.set_xlabel("荷 Q = m × n", color=INK2)
     ax.set_ylabel("E / Q^0.75", color=INK2)
     ax.legend(frameon=False, fontsize=9, loc="upper left")
-    ax.set_title("軸對稱的環：合數荷可以把圈數分給兩個方向（2×2、3×2、4×2），質數荷只能 Q×1 → Q ≥ 5 的質數比較貴",
+    ax.set_title("軸對稱的環：合數荷可以把圈數分給兩個方向（2×2、3×2、4×3…），質數荷只能 Q×1 → Q ≥ 5 的質數比較貴，越大越貴",
                  fontsize=10.5, color=INK, loc="left")
     ax = fig.add_subplot(gs[0, 3])
     style(ax)
-    pen = [100 * (best[q][2] / trend - 1) for q in bx]
+    pen = [100 * (best[q][2] / trend[q] - 1) for q in bx]
     cols = [C2 if (q > 1 and all(q % k for k in range(2, q))) else C1 for q in bx]
     ax.bar(bx, pen, color=cols, width=0.62)
     ax.axhline(0, color=INK2, lw=0.8)
@@ -91,8 +102,8 @@ def main(fn="figures/prime_charges_R6.png"):
                     fontsize=8.5, color=INK)
     ax.set_xticks(bx)
     ax.set_xlabel("Q（橙：質數，藍：1 與合數）", color=INK2)
-    ax.set_ylabel("相對合數平均的能量（%）", color=INK2)
-    ax.set_ylim(-8, 16)
+    ax.set_ylabel("相對合數趨勢的能量（%）", color=INK2)
+    ax.set_ylim(-8, 24)
     ax.set_title("質數的「代價」", fontsize=10.5, color=INK, loc="left")
     # shapes: u3 in the meridional plane for the Q = 6 factorizations and Q = 7
     G = freeze_A(Grid(d["ne_r"], d["ne_z"], p=2, a=d["a"], half=True))

@@ -16,6 +16,7 @@ azimuthal winding (Q, 1) is the cheapest for every Q, i.e. no prime frustration 
 
 Usage: python prime_charges.py [Qmax] [ne_r ne_z a] [procs]     (default 8, 32 48 5, 4)
        python prime_charges.py check                               (key cases on 40 × 64, a = 7)
+       python prime_charges.py big                                 (11 × 1 and its neighbours on 40 × 64, a = 7)
 """
 
 import json
@@ -132,6 +133,10 @@ def main(Qmax=8, ne_r=32, ne_z=48, a=5.0, procs=4):
     from multiprocessing import Pool
     os.makedirs(SCRATCH, exist_ok=True)
     pairs = [(m, Q // m) for Q in range(1, Qmax + 1) for m in range(1, Q + 1) if Q % m == 0]
+    # 1 × n with n ≥ 6 lost their charge at both seed sizes for n = 6, 7, 8 (and are far above the cheapest
+    # anyway); they are the slowest relaxations, so they are skipped beyond n = 8 and listed as skipped
+    skipped = [(m, n) for (m, n) in pairs if m == 1 and n > 8]
+    pairs = [p for p in pairs if p not in skipped]
     jobs = [(m, n, ne_r, ne_z, a, round(size0(m, n) * f, 2)) for (m, n) in pairs for f in (1.0, 1.35)]
     jobs = sorted(jobs, key=lambda j: -j[0] * j[1])          # big ones first
     t0 = time.time()
@@ -162,7 +167,9 @@ def main(Qmax=8, ne_r=32, ne_z=48, a=5.0, procs=4):
         missing = [p for p in pairs if p[0] * p[1] == Q and p not in per]
         print(f"   Q = {Q} ({'prime' if prime else 'composite' if Q > 1 else 'unit'}): ({b['m']},{b['n']})  E = {b['E']:.2f}"
               f"  E/Q = {b['E'] / Q:.2f}  E/Q^0.75 = {b['E'] / Q ** 0.75:.2f}" + (f"   (not available: {missing})" if missing else ""))
-    json.dump(dict(ne_r=ne_r, ne_z=ne_z, a=a, results=res, per_factorization={f"{m}x{n}": r for (m, n), r in per.items()},
+    if skipped:
+        print("skipped (1 × n, n > 8):", skipped)
+    json.dump(dict(ne_r=ne_r, ne_z=ne_z, a=a, skipped=skipped, results=res, per_factorization={f"{m}x{n}": r for (m, n), r in per.items()},
                    best={str(k): v for k, v in best.items()}, seconds=time.time() - t0),
               open(os.path.join(DATA, f"prime_charges_ne{ne_r}x{ne_z}_a{a:g}.json"), "w"), indent=1)
     print(f"total {time.time() - t0:.0f} s")
@@ -192,8 +199,37 @@ def cmd_check(ne_r=40, ne_z=64, a=7.0, procs=4, ref="data/prime_charges_ne32x48_
     print(f"total {time.time() - t0:.0f} s")
 
 
+def cmd_big(ne_r=40, ne_z=64, a=7.0, procs=4):
+    """The large rings near Q = 11 on the larger grid: 11 × 1 with four seed sizes (on 32 × 48, a = 5 both
+    sizes unwound, while 10 × 1 and 12 × 1 only survived with the larger seed), and its neighbours."""
+    from multiprocessing import Pool
+    s11 = size0(11, 1)
+    jobs = [(11, 1, ne_r, ne_z, a, round(s11 * f, 2)) for f in (1.0, 1.15, 1.3, 1.45)]
+    jobs += [(10, 1, ne_r, ne_z, a, round(size0(10, 1) * 1.35, 2)), (12, 1, ne_r, ne_z, a, round(size0(12, 1) * 1.35, 2)),
+             (5, 2, ne_r, ne_z, a, round(size0(5, 2), 2)), (4, 3, ne_r, ne_z, a, round(size0(4, 3), 2)),
+             (9, 1, ne_r, ne_z, a, round(size0(9, 1) * 1.35, 2)), (3, 3, ne_r, ne_z, a, round(size0(3, 3), 2))]
+    t0 = time.time()
+    with Pool(procs) as pool:
+        res = pool.map(relax_mn, jobs, chunksize=1)
+    ok = [r for r in res if r["converged"] and abs(abs(r["Q_H"]) - r["Q"]) < 0.05 * r["Q"]]
+    best = {}
+    for r in ok:
+        k = f"{r['m']}x{r['n']}"
+        if k not in best or r["E"] < best[k]["E"]:
+            best[k] = r
+    print("\nbest per ring on the larger grid:")
+    for k, r in sorted(best.items(), key=lambda kv: (kv[1]["Q"], -kv[1]["m"])):
+        print(f"   {k:5s} Q = {r['Q']:2d}: E = {r['E']:9.2f}  E/Q^0.75 = {r['E'] / r['Q'] ** 0.75:7.2f}  Q_H = {r['Q_H']:+.3f}  [{r['seed']}]")
+    json.dump(dict(ne_r=ne_r, ne_z=ne_z, a=a, results=res, best=best, seconds=time.time() - t0),
+              open(os.path.join(DATA, f"prime_charges_big_ne{ne_r}x{ne_z}_a{a:g}.json"), "w"), indent=1)
+    print(f"total {time.time() - t0:.0f} s")
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
+    if args and args[0] == "big":
+        cmd_big()
+        sys.exit(0)
     if args and args[0] == "check":
         cmd_check()
         sys.exit(0)

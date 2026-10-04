@@ -70,7 +70,11 @@ def _bcoo(P):
 
 
 class SectorHessian:
-    def __init__(self, model, U0, k, M=None):
+    def __init__(self, model, U0, k, M=None, axis_k=1, matter_only=False):
+        # axis_k: the sector in which the matter perturbation may be non-zero on the axis.  Lab-frame
+        # smoothness of n = R3(m phi)(u0 + dv) needs dv1 + i dv2 ~ e^{-i m phi} there, i.e. axis_k = m
+        # (the default 1 is the m = 1 case of the earlier rounds).  matter_only drops the gauge field
+        # (for e = 0 it decouples and would add the massless photon continuum from 0).
         G = model.G
         assert not G.half, "use the full meridional plane"
         self.M_, self.G, self.k = model, G, k
@@ -95,10 +99,14 @@ class SectorHessian:
         ax = G.axis_mask & ~G.inf_mask
         if k == 0:
             free[ax, CAZ] = True
-        elif k == 1:
+        if k == axis_k and k >= 1:
             assert np.allclose(e1[ax], [-1, 0, 0]) and np.allclose(e2[ax], [0, 1, 0])
             free[ax, CT1] = free[ax, CT2] = True
+        if k == 1:
             free[ax, CAR] = free[ax, CAP] = True
+        if matter_only:
+            free[:, CAR:] = False
+        self.axis_k, self.matter_only = axis_k, matter_only
         self.free = free
         self.axis_nodes = np.nonzero(ax)[0]
         self.nfree = int(free.sum())
@@ -123,7 +131,8 @@ class SectorHessian:
         nn, Mφ, kk = G.nn, self.M, float(k)
         betaq2 = jnp.asarray(beta_q ** 2)
         kap = model.kappa
-        is_k1 = (k == 1)
+        is_kax = (k == axis_k and k >= 1)
+        is_k1 = (k == 1) and not matter_only
 
         def interp(P, F):          # F: (M, nn, C) -> (M, nq, C)
             Mm, n, C = F.shape
@@ -133,9 +142,10 @@ class SectorHessian:
 
         def embed(x):
             X = jnp.zeros(nn * NT).at[free_flat].set(x).reshape(nn, NT)
-            if is_k1 and axn.size:
+            if is_kax and axn.size:
                 X = X.at[axn, ST1].set(-X[axn, CT2])
                 X = X.at[axn, ST2].set(X[axn, CT1])
+            if is_k1 and axn.size:
                 X = X.at[axn, SAR].set(X[axn, CAP])
                 X = X.at[axn, SAP].set(-X[axn, CAR])
             return X
@@ -268,13 +278,18 @@ class SectorHessian:
         rows = list(self.free_flat)
         cols = list(range(self.nfree))
         vals = [1.0] * self.nfree
-        if self.k == 1:
+        if self.k == self.axis_k and self.k >= 1:
             for n in self.axis_nodes:
                 ct1, ct2 = self.dof[n, CT1], self.dof[n, CT2]
+                rows += [n * NT + ST1, n * NT + ST2]
+                cols += [ct2, ct1]
+                vals += [-1.0, 1.0]
+        if self.k == 1 and not self.matter_only:
+            for n in self.axis_nodes:
                 car, cap = self.dof[n, CAR], self.dof[n, CAP]
-                rows += [n * NT + ST1, n * NT + ST2, n * NT + SAR, n * NT + SAP]
-                cols += [ct2, ct1, cap, car]
-                vals += [-1.0, 1.0, 1.0, -1.0]
+                rows += [n * NT + SAR, n * NT + SAP]
+                cols += [cap, car]
+                vals += [1.0, -1.0]
         return sp.csr_matrix((vals, (rows, cols)), shape=(G.nn * NT, self.nfree))
 
     def lowest(self, H, nev=10, sigma=-1e-3, a_scale=1.0):
