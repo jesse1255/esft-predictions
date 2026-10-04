@@ -51,7 +51,7 @@ def main(fn="figures/prime_decay_R6.png"):
         E = [r["E_seed"]] + [h[1] for h in r["history"]]
         rel = [100 * (e / r["E_axial_lattice"] - 1) for e in E]
         lab = f"{r['m']}×{r['n']}（Q = {r['Q']}，推 k = {r['k']}）：{r['E_axial_lattice']:.0f} → {r['E_final']:.0f}"
-        ax.plot(it, rel, color=COL.get(r["key"], INK2), lw=2, marker="o", ms=3.5, ls="-" if r["m"] >= 4 else "--", label=lab)
+        ax.plot(it, rel, color=COL.get(r["key"], INK2), lw=2, marker="o", ms=3.5, ls="--" if r["key"] in ("2x2", "3x2") else "-", label=lab)
     # undeformed relaxations, relative to the same ring embedded at a lattice site (as the decays are)
     site = {r["key"]: r["E_axial_lattice"] for r in allruns if not any(r.get("shift", [0]))}
     xmax = max(h[0] for r in runs for h in r["history"])
@@ -70,7 +70,7 @@ def main(fn="figures/prime_decay_R6.png"):
     for s in ("left", "bottom"):
         ax.spines[s].set_color(GRID)
     ax.tick_params(colors=INK2, labelsize=9)
-    ax.set_title("在完整的三條線模型裡沿最不穩定的方向輕推再鬆弛：內部繞數 m ≥ 4 的環（實線）一路往下掉，m ≤ 3 的環（虛線）只動到格點本身的尺度",
+    ax.set_title("在完整的三條線模型裡沿最不穩定的方向輕推再鬆弛：會扭的環（實線）一路往下掉，2×2、3×2（虛線）只動到格點本身的尺度",
                  fontsize=10.5, color=INK, loc="left")
     for j, r in enumerate(runs):
         ax = fig.add_subplot(gs[1 + j // 3, j % 3], projection="3d")

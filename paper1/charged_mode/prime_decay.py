@@ -279,7 +279,7 @@ def summary():
     axial, lattice = {}, {}
     for k, r in fe.items():
         Q = r["m"] * r["n"]
-        if Q <= 8 and (Q not in axial or r["E"] < axial[Q][1]):
+        if Q <= 9 and (Q not in axial or r["E"] < axial[Q][1]):
             axial[Q] = (k, r["E"])
     for f in sorted(glob.glob(os.path.join(DATA, "prime_decay_*_k*.json"))):
         r = json.load(open(f))
